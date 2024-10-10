@@ -3,19 +3,35 @@ package com.fallt.service;
 import com.fallt.dto.UserDto;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
+import com.fallt.out.ConsoleOutput;
+import com.fallt.util.Message;
+import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.util.*;
 
+@RequiredArgsConstructor
 public class UserService {
+
+    private final ConsoleOutput consoleOutput;
 
     private final Map<String, User> users = new HashMap<>();
 
     private final Set<String> passwords = new HashSet<>();
 
+    public Collection<User> getAllUsers = users.values();
+
+    public User getUserByEmail(String email) {
+        Optional<User> user = getByEmail(email);
+        if (user.isEmpty()) {
+            consoleOutput.printMessage(Message.INCORRECT_EMAIL);
+            return null;
+        }
+        return user.get();
+    }
+
     public void createUser(UserDto userDto) {
         User user = User.builder()
-                .id(users.size() + 1L)
                 .name(userDto.getName())
                 .password(userDto.getPassword())
                 .email(userDto.getEmail())

@@ -3,6 +3,7 @@ package com.fallt.entity;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,10 +12,10 @@ import java.time.Instant;
 @Builder
 public class User {
 
-    private Long id;
-
+    @ToString.Include
     private String name;
 
+    @ToString.Include
     private String email;
 
     private String password;
@@ -25,6 +26,9 @@ public class User {
 
     private Instant updateAt;
 
+    @ToString.Include
     private boolean isBlocked;
+
+    private List<Habit> habits;
 
 }

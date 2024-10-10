@@ -1,28 +1,30 @@
 package com.fallt.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Habit {
 
-    private Long id;
-
+    @ToString.Include
     private String title;
 
+    @ToString.Include
     private String text;
 
     private ExecutionRate executionRate;
 
+    private LocalDate createAt;
+
     private User user;
 
-    private List<LocalDate> successfulExecution;
+    @ToString.Include
+    private Set<LocalDate> successfulExecution = new HashSet<>();
 }
