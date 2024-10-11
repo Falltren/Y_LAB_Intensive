@@ -11,5 +11,9 @@ public class ConsoleOutput {
     public void printCollection(Collection<?> collection) {
         collection.forEach(System.out::println);
     }
+
+    public void printObject(Object object) {
+        System.out.println(object);
+    }
 }
 

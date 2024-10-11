@@ -57,9 +57,9 @@ public class StatisticService {
         LocalDate startOfWeek = start;
         LocalDate endOfWeek = start.plusDays((long) 7 - dateOfWeek);
         while (!endOfWeek.isAfter(end)) {
-            if (executed.getFirst().isAfter(startOfWeek) && executed.getFirst().isBefore(endOfWeek)) {
+            if (!executed.get(0).isBefore(startOfWeek) && !executed.get(0).isAfter(endOfWeek)) {
                 result.add(new ExecutionDto(startOfWeek, endOfWeek, true));
-                executed.removeFirst();
+                executed.remove(0);
             } else {
                 result.add(new ExecutionDto(startOfWeek, endOfWeek, false));
             }
@@ -80,9 +80,9 @@ public class StatisticService {
         LocalDate startOfMonth = start;
         LocalDate endOfMonth = start.withDayOfMonth(start.getMonth().length(start.isLeapYear()));
         while (!endOfMonth.isAfter(end)) {
-            if (executed.getFirst().isAfter(startOfMonth) && executed.getFirst().isBefore(endOfMonth)) {
+            if (!executed.get(0).isBefore(startOfMonth) && !executed.get(0).isAfter(endOfMonth)) {
                 result.add(new ExecutionDto(startOfMonth, endOfMonth, true));
-                executed.removeFirst();
+                executed.remove(0);
             } else {
                 result.add(new ExecutionDto(startOfMonth, endOfMonth, false));
             }

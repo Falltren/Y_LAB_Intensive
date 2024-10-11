@@ -16,4 +16,9 @@ public class ExecutionDto {
     private LocalDate endPeriod;
 
     private boolean executed;
+
+    @Override
+    public String toString(){
+        return "Период: " + startPeriod + " - " + endPeriod + " результат: " + (executed?"выполнено":"невыполнено");
+    }
 }

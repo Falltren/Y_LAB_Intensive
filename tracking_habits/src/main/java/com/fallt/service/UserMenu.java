@@ -1,9 +1,14 @@
 package com.fallt.service;
 
+import com.fallt.dto.HabitDto;
+import com.fallt.dto.UserDto;
+import com.fallt.entity.ExecutionRate;
+import com.fallt.entity.Habit;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.in.UserInput;
 import com.fallt.out.ConsoleOutput;
+import com.fallt.util.DateHandler;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +29,10 @@ public class UserMenu {
 
     private final UserService userService;
 
+    private final HabitService habitService;
+
+    private final StatisticService statisticService;
+
     public void start() {
         while (!isStop) {
             consoleOutput.printMessage(Message.MAIN_MENU);
@@ -40,8 +49,8 @@ public class UserMenu {
     private void registerMenu() {
         String name = userInput.inputName();
         String password = userInput.inputPassword();
-        String confirmPassword = userInput.inputEmail();
-        boolean successRegister = registrationService.register(name, password, confirmPassword);
+        String email = userInput.inputEmail();
+        boolean successRegister = registrationService.register(name, password, email);
         if (successRegister) {
             consoleOutput.printMessage(Message.SUCCESS_REGISTER);
         }
@@ -57,7 +66,7 @@ public class UserMenu {
         if (registerUser.getRole().equals(Role.ADMIN)) {
             getAdminMenu();
         } else {
-//            getUserMenu(registerUser);
+            getUserMenu(registerUser);
         }
     }
 
@@ -105,40 +114,146 @@ public class UserMenu {
         }
     }
 
-//    private void getUserMenu(User user) {
-//        while (true) {
-//            consoleOutput.printMessage(Message.USER_MENU);
-//            String selection = userInput.getUserInput();
-//            switch (selection) {
-//                case "1" -> inputHabitMenu(user);
-//                case "2" -> deleteHabitMenu(user);
-//                case "3" -> editTrainingMenu(user);
-//                case "4" -> reportPrinter.printAllTrainings(user.getTrainings());
-//                case "5" -> getCaloriesReportMenu(user);
-//                case "0" -> {
-//                    return;
-//                }
-//                default -> consoleOutput.printMessage(Message.INCORRECT_MENU_NUMBER);
-//            }
-//        }
-//    }
-//
-//    private void inputHabitMenu(User user) {
-//        if (!authService.isAuthenticated(user)) {
-//            consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
-//            return;
-//        }
-//        String type = userInput.;
-//        String date = userInput.inputDate();
-//        if (!DateHandler.checkInputDate(date)) {
-//            System.out.println(Message.INCORRECT_DATE);
-//            return;
-//        }
-//        LocalDate trainingDate = DateHandler.getDateFromString(date);
-//        String duration = userInput.getUserInput("Введите продолжительность тренировки в минутах");
-//        String spentCalories = userInput.getUserInput("Введите количество потраченных калорий");
-//        String description = userInput.getUserInput("Введите дополнительную информацию о тренировке (при необходимости)");
-//        trainingService.addNewTraining(user, type, trainingDate, Integer.parseInt(duration),
-//                Integer.parseInt(spentCalories), description);
-//    }
+    private void getUserMenu(User user) {
+        while (true) {
+            consoleOutput.printMessage(Message.USER_MENU);
+            String selection = userInput.getUserInput();
+            switch (selection) {
+                case "1" -> editAccount(user);
+                case "2" -> {
+                    userService.deleteUser(user.getName());
+                    return;
+                }
+                case "3" -> inputHabitMenu(user);
+                case "4" -> deleteHabitMenu(user);
+                case "5" -> editHabitMenu(user);
+                case "6" -> consoleOutput.printCollection(habitService.getAllHabits(user));
+                case "7" -> confirmHabitMenu(user);
+                case "8" -> getStatisticMenu(user);
+                case "0" -> {
+                    return;
+                }
+                default -> consoleOutput.printMessage(Message.INCORRECT_MENU_NUMBER);
+            }
+        }
+    }
+
+    private void editAccount(User user){
+        String name = userInput.inputName();
+        String password = userInput.inputPassword();
+        String email = userInput.inputEmail();
+        UserDto dto = new UserDto(name, password, email);
+        userService.updateUser(user.getName(), dto);
+    }
+
+    private void inputHabitMenu(User user) {
+        if (!authService.isAuthenticated(user)) {
+            consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
+            return;
+        }
+        String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
+        String text = userInput.getUserInput("Введите описание привычки");
+        ExecutionRate rate = ExecutionRate.valueOf(userInput.getUserInput("Введите частоту выполнения привычки (DAILY/WEEKLY/MONTHLY)"));
+        habitService.createHabit(user, new HabitDto(title, text, rate));
+    }
+
+    private void deleteHabitMenu(User user) {
+        String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
+        habitService.deleteHabit(user, title);
+    }
+
+    private void editHabitMenu(User user) {
+        String title = userInput.getUserInput("Введите название редактируемой привычки");
+        String newTitle = userInput.getUserInput("Введите новое название привычки");
+        String newText = userInput.getUserInput("Введите новое описание привычки");
+        ExecutionRate newRate = ExecutionRate.valueOf(userInput.getUserInput("Введите новую частоту привычки"));
+        HabitDto updateHabit = new HabitDto(newTitle, newText, newRate);
+        habitService.updateHabit(user, title, updateHabit);
+    }
+
+    private void confirmHabitMenu(User user) {
+        String date = userInput.inputDate();
+        if (!DateHandler.checkInputDate(date)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
+        habitService.confirmHabit(user, title, DateHandler.getDateFromString(date));
+    }
+
+    private void getStatisticMenu(User user) {
+        while (true) {
+            consoleOutput.printMessage(Message.STATISTIC_MENU);
+            String selection = userInput.getUserInput();
+            switch (selection) {
+                case "1" -> getStreak(user);
+                case "2" -> getPercentage(user);
+                case "3" -> getFullStatistics(user);
+                case "0" -> {
+                    return;
+                }
+                default -> consoleOutput.printMessage(Message.INCORRECT_MENU_NUMBER);
+            }
+        }
+    }
+
+    private void getStreak(User user) {
+        String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
+        Habit habit = habitService.getHabitByTitle(user, title);
+        if (habit == null) {
+            return;
+        }
+        String from = userInput.getUserInput("Введите дату начала периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(from)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateFrom = DateHandler.getDateFromString(from);
+        String to = userInput.getUserInput("Введите дату окончания периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(to)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateTo = DateHandler.getDateFromString(to);
+        consoleOutput.printCollection(statisticService.getHabitStreak(habit, dateFrom, dateTo));
+    }
+
+    private void getPercentage(User user) {
+        String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
+        Habit habit = habitService.getHabitByTitle(user, title);
+        if (habit == null) {
+            return;
+        }
+        String from = userInput.getUserInput("Введите дату начала периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(from)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateFrom = DateHandler.getDateFromString(from);
+        String to = userInput.getUserInput("Введите дату начала периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(to)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateTo = DateHandler.getDateFromString(to);
+        consoleOutput.printObject(statisticService.getSuccessHabitRate(habit, dateFrom, dateTo));
+    }
+
+    private void getFullStatistics(User user) {
+        String from = userInput.getUserInput("Введите дату начала периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(from)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateFrom = DateHandler.getDateFromString(from);
+        String to = userInput.getUserInput("Введите дату начала периода в формате дд/мм/гггг");
+        if (!DateHandler.checkInputDate(to)) {
+            consoleOutput.printMessage(Message.INCORRECT_DATE);
+            return;
+        }
+        LocalDate dateTo = DateHandler.getDateFromString(to);
+        for (Habit h : user.getHabits()) {
+            consoleOutput.printObject(statisticService.getHabitProgress(h, dateFrom, dateTo));
+        }
+    }
 }

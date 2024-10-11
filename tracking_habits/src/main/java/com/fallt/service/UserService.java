@@ -45,17 +45,25 @@ public class UserService {
 
     public void updateUser(String userName, UserDto updateUser) {
         User user = users.get(userName);
-        if (updateUser.getName() != null) {
-            users.remove(user.getName());
-            user.setName(updateUser.getName());
+        if (!updateUser.getEmail().isBlank()) {
+            if (isExistsEmail(updateUser.getEmail())) {
+                consoleOutput.printMessage(Message.EMAIL_EXIST);
+                return;
+            }
+            user.setEmail(updateUser.getEmail());
         }
-        if (updateUser.getPassword() != null) {
+        if (!updateUser.getPassword().isBlank()) {
+            if (isExistsPassword(updateUser.getPassword())){
+                consoleOutput.printMessage(Message.PASSWORD_EXIST);
+                return;
+            }
             passwords.remove(user.getPassword());
             user.setPassword(updateUser.getPassword());
             passwords.add(updateUser.getPassword());
         }
-        if (updateUser.getEmail() != null) {
-            user.setEmail(updateUser.getEmail());
+        if (!updateUser.getName().isBlank()) {
+            users.remove(user.getName());
+            user.setName(updateUser.getName());
         }
         user.setUpdateAt(Instant.now());
         users.put(user.getName(), user);

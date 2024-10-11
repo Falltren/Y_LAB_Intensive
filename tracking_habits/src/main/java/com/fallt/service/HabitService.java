@@ -54,10 +54,14 @@ public class HabitService {
         return user.getHabits().stream()
                 .filter(h -> h.getTitle().equals(title))
                 .findFirst()
-                .or(() ->{
+                .or(() -> {
                     consoleOutput.printMessage(Message.INCORRECT_HABIT_TITLE);
                     return Optional.empty();
                 });
+    }
+
+    public Habit getHabitByTitle(User user, String title) {
+        return findHabit(user, title).orElse(null);
     }
 
     private boolean checkUniqueTitle(User user, String title) {
@@ -65,13 +69,13 @@ public class HabitService {
     }
 
     private void updateNotNullableFields(Habit habit, HabitDto dto) {
-        if (dto.getTitle() != null) {
+        if (!dto.getTitle().isBlank()) {
             habit.setTitle(dto.getTitle());
         }
-        if (dto.getText() != null) {
+        if (!dto.getText().isBlank()) {
             habit.setText(dto.getText());
         }
-        if (dto.getRate() != null) {
+        if (!dto.getRate().name().isBlank()) {
             habit.setExecutionRate(dto.getRate());
         }
     }
