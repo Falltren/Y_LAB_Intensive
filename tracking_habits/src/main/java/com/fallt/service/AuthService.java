@@ -19,25 +19,16 @@ public class AuthService {
     private final ConsoleOutput consoleOutput;
 
     public User login(String email, String password) {
-        Optional<User> optionalUser = userService.getByEmail(email);
-        if (optionalUser.isEmpty() || !optionalUser.get().getPassword().equals(password)) {
+        User user = userService.getUserByEmail(email);
+        if (user == null || !user.getPassword().equals(password)) {
             consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
             return null;
         }
-        User user = optionalUser.get();
         if (user.isBlocked()){
             consoleOutput.printMessage(Message.BLOCKED_USER);
             return null;
         }
         authenticatedUsers.add(user);
         return user;
-    }
-
-    public void logout(User user) {
-        authenticatedUsers.remove(user);
-    }
-
-    public boolean isAuthenticated(User user) {
-        return authenticatedUsers.contains(user);
     }
 }

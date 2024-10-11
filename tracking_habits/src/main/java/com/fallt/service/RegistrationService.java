@@ -13,16 +13,11 @@ public class RegistrationService {
     private final ConsoleOutput consoleOutput;
 
     public boolean register(String name, String password, String email) {
-        if (userService.isExistsEmail(email)) {
-            consoleOutput.printMessage(Message.EMAIL_EXIST);
-            return false;
-        }
-        if (userService.isExistsPassword(password)) {
-            consoleOutput.printMessage(Message.PASSWORD_EXIST);
+        if (name.isBlank() || password.isBlank() || email.isBlank()) {
+            consoleOutput.printMessage(Message.INCORRECT_INPUT);
             return false;
         }
         UserDto userDto = new UserDto(name, password, email);
-        userService.createUser(userDto);
-        return true;
+        return userService.createUser(userDto) != null;
     }
 }

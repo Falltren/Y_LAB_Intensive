@@ -40,6 +40,8 @@ public class Message {
 
     public static final String INCORRECT_DATE = "Введена некорректная дата";
 
+    public static final String INCORRECT_INPUT = "Некорректный ввод";
+
     public static final String INCORRECT_MENU_NUMBER = "Введен отсутствующий номер пункта меню" + "\n" + "Пожалуйста повторите ввод";
 
     public static final String EMAIL_EXIST = "Указанный email уже используется";

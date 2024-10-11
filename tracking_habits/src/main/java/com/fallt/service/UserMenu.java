@@ -147,10 +147,6 @@ public class UserMenu {
     }
 
     private void inputHabitMenu(User user) {
-        if (!authService.isAuthenticated(user)) {
-            consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
-            return;
-        }
         String title = userInput.getUserInput(Message.INPUT_HABIT_TITLE);
         String text = userInput.getUserInput("Введите описание привычки");
         ExecutionRate rate = ExecutionRate.valueOf(userInput.getUserInput("Введите частоту выполнения привычки (DAILY/WEEKLY/MONTHLY)"));

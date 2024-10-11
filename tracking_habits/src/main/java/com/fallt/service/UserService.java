@@ -30,7 +30,15 @@ public class UserService {
         return user.get();
     }
 
-    public void createUser(UserDto userDto) {
+    public User createUser(UserDto userDto) {
+        if (isExistsEmail(userDto.getEmail())) {
+            consoleOutput.printMessage(Message.EMAIL_EXIST);
+            return null;
+        }
+        if (isExistsPassword(userDto.getPassword())) {
+            consoleOutput.printMessage(Message.PASSWORD_EXIST);
+            return null;
+        }
         User user = User.builder()
                 .name(userDto.getName())
                 .password(userDto.getPassword())
@@ -41,18 +49,20 @@ public class UserService {
                 .build();
         users.put(user.getEmail(), user);
         passwords.add(user.getPassword());
+        return user;
     }
 
-    public void updateUser(String userName, UserDto updateUser) {
-        User user = users.get(userName);
-        if (!updateUser.getEmail().isBlank()) {
+    public void updateUser(String email, UserDto updateUser) {
+        User user = users.get(email);
+        String oldEmail = user.getEmail();
+        if (updateUser.getEmail() != null && !updateUser.getEmail().isBlank()) {
             if (isExistsEmail(updateUser.getEmail())) {
                 consoleOutput.printMessage(Message.EMAIL_EXIST);
                 return;
             }
             user.setEmail(updateUser.getEmail());
         }
-        if (!updateUser.getPassword().isBlank()) {
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
             if (isExistsPassword(updateUser.getPassword())){
                 consoleOutput.printMessage(Message.PASSWORD_EXIST);
                 return;
@@ -61,21 +71,22 @@ public class UserService {
             user.setPassword(updateUser.getPassword());
             passwords.add(updateUser.getPassword());
         }
-        if (!updateUser.getName().isBlank()) {
+        if (updateUser.getName() != null && !updateUser.getName().isBlank()) {
             users.remove(user.getName());
             user.setName(updateUser.getName());
         }
         user.setUpdateAt(Instant.now());
-        users.put(user.getName(), user);
+        users.remove(oldEmail);
+        users.put(user.getEmail(), user);
     }
 
     public Optional<User> getByEmail(String email) {
         return Optional.ofNullable(users.get(email));
     }
 
-    public void deleteUser(String userName) {
-        passwords.remove(getPasswordByName(userName));
-        users.remove(userName);
+    public void deleteUser(String email) {
+        passwords.remove(getPasswordByName(email));
+        users.remove(email);
     }
 
     private String getPasswordByName(String userName) {
