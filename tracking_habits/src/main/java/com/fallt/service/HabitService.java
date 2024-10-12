@@ -18,7 +18,7 @@ public class HabitService {
 
 
     public void createHabit(User user, HabitDto dto) {
-        if (checkUniqueTitle(user, dto.getTitle())) {
+        if (user.getHabits().stream().anyMatch(h -> h.getTitle().equals(dto.getTitle()))) {
             consoleOutput.printMessage(Message.HABIT_EXIST);
         } else {
             Habit habit = Habit.builder()
@@ -64,18 +64,14 @@ public class HabitService {
         return findHabit(user, title).orElse(null);
     }
 
-    private boolean checkUniqueTitle(User user, String title) {
-        return findHabit(user, title).isPresent();
-    }
-
     private void updateNotNullableFields(Habit habit, HabitDto dto) {
-        if (!dto.getTitle().isBlank()) {
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
             habit.setTitle(dto.getTitle());
         }
-        if (!dto.getText().isBlank()) {
+        if (dto.getText() != null && !dto.getText().isBlank()) {
             habit.setText(dto.getText());
         }
-        if (!dto.getRate().name().isBlank()) {
+        if (dto.getRate() != null && !dto.getRate().name().isBlank()) {
             habit.setExecutionRate(dto.getRate());
         }
     }

@@ -2,7 +2,6 @@ package com.fallt.service;
 
 import com.fallt.dto.ExecutionDto;
 import com.fallt.dto.HabitProgress;
-import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import lombok.RequiredArgsConstructor;
 
@@ -16,16 +15,15 @@ public class StatisticService {
     public HabitProgress getHabitProgress(Habit habit, LocalDate start, LocalDate end) {
         HabitProgress progress = new HabitProgress();
         progress.setTitle(habit.getTitle());
-        progress.setSuccessRate(getSuccessHabitRate(habit, start, end));
-        progress.setExecution(getHabitStreak(habit, start, end));
+        List<ExecutionDto> executions = getHabitStreak(habit, start, end);
+        progress.setSuccessRate(calculateSuccessRate(executions));
+        progress.setExecution(executions);
         return progress;
     }
 
     public int getSuccessHabitRate(Habit habit, LocalDate start, LocalDate end) {
-        int totalCountHabit = calculatePerformedHabitDuringPeriod(habit.getExecutionRate(), start, end);
-        int successHabitCount = (int) habit.getSuccessfulExecution().stream()
-                .filter(d -> !d.isBefore(start) && !d.isAfter(end)).count();
-        return Math.round((float) successHabitCount * 100 / totalCountHabit);
+        List<ExecutionDto> executions = getHabitStreak(habit, start, end);
+        return calculateSuccessRate(executions);
     }
 
     public List<ExecutionDto> getHabitStreak(Habit habit, LocalDate start, LocalDate end) {
@@ -36,7 +34,12 @@ public class StatisticService {
         };
     }
 
-    public List<ExecutionDto> getDailyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
+    public int calculateSuccessRate(List<ExecutionDto> executions) {
+        long success = executions.stream().filter(ExecutionDto::isExecuted).count();
+        return Math.round((float) success * 100 / executions.size());
+    }
+
+    private List<ExecutionDto> getDailyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
         List<ExecutionDto> result = new ArrayList<>();
         LocalDate currentDay = start;
         while (!currentDay.isAfter(end)) {
@@ -50,14 +53,16 @@ public class StatisticService {
         return result;
     }
 
-    public List<ExecutionDto> getWeeklyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
+    private List<ExecutionDto> getWeeklyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
         List<LocalDate> executed = new ArrayList<>(habit.getSuccessfulExecution());
         List<ExecutionDto> result = new ArrayList<>();
         int dateOfWeek = start.getDayOfWeek().getValue();
         LocalDate startOfWeek = start;
         LocalDate endOfWeek = start.plusDays((long) 7 - dateOfWeek);
         while (!endOfWeek.isAfter(end)) {
-            if (!executed.get(0).isBefore(startOfWeek) && !executed.get(0).isAfter(endOfWeek)) {
+            if (executed.isEmpty()) {
+                result.add(new ExecutionDto(startOfWeek, endOfWeek, false));
+            } else if (!executed.get(0).isBefore(startOfWeek) && !executed.get(0).isAfter(endOfWeek)) {
                 result.add(new ExecutionDto(startOfWeek, endOfWeek, true));
                 executed.remove(0);
             } else {
@@ -74,13 +79,15 @@ public class StatisticService {
         return result;
     }
 
-    public List<ExecutionDto> getMonthlyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
+    private List<ExecutionDto> getMonthlyHabitStreak(Habit habit, LocalDate start, LocalDate end) {
         List<LocalDate> executed = new ArrayList<>(habit.getSuccessfulExecution());
         List<ExecutionDto> result = new ArrayList<>();
         LocalDate startOfMonth = start;
         LocalDate endOfMonth = start.withDayOfMonth(start.getMonth().length(start.isLeapYear()));
         while (!endOfMonth.isAfter(end)) {
-            if (!executed.get(0).isBefore(startOfMonth) && !executed.get(0).isAfter(endOfMonth)) {
+            if (executed.isEmpty()) {
+                result.add(new ExecutionDto(startOfMonth, endOfMonth, false));
+            } else if (!executed.get(0).isBefore(startOfMonth) && !executed.get(0).isAfter(endOfMonth)) {
                 result.add(new ExecutionDto(startOfMonth, endOfMonth, true));
                 executed.remove(0);
             } else {
@@ -95,29 +102,5 @@ public class StatisticService {
             }
         }
         return result;
-    }
-
-    private int calculatePerformedHabitDuringPeriod(ExecutionRate rate, LocalDate start, LocalDate end) {
-        int eventCount = 0;
-        LocalDate currentDate = start;
-        while (!currentDate.isAfter(end)) {
-            switch (rate) {
-                case DAILY:
-                    eventCount++;
-                    break;
-                case WEEKLY:
-                    if (currentDate.getDayOfWeek() == start.getDayOfWeek()) {
-                        eventCount++;
-                    }
-                    break;
-                case MONTHLY:
-                    if (currentDate.getDayOfMonth() == start.getDayOfMonth()) {
-                        eventCount++;
-                    }
-                    break;
-            }
-            currentDate = currentDate.plusDays(1);
-        }
-        return eventCount;
     }
 }

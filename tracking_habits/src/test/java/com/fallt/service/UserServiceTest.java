@@ -28,8 +28,8 @@ class UserServiceTest {
     @DisplayName("Получение пользователя по email")
     void testGetUserByEmail() {
         UserDto userDto = createUserDto("user@user.user", "user");
-
         userService.createUser(userDto);
+
         User existedUser = userService.getUserByEmail(userDto.getEmail());
 
         assertThat(existedUser.getEmail()).isEqualTo("user@user.user");
@@ -40,8 +40,8 @@ class UserServiceTest {
     @DisplayName("Попытка получения пользователя по отсутствующему email")
     void testGetUserByIncorrectEmail() {
         UserDto userDto = createUserDto("user@user.user", "user");
-
         userService.createUser(userDto);
+
         User existedUser = userService.getUserByEmail("some@email.email");
 
         assertThat(existedUser).isNull();
@@ -63,8 +63,8 @@ class UserServiceTest {
     void testCreateUserWithDuplicateEmail() {
         UserDto user1 = createUserDto("user@user.user", "user1");
         UserDto user2 = createUserDto("user@user.user", "user2");
-
         userService.createUser(user1);
+
         userService.createUser(user2);
 
         verify(consoleOutput).printMessage(Message.EMAIL_EXIST);
@@ -76,8 +76,8 @@ class UserServiceTest {
     void testCreateUserWithDuplicatePassword() {
         UserDto user1 = createUserDto("user1@user.user", "user");
         UserDto user2 = createUserDto("user2@user.user", "user");
-
         userService.createUser(user1);
+
         userService.createUser(user2);
 
         verify(consoleOutput).printMessage(Message.PASSWORD_EXIST);
@@ -89,8 +89,8 @@ class UserServiceTest {
     void successUpdateUser() {
         UserDto userDto = createUserDto("user@user.user", "user");
         UserDto updateDto = UserDto.builder().password("newPwd").name("newName").email("newEmail").build();
-
         userService.createUser(userDto);
+
         userService.updateUser(userDto.getEmail(), updateDto);
         User updatedUser = userService.getUserByEmail("newEmail");
 
@@ -106,9 +106,9 @@ class UserServiceTest {
         UserDto userDto1 = createUserDto("user1@user.user", "user1");
         UserDto userDto2 = createUserDto("user2@user.user", "user2");
         UserDto updateDto = UserDto.builder().password("user2").build();
-
         userService.createUser(userDto1);
         userService.createUser(userDto2);
+
         userService.updateUser("user1@user.user", updateDto);
         User user = userService.getUserByEmail("user1@user.user");
 
@@ -122,9 +122,9 @@ class UserServiceTest {
         UserDto userDto1 = createUserDto("user1@user.user", "user1");
         UserDto userDto2 = createUserDto("user2@user.user", "user2");
         UserDto updateDto = UserDto.builder().email("user2@user.user").build();
-
         userService.createUser(userDto1);
         userService.createUser(userDto2);
+
         userService.updateUser("user1@user.user", updateDto);
         User user = userService.getUserByEmail("user1@user.user");
 
@@ -136,9 +136,9 @@ class UserServiceTest {
     @DisplayName("Удаление пользователя")
     void deleteUser() {
         UserDto userDto = createUserDto("user@user.user", "user");
-
         userService.createUser(userDto);
         assertThat(userService.getAllUsers).hasSize(1);
+
         userService.deleteUser(userDto.getEmail());
 
         assertThat(userService.getAllUsers).isEmpty();
