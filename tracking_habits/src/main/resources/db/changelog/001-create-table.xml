@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
+                   logicalFilePath="db/changelog/changelog-master.xml">
+    <changeSet id="001-create-table" author="fallt">
+        <sql endDelimiter=";">
+            CREATE SCHEMA my_schema
+        </sql>
+
+        <createSequence schemaName="my_schema"
+                        sequenceName="users_id_seq"
+                        startValue="2"
+                        incrementBy="1"
+                        cacheSize="1"/>
+
+        <createTable schemaName="my_schema"
+                     tableName="users"
+                     remarks="Таблица пользователей">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="users_id_seq" remarks="Первичный ключ">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(255)" remarks="Роль пользователя в системе"/>
+            <column name="name" type="VARCHAR(255)" remarks="Имя пользователя"/>
+            <column name="email" type="VARCHAR(255)" remarks="Уникальный электронный адрес пользователя"/>
+            <column name="create_at" type="TIMESTAMP WITH TIMEZONE" remarks="Дата и время регистрации пользователя"/>
+            <column name="update_at" type="TIMESTAMP WITH TIMEZONE" remarks="Дата и время обновления данных о пользователе"/>
+            <column name="password" type="VARCHAR(255)" remarks="Пароль пользователя для доступа к системе"/>
+            <column name="is_blocked" type="BOOLEAN" remarks="Флаг блокировки пользователя"/>
+        </createTable>
+
+        <createSequence schemaName="my_schema"
+                        sequenceName="habits_id_seq"
+                        startValue="1"
+                        incrementBy="1"
+                        cacheSize="1"/>
+
+        <createTable schemaName="my_schema"
+                     tableName="habits"
+                     remarks="Таблица, содержащая привычки пользователя">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="habits_id_seq" remarks="Первичный ключ">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)" remarks="Название привычки"/>
+            <column name="text" type="VARCHAR(255)" remarks="Описание привычки"/>
+            <column name="execution_rate" type="VARCHAR(255)" remarks="Частота выполнения привычки"/>
+            <column name="create_at" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата создания привычки"/>
+            <column name="user_id" type="BIGINT" remarks="Внешний ключ, связывающий привычку с пользователем"/>
+        </createTable>
+
+        <createSequence schemaName="my_schema"
+                        sequenceName="habit_execution_id_seq"
+                        startValue="1"
+                        incrementBy="1"
+                        cacheSize="1"/>
+
+        <createTable schemaName="my_schema"
+                     tableName="habit_execution"
+        remarks="Таблица выполнения привычек">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="habit_execution_id_seq" remarks="Первичный ключ">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата выполнения привычки"/>
+            <column name="habit_id" type="BIGINT" remarks="Внешний ключ, связывающий привычки с их выполнением"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableSchemaName="my_schema"
+                                 baseTableName="habits"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_habit_user"
+                                 referencedTableSchemaName="my_schema"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableSchemaName="my_schema"
+                                 baseTableName="habit_execution"
+                                 baseColumnNames="habit_id"
+                                 constraintName="fk_execution_habit"
+                                 referencedTableSchemaName="my_schema"
+                                 referencedTableName="habits"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
