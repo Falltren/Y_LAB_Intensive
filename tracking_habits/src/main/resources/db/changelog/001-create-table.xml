@@ -21,12 +21,12 @@
             <column name="id" type="BIGINT" defaultValueSequenceNext="users_id_seq" remarks="Первичный ключ">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="role" type="VARCHAR(255)" remarks="Роль пользователя в системе"/>
             <column name="name" type="VARCHAR(255)" remarks="Имя пользователя"/>
-            <column name="email" type="VARCHAR(255)" remarks="Уникальный электронный адрес пользователя"/>
-            <column name="create_at" type="TIMESTAMP WITH TIMEZONE" remarks="Дата и время регистрации пользователя"/>
-            <column name="update_at" type="TIMESTAMP WITH TIMEZONE" remarks="Дата и время обновления данных о пользователе"/>
             <column name="password" type="VARCHAR(255)" remarks="Пароль пользователя для доступа к системе"/>
+            <column name="email" type="VARCHAR(255)" remarks="Уникальный электронный адрес пользователя"/>
+            <column name="role" type="VARCHAR(255)" remarks="Роль пользователя в системе"/>
+            <column name="create_at" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата и время регистрации пользователя"/>
+            <column name="update_at" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата и время обновления данных о пользователе"/>
             <column name="is_blocked" type="BOOLEAN" remarks="Флаг блокировки пользователя"/>
         </createTable>
 

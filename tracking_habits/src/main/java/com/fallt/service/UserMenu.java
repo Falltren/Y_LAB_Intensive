@@ -63,7 +63,7 @@ public class UserMenu {
         if (registerUser == null) {
             return;
         }
-        if (registerUser.getRole().equals(Role.ADMIN)) {
+        if (registerUser.getRole().equals(Role.ROLE_ADMIN)) {
             getAdminMenu();
         } else {
             getUserMenu(registerUser);
@@ -75,7 +75,7 @@ public class UserMenu {
             consoleOutput.printMessage(Message.ADMIN_MENU);
             String selection = userInput.getUserInput();
             switch (selection) {
-                case "1" -> consoleOutput.printCollection(userService.getAllUsers);
+                case "1" -> consoleOutput.printCollection(userService.getAllUsers());
                 case "2" -> viewUserHabitsMenu();
                 case "3" -> deleteUserMenu();
                 case "4" -> blockingUserMenu();
@@ -100,7 +100,7 @@ public class UserMenu {
         String email = userInput.inputEmail();
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            userService.deleteUser(user.getEmail());
+            userService.deleteUser(user);
             consoleOutput.printMessage(Message.SUCCESS_ACTION);
         }
     }
@@ -109,7 +109,7 @@ public class UserMenu {
         String email = userInput.inputEmail();
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            user.setBlocked(true);
+            userService.blockingUser(user);
             consoleOutput.printMessage(Message.SUCCESS_ACTION);
         }
     }
@@ -121,7 +121,7 @@ public class UserMenu {
             switch (selection) {
                 case "1" -> editAccount(user);
                 case "2" -> {
-                    userService.deleteUser(user.getName());
+                    userService.deleteUser(user);
                     return;
                 }
                 case "3" -> inputHabitMenu(user);
@@ -138,7 +138,7 @@ public class UserMenu {
         }
     }
 
-    private void editAccount(User user){
+    private void editAccount(User user) {
         String name = userInput.inputName();
         String password = userInput.inputPassword();
         String email = userInput.inputEmail();

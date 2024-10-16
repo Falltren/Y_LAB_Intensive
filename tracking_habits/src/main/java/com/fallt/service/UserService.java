@@ -4,25 +4,27 @@ import com.fallt.dto.UserDto;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
+import com.fallt.repository.UserDao;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class UserService {
 
+    private final UserDao userDao;
+
     private final ConsoleOutput consoleOutput;
 
-    private final Map<String, User> users = new HashMap<>();
-
-    private final Set<String> passwords = new HashSet<>();
-
-    public Collection<User> getAllUsers = users.values();
+    public Collection<User> getAllUsers() {
+        return userDao.findAll();
+    }
 
     public User getUserByEmail(String email) {
-        Optional<User> user = getByEmail(email);
+        Optional<User> user = userDao.getUserByEmail(email);
         if (user.isEmpty()) {
             consoleOutput.printMessage(Message.INCORRECT_EMAIL);
             return null;
@@ -43,18 +45,21 @@ public class UserService {
                 .name(userDto.getName())
                 .password(userDto.getPassword())
                 .email(userDto.getEmail())
-                .createAt(Instant.now())
-                .role(Role.USER)
+                .createAt(LocalDateTime.now())
+                .role(Role.ROLE_USER)
                 .isBlocked(false)
                 .build();
-        users.put(user.getEmail(), user);
-        passwords.add(user.getPassword());
-        return user;
+        return userDao.create(user);
+    }
+
+    public void blockingUser(User user) {
+        user.setBlocked(true);
+        user.setUpdateAt(LocalDateTime.now());
+        userDao.update(user);
     }
 
     public void updateUser(String email, UserDto updateUser) {
-        User user = users.get(email);
-        String oldEmail = user.getEmail();
+        User user = getUserByEmail(email);
         if (updateUser.getEmail() != null && !updateUser.getEmail().isBlank()) {
             if (isExistsEmail(updateUser.getEmail())) {
                 consoleOutput.printMessage(Message.EMAIL_EXIST);
@@ -63,41 +68,28 @@ public class UserService {
             user.setEmail(updateUser.getEmail());
         }
         if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
-            if (isExistsPassword(updateUser.getPassword())){
+            if (isExistsPassword(updateUser.getPassword())) {
                 consoleOutput.printMessage(Message.PASSWORD_EXIST);
                 return;
             }
-            passwords.remove(user.getPassword());
             user.setPassword(updateUser.getPassword());
-            passwords.add(updateUser.getPassword());
         }
         if (updateUser.getName() != null && !updateUser.getName().isBlank()) {
-            users.remove(user.getName());
             user.setName(updateUser.getName());
         }
-        user.setUpdateAt(Instant.now());
-        users.remove(oldEmail);
-        users.put(user.getEmail(), user);
+        user.setUpdateAt(LocalDateTime.now());
+        userDao.update(user);
     }
 
-    public Optional<User> getByEmail(String email) {
-        return Optional.ofNullable(users.get(email));
-    }
-
-    public void deleteUser(String email) {
-        passwords.remove(getPasswordByName(email));
-        users.remove(email);
-    }
-
-    private String getPasswordByName(String userName) {
-        return users.get(userName).getPassword();
+    public void deleteUser(User user) {
+        userDao.delete(user);
     }
 
     public boolean isExistsEmail(String email) {
-        return users.containsKey(email);
+        return userDao.getUserByEmail(email).isPresent();
     }
 
     public boolean isExistsPassword(String password) {
-        return passwords.contains(password);
+        return userDao.getUserByPassword(password).isPresent();
     }
 }
