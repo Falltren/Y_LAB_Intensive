@@ -36,6 +36,7 @@ public class UserDaoImpl implements UserDao {
                 user.setId(userId);
             }
             connection.commit();
+            DBUtils.closeResultSet(generatedKeys);
             return user;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

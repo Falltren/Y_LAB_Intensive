@@ -5,6 +5,7 @@ import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
+import com.fallt.repository.HabitDao;
 import com.fallt.util.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,10 +24,13 @@ class HabitServiceTest {
 
     private ConsoleOutput consoleOutput;
 
+    private HabitDao habitDao;
+
     @BeforeEach
     void setup() {
+        habitDao = Mockito.mock(HabitDao.class);
         consoleOutput = Mockito.mock(ConsoleOutput.class);
-        habitService = new HabitService(consoleOutput);
+        habitService = new HabitService(consoleOutput, habitDao);
     }
 
     @Test
@@ -113,7 +117,7 @@ class HabitServiceTest {
 
     @Test
     @DisplayName("Попытка обновления привычки по некорректному названию")
-    void testUpdateHabitByIncorrectTitle(){
+    void testUpdateHabitByIncorrectTitle() {
         User user = createUser();
         HabitDto habitDto = createHabitDto();
         HabitDto updateDto = HabitDto.builder().text("newText").title("newTitle").build();
@@ -129,7 +133,7 @@ class HabitServiceTest {
 
     @Test
     @DisplayName("Отметка выполнения привычки")
-    void testConfirmHabit(){
+    void testConfirmHabit() {
         User user = createUser();
         HabitDto habitDto = createHabitDto();
         habitService.createHabit(user, habitDto);
@@ -141,7 +145,7 @@ class HabitServiceTest {
 
     @Test
     @DisplayName("Получение всех привычек пользователя")
-    void testGetAllHabits(){
+    void testGetAllHabits() {
         User user = createUser();
         HabitDto habitDto1 = createHabitDto();
         HabitDto habitDto2 = HabitDto.builder().title("title").text("text2").rate(ExecutionRate.DAILY).build();
