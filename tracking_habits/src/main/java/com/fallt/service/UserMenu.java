@@ -9,6 +9,7 @@ import com.fallt.entity.User;
 import com.fallt.in.UserInput;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.util.DateHandler;
+import com.fallt.util.Fetch;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
@@ -127,7 +128,7 @@ public class UserMenu {
                 case "3" -> inputHabitMenu(user);
                 case "4" -> deleteHabitMenu(user);
                 case "5" -> editHabitMenu(user);
-                case "6" -> consoleOutput.printCollection(habitService.getAllHabits(user));
+                case "6" -> consoleOutput.printCollection(habitService.getAllHabits(user, Fetch.LAZY));
                 case "7" -> confirmHabitMenu(user);
                 case "8" -> getStatisticMenu(user);
                 case "0" -> {
@@ -248,7 +249,7 @@ public class UserMenu {
             return;
         }
         LocalDate dateTo = DateHandler.getDateFromString(to);
-        for (Habit h : user.getHabits()) {
+        for (Habit h : habitService.getAllHabits(user, Fetch.EAGER)) {
             consoleOutput.printObject(statisticService.getHabitProgress(h, dateFrom, dateTo));
         }
     }

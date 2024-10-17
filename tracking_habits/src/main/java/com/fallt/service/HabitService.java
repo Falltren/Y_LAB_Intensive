@@ -2,9 +2,12 @@ package com.fallt.service;
 
 import com.fallt.dto.HabitDto;
 import com.fallt.entity.Habit;
+import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
+import com.fallt.repository.HabitExecutionDao;
+import com.fallt.util.Fetch;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +21,8 @@ public class HabitService {
     private final ConsoleOutput consoleOutput;
 
     private final HabitDao habitDao;
+
+    private final HabitExecutionDao executionDao;
 
 
     public void createHabit(User user, HabitDto dto) {
@@ -49,13 +54,21 @@ public class HabitService {
         habitDao.delete(user.getId(), title);
     }
 
-    public List<Habit> getAllHabits(User user) {
-        return habitDao.getAllUserHabits(user.getId());
+    public List<Habit> getAllHabits(User user, Fetch fetchType) {
+        return habitDao.getAllUserHabits(user.getId(), fetchType);
     }
 
     public void confirmHabit(User user, String title, LocalDate date) {
         Optional<Habit> optionalHabit = findHabit(user, title);
-        optionalHabit.ifPresent(habit -> habit.getSuccessfulExecution().add(date));
+        if (optionalHabit.isEmpty()) {
+            consoleOutput.printMessage(Message.INCORRECT_HABIT_TITLE);
+            return;
+        }
+        HabitExecution habitExecution = HabitExecution.builder()
+                .habit(optionalHabit.get())
+                .date(date)
+                .build();
+        executionDao.save(habitExecution);
     }
 
     private Optional<Habit> findHabit(User user, String title) {

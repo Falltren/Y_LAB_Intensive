@@ -6,6 +6,9 @@ import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
+import com.fallt.repository.HabitExecutionDao;
+import com.fallt.repository.impl.HabitDaoImpl;
+import com.fallt.util.Fetch;
 import com.fallt.util.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,11 +29,14 @@ class HabitServiceTest {
 
     private HabitDao habitDao;
 
+    private HabitExecutionDao executionDao;
+
     @BeforeEach
     void setup() {
-        habitDao = Mockito.mock(HabitDao.class);
+        executionDao = Mockito.mock(HabitExecutionDao.class);
+        habitDao = Mockito.mock(HabitDaoImpl.class);
         consoleOutput = Mockito.mock(ConsoleOutput.class);
-        habitService = new HabitService(consoleOutput, habitDao);
+        habitService = new HabitService(consoleOutput, habitDao, executionDao);
     }
 
     @Test
@@ -152,7 +158,7 @@ class HabitServiceTest {
         habitService.createHabit(user, habitDto1);
         habitService.createHabit(user, habitDto2);
 
-        List<Habit> habits = habitService.getAllHabits(user);
+        List<Habit> habits = habitService.getAllHabits(user, Fetch.LAZY);
 
         assertThat(habits).hasSize(2);
         assertThat(habits.get(0).getTitle()).isEqualTo("habit");

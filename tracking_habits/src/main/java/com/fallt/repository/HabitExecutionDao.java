@@ -4,5 +4,5 @@ import com.fallt.entity.HabitExecution;
 
 public interface HabitExecutionDao {
 
-    HabitExecution save(HabitExecution execution);
+    void save(HabitExecution execution);
 }

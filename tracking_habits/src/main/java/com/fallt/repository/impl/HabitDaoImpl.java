@@ -5,6 +5,7 @@ import com.fallt.entity.Habit;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
+import com.fallt.util.Fetch;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.Connection;
@@ -12,9 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class HabitDaoImpl implements HabitDao {
@@ -59,7 +58,15 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     @Override
-    public List<Habit> getAllUserHabits(Long userId) {
+    public List<Habit> getAllUserHabits(Long userId, Fetch fetchType) {
+        if (fetchType.equals(Fetch.LAZY)) {
+            return getAllHabitsWithoutExecutions(userId);
+        } else {
+            return getAllHabitsWithExecutions(userId);
+        }
+    }
+
+    public List<Habit> getAllHabitsWithoutExecutions(Long userId) {
         List<Habit> habits = new ArrayList<>();
         String sql = "SELECT * FROM my_schema.habits WHERE user_id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -76,16 +83,54 @@ public class HabitDaoImpl implements HabitDao {
         return habits;
     }
 
+    public List<Habit> getAllHabitsWithExecutions(Long userId) {
+        String sql = """
+                SELECT h.*, e.date
+                FROM my_schema.habits h
+                LEFT JOIN my_schema.habit_execution e
+                ON e.habit_id = h.id
+                WHERE h.user_id = ?
+                """;
+        Map<Long, Habit> userHabits = new HashMap<>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                if (userHabits.containsKey(id)) {
+                    Habit habit = userHabits.get(id);
+                    setExistsExecutionDate(habit, resultSet);
+                } else {
+                    Habit habit = instantiateHabit(resultSet);
+                    userHabits.put(id, habit);
+                }
+            }
+            return new ArrayList<>(userHabits.values());
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        }
+    }
+
     @Override
     public Optional<Habit> findHabitByTitleAndUserId(Long userId, String title) {
-        String sql = "SELECT * FROM my_schema.habits WHERE user_id = ? AND title = ?";
+        String sql = """
+                SELECT * 
+                FROM my_schema.habits h 
+                LEFT JOIN my_schema.habit_execution e 
+                ON e.habit_id = h.id 
+                WHERE h.user_id = ? AND h.title = ?
+                """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             ResultSet resultSet = preparedStatement.executeQuery();
             Habit habit = null;
             while (resultSet.next()) {
-                habit = instantiateHabit(resultSet);
+                if (habit == null) {
+                    habit = instantiateHabit(resultSet);
+                } else {
+                    setExistsExecutionDate(habit, resultSet);
+                }
             }
             DBUtils.closeResultSet(resultSet);
             return Optional.ofNullable(habit);
@@ -107,12 +152,21 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     private Habit instantiateHabit(ResultSet resultSet) throws SQLException {
-        return Habit.builder()
+        Habit habit = Habit.builder()
                 .id(resultSet.getLong("id"))
                 .title(resultSet.getString("title"))
                 .text(resultSet.getString("text"))
                 .executionRate(ExecutionRate.valueOf(resultSet.getString("execution_rate")))
                 .createAt(resultSet.getObject("create_at", LocalDate.class))
                 .build();
+        setExistsExecutionDate(habit, resultSet);
+        return habit;
+    }
+
+    private void setExistsExecutionDate(Habit habit, ResultSet resultSet) throws SQLException {
+        LocalDate date = resultSet.getObject("date", LocalDate.class);
+        if (date != null) {
+            habit.getSuccessfulExecution().add(date);
+        }
     }
 }
