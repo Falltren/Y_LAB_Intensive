@@ -93,21 +93,21 @@ public class UserService {
      */
     public void updateUser(String email, UserDto updateUser) {
         User user = getUserByEmail(email);
-        if (updateUser.getEmail() != null && !updateUser.getEmail().isBlank()) {
+        if (updateUser.getEmail() != null) {
             if (isExistsEmail(updateUser.getEmail())) {
                 consoleOutput.printMessage(Message.EMAIL_EXIST);
                 return;
             }
             user.setEmail(updateUser.getEmail());
         }
-        if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
+        if (updateUser.getPassword() != null) {
             if (isExistsPassword(updateUser.getPassword())) {
                 consoleOutput.printMessage(Message.PASSWORD_EXIST);
                 return;
             }
             user.setPassword(updateUser.getPassword());
         }
-        if (updateUser.getName() != null && !updateUser.getName().isBlank()) {
+        if (updateUser.getName() != null) {
             user.setName(updateUser.getName());
         }
         user.setUpdateAt(LocalDateTime.now());

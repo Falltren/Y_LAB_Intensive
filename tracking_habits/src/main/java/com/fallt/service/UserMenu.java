@@ -149,7 +149,16 @@ public class UserMenu {
         String name = userInput.inputName();
         String password = userInput.inputPassword();
         String email = userInput.inputEmail();
-        UserDto dto = new UserDto(name, password, email);
+        UserDto dto = new UserDto();
+        if (!name.isBlank()) {
+            dto.setName(name);
+        }
+        if (!password.isBlank()) {
+            dto.setPassword(password);
+        }
+        if (!email.isBlank()) {
+            dto.setEmail(email);
+        }
         userService.updateUser(user.getName(), dto);
     }
 
