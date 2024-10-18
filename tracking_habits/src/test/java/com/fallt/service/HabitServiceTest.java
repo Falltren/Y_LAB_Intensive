@@ -3,6 +3,7 @@ package com.fallt.service;
 import com.fallt.dto.HabitDto;
 import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
+import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
@@ -17,9 +18,10 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class HabitServiceTest {
 
@@ -44,13 +46,11 @@ class HabitServiceTest {
     void createHabit() {
         User user = createUser();
         HabitDto habitDto = createHabitDto();
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), habitDto.getTitle())).thenReturn(Optional.empty());
 
         habitService.createHabit(user, habitDto);
 
-        Habit habit = user.getHabits().get(0);
-        assertThat(user.getHabits()).hasSize(1);
-        assertThat(habit.getTitle()).isEqualTo(habitDto.getTitle());
-        assertThat(habit.getText()).isEqualTo(habitDto.getText());
+        verify(habitDao, times(1)).save(any(Habit.class));
     }
 
     @Test
@@ -58,39 +58,37 @@ class HabitServiceTest {
     void createHabitWithDuplicateTitle() {
         User user = createUser();
         HabitDto habitDto = createHabitDto();
-        habitService.createHabit(user, habitDto);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), habitDto.getTitle())).thenReturn(Optional.of(new Habit()));
 
         habitService.createHabit(user, habitDto);
 
-        assertThat(user.getHabits()).hasSize(1);
         verify(consoleOutput).printMessage(Message.HABIT_EXIST);
+        verify(habitDao, times(0)).save(any(Habit.class));
     }
 
     @Test
     @DisplayName("Получение привычки по названию")
     void testGetHabitByTitle() {
+        String title = "title";
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        habitService.createHabit(user, habitDto);
+        Habit habit = createHabit(title);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), title)).thenReturn(Optional.of(habit));
 
-        Habit existedHAbit = habitService.getHabitByTitle(user, habitDto.getTitle());
+        Habit existedHabit = habitService.getHabitByTitle(user, title);
 
-        assertThat(existedHAbit.getText()).isEqualTo("text");
-        assertThat(existedHAbit.getTitle()).isEqualTo("habit");
-
+        assertThat(existedHabit.getTitle()).isEqualTo(title);
     }
 
     @Test
     @DisplayName("Попытка получения привычки по отсутствующему названию")
     void testGetHabitByIncorrectTitle() {
+        String title = "title";
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        habitService.createHabit(user, habitDto);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), title)).thenReturn(Optional.empty());
 
-        Habit existedHAbit = habitService.getHabitByTitle(user, "someTitle");
+        Habit existedHAbit = habitService.getHabitByTitle(user, title);
 
         assertThat(existedHAbit).isNull();
-        verify(consoleOutput).printMessage(Message.INCORRECT_HABIT_TITLE);
     }
 
     @Test
@@ -108,32 +106,29 @@ class HabitServiceTest {
     @Test
     @DisplayName("Обновление данных о привычке")
     void testUpdateHabit() {
+        String newTitle = "new title";
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        HabitDto updateDto = HabitDto.builder().text("newText").title("newTitle").rate(ExecutionRate.MONTHLY).build();
-        habitService.createHabit(user, habitDto);
+        Habit habit = createHabit("old title");
+        HabitDto habitDto = HabitDto.builder().title(newTitle).build();
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
 
-        habitService.updateHabit(user, habitDto.getTitle(), updateDto);
+        habitService.updateHabit(user, habit.getTitle(), habitDto);
 
-        assertThat(user.getHabits()).hasSize(1);
-        assertThat(user.getHabits().get(0).getTitle()).isEqualTo("newTitle");
-        assertThat(user.getHabits().get(0).getText()).isEqualTo("newText");
-        assertThat(user.getHabits().get(0).getExecutionRate()).isEqualTo(ExecutionRate.MONTHLY);
+        verify(habitDao, times(1)).update(habit);
     }
 
     @Test
     @DisplayName("Попытка обновления привычки по некорректному названию")
     void testUpdateHabitByIncorrectTitle() {
+        String newTitle = "new title";
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        HabitDto updateDto = HabitDto.builder().text("newText").title("newTitle").build();
-        habitService.createHabit(user, habitDto);
+        Habit habit = createHabit("old title");
+        HabitDto habitDto = HabitDto.builder().title(newTitle).build();
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.empty());
 
-        habitService.updateHabit(user, "someTitle", updateDto);
+        habitService.updateHabit(user, habit.getTitle(), habitDto);
 
-        assertThat(user.getHabits()).hasSize(1);
-        assertThat(user.getHabits().get(0).getText()).isEqualTo("text");
-        assertThat(user.getHabits().get(0).getTitle()).isEqualTo("habit");
+        verify(habitDao, times(0)).update(habit);
         verify(consoleOutput).printMessage(Message.INCORRECT_HABIT_TITLE);
     }
 
@@ -141,32 +136,33 @@ class HabitServiceTest {
     @DisplayName("Отметка выполнения привычки")
     void testConfirmHabit() {
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        habitService.createHabit(user, habitDto);
+        Habit habit = createHabit("habit");
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
 
-        habitService.confirmHabit(user, habitDto.getTitle(), LocalDate.now());
+        habitService.confirmHabit(user, habit.getTitle(), LocalDate.now());
 
-        assertThat(user.getHabits().get(0).getSuccessfulExecution()).contains(LocalDate.now());
+        verify(executionDao, times(1)).save(any(HabitExecution.class));
     }
 
     @Test
     @DisplayName("Получение всех привычек пользователя")
     void testGetAllHabits() {
         User user = createUser();
-        HabitDto habitDto1 = createHabitDto();
-        HabitDto habitDto2 = HabitDto.builder().title("title").text("text2").rate(ExecutionRate.DAILY).build();
-        habitService.createHabit(user, habitDto1);
-        habitService.createHabit(user, habitDto2);
+        List<Habit> habits = List.of(
+                createHabit("habit1"),
+                createHabit("habit2")
+        );
+        when(habitDao.getAllUserHabits(user.getId(), Fetch.LAZY)).thenReturn(habits);
 
-        List<Habit> habits = habitService.getAllHabits(user, Fetch.LAZY);
+        List<Habit> expected = habitService.getAllHabits(user, Fetch.LAZY);
 
-        assertThat(habits).hasSize(2);
-        assertThat(habits.get(0).getTitle()).isEqualTo("habit");
-        assertThat(habits.get(1).getTitle()).isEqualTo("title");
+        assertThat(expected).hasSize(2);
+        assertThat(habits).isEqualTo(expected);
     }
 
     private User createUser() {
         return User.builder()
+                .id(1L)
                 .name("user")
                 .email("user@user.user")
                 .password("user")
@@ -178,6 +174,13 @@ class HabitServiceTest {
                 .title("habit")
                 .text("text")
                 .rate(ExecutionRate.WEEKLY)
+                .build();
+    }
+
+    private Habit createHabit(String title) {
+        return Habit.builder()
+                .title(title)
+                .text("text")
                 .build();
     }
 }

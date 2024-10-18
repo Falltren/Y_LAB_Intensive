@@ -19,5 +19,6 @@ public interface UserDao {
 
     Optional<User> getUserByPassword(String password);
 
+    void deleteAll();
 
 }

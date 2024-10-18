@@ -20,8 +20,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO my_schema.users (name, password, email, role, create_at, update_at, is_blocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "INSERT INTO users (name, password, email, role, create_at, update_at, is_blocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getEmail());
@@ -45,7 +45,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void update(User user) {
-        String sql = "UPDATE my_schema.users SET name = ?, password = ?, email = ?, role = ?, update_at = ?, is_blocked = ? WHERE id = ?";
+        String sql = "UPDATE users SET name = ?, password = ?, email = ?, role = ?, update_at = ?, is_blocked = ? WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
@@ -64,7 +64,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void delete(User user) {
-        String sql = "DELETE FROM my_schema.users WHERE email = ?";
+        String sql = "DELETE FROM users WHERE email = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getEmail());
             preparedStatement.execute();
@@ -77,7 +77,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM my_schema.users";
+        String sql = "SELECT * FROM users";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -93,11 +93,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        String sql = """
-                SELECT * 
-                FROM my_schema.users 
-                WHERE email = ?
-                """;
+        String sql = "SELECT * FROM users WHERE email = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -114,11 +110,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByPassword(String password) {
-        String sql = """
-                SELECT * 
-                FROM my_schema.users 
-                WHERE password = ?
-                """;
+        String sql = "SELECT * FROM users WHERE password = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, password);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -128,6 +120,17 @@ public class UserDaoImpl implements UserDao {
             }
             DBUtils.closeResultSet(resultSet);
             return Optional.ofNullable(user);
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        String sql = "DELETE FROM users";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }

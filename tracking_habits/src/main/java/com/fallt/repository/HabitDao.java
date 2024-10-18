@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface HabitDao {
 
-    void save(Habit habit);
+    Habit save(Habit habit);
 
     void update(Habit habit);
 

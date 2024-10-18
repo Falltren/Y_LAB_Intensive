@@ -9,7 +9,7 @@ import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class UserService {
 
     private final ConsoleOutput consoleOutput;
 
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userDao.findAll();
     }
 
