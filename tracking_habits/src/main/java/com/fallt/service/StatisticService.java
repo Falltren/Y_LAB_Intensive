@@ -9,9 +9,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс для расчета различной статистики по выполнению привычек пользователем
+ */
 @RequiredArgsConstructor
 public class StatisticService {
-
+    /**
+     * Получение общей статистики по выполнению привычки пользователем, включая название привычки,
+     * % успешного выполнения и серии выполнения
+     *
+     * @param habit Привычка
+     * @param start Дата начала периода
+     * @param end   Дата окончания периода
+     * @return Прогресс выполнения пользователем привычки
+     */
     public HabitProgress getHabitProgress(Habit habit, LocalDate start, LocalDate end) {
         HabitProgress progress = new HabitProgress();
         progress.setTitle(habit.getTitle());
@@ -21,11 +32,27 @@ public class StatisticService {
         return progress;
     }
 
+    /**
+     * Расчет % успешного выполнения привычки за указанный период
+     *
+     * @param habit Привычка пользователя
+     * @param start Дата начала периода
+     * @param end   Дата окончания периода
+     * @return % успешного выполнения привычки
+     */
     public int getSuccessHabitRate(Habit habit, LocalDate start, LocalDate end) {
         List<ExecutionDto> executions = getHabitStreak(habit, start, end);
         return calculateSuccessRate(executions);
     }
 
+    /**
+     * Расчет серии выполнения привычки
+     *
+     * @param habit Привычка пользователя
+     * @param start Дата начала периода
+     * @param end   Дата окончания периода
+     * @return Список с данными по выполнению привычки за указанны период
+     */
     public List<ExecutionDto> getHabitStreak(Habit habit, LocalDate start, LocalDate end) {
         return switch (habit.getExecutionRate()) {
             case DAILY -> getDailyHabitStreak(habit, start, end);
@@ -34,7 +61,7 @@ public class StatisticService {
         };
     }
 
-    public int calculateSuccessRate(List<ExecutionDto> executions) {
+    private int calculateSuccessRate(List<ExecutionDto> executions) {
         long success = executions.stream().filter(ExecutionDto::isExecuted).count();
         return Math.round((float) success * 100 / executions.size());
     }

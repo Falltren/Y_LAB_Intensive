@@ -1,5 +1,8 @@
 package com.fallt.util;
 
+/**
+ * Класс, содержащий сообщения, выводимые пользователю
+ */
 public class Message {
 
     private Message() {

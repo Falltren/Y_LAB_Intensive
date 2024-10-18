@@ -3,7 +3,6 @@ package com.fallt.entity;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,6 +13,8 @@ import java.util.TreeSet;
 @Builder
 @ToString
 public class Habit {
+
+    private Long id;
 
     private String title;
 
