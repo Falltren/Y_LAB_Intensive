@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс предназначен для взаимодействия с таблицей users посредствам SQL запросов
+ */
 @RequiredArgsConstructor
 public class UserDaoImpl implements UserDao {
 

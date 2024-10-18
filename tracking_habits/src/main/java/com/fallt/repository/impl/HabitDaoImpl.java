@@ -12,6 +12,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Класс предназначен для взаимодействия с таблицей habits посредствам SQL запросов
+ */
 @RequiredArgsConstructor
 public class HabitDaoImpl implements HabitDao {
 

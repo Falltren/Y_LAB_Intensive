@@ -1,5 +1,7 @@
 package com.fallt.util;
 
+import com.fallt.exception.DBException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -54,8 +56,7 @@ public class DBUtils {
             properties.load(inputStream);
             return properties;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-            return new Properties();   //посмотреть еще раз
+            throw new DBException(e.getMessage());
         }
     }
 

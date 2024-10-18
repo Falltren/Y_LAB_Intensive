@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Содержит логику перехода между различными меню программы
+ */
 @RequiredArgsConstructor
 public class UserMenu {
 
@@ -34,6 +37,9 @@ public class UserMenu {
 
     private final StatisticService statisticService;
 
+    /**
+     * Запуск
+     */
     public void start() {
         while (!isStop) {
             consoleOutput.printMessage(Message.MAIN_MENU);

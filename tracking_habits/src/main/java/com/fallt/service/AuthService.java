@@ -5,30 +5,33 @@ import com.fallt.out.ConsoleOutput;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
+/**
+ * Аутентификация пользователя
+ */
 @RequiredArgsConstructor
 public class AuthService {
-
-    private final Set<User> authenticatedUsers = new HashSet<>();
 
     private final UserService userService;
 
     private final ConsoleOutput consoleOutput;
 
+    /**
+     * Проверка наличия пользователя в базе данных
+     *
+     * @param email    Электронный адрес пользователя
+     * @param password Пароль пользователя
+     * @return Возвращает объект класса User в случае успешной аутентификации или null если аутентификация завершилась неудачно
+     */
     public User login(String email, String password) {
         User user = userService.getUserByEmail(email);
         if (user == null || !user.getPassword().equals(password)) {
             consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
             return null;
         }
-        if (user.isBlocked()){
+        if (user.isBlocked()) {
             consoleOutput.printMessage(Message.BLOCKED_USER);
             return null;
         }
-        authenticatedUsers.add(user);
         return user;
     }
 }

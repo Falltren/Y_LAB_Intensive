@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
 
+/**
+ * Класс предназначен для взаимодействия с таблицей habit_execution посредствам SQL запросов
+ */
 @RequiredArgsConstructor
 public class HabitExecutionDaoImpl implements HabitExecutionDao {
 
