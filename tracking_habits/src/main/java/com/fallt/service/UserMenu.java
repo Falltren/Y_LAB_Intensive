@@ -159,7 +159,7 @@ public class UserMenu {
         if (!email.isBlank()) {
             dto.setEmail(email);
         }
-        userService.updateUser(user.getName(), dto);
+        userService.updateUser(user.getEmail(), dto);
     }
 
     private void inputHabitMenu(User user) {

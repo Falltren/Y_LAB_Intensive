@@ -4,9 +4,9 @@ import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.repository.AbstractTest;
 import com.fallt.repository.UserDao;
+import com.fallt.util.DBUtils;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +19,7 @@ class UserDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        Connection connection = getConnection();
-        userDao = new UserDaoImpl(connection);
+        userDao = new UserDaoImpl();
     }
 
     @AfterEach
@@ -31,6 +30,8 @@ class UserDaoImplTest extends AbstractTest {
     @BeforeAll
     static void startContainer() {
         postgreSQLContainer.start();
+        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        migrateDatabase();
     }
 
     @AfterAll

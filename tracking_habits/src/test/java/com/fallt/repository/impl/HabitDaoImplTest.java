@@ -5,6 +5,7 @@ import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import com.fallt.repository.AbstractTest;
 import com.fallt.repository.HabitDao;
+import com.fallt.util.DBUtils;
 import com.fallt.util.Fetch;
 import org.junit.jupiter.api.*;
 
@@ -24,6 +25,8 @@ class HabitDaoImplTest extends AbstractTest {
     @BeforeAll
     static void beforeAll() {
         postgreSQLContainer.start();
+        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        migrateDatabase();
     }
 
     @AfterAll
@@ -33,14 +36,8 @@ class HabitDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        Connection connection = getConnection();
-        habitDao = new HabitDaoImpl(connection);
+        habitDao = new HabitDaoImpl();
         user = addUserToDatabase();
-    }
-
-    @AfterEach
-    void afterEach() {
-        clearDatabase();
     }
 
     @Test

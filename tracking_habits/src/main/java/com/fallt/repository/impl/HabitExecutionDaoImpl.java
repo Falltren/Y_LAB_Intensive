@@ -4,6 +4,7 @@ import com.fallt.entity.HabitExecution;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitExecutionDao;
 import com.fallt.util.DBUtils;
+import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
@@ -14,12 +15,12 @@ import java.sql.*;
 @RequiredArgsConstructor
 public class HabitExecutionDaoImpl implements HabitExecutionDao {
 
-    private final Connection connection;
+    private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
 
     @Override
     public void save(HabitExecution execution) {
-        String sql = "INSERT INTO habit_execution (date, habit_id) VALUES (?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO " + SCHEMA_NAME + "habit_execution (date, habit_id) VALUES (?, ?)";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, execution.getDate());
             preparedStatement.setLong(2, execution.getHabit().getId());
             preparedStatement.execute();
@@ -28,7 +29,6 @@ public class HabitExecutionDaoImpl implements HabitExecutionDao {
                 long habitId = generatedKeys.getLong(1);
                 execution.setId(habitId);
             }
-            connection.commit();
             DBUtils.closeResultSet(generatedKeys);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

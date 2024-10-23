@@ -16,16 +16,14 @@ import java.sql.Statement;
  */
 public class LiquibaseRunner {
 
-
     public void run() {
         try {
-            Connection connection = DBUtils.getConnection();
             Database database =
-                    DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            String serviceSchemaName = "service_schema";
-            createServiceSchema(connection, serviceSchemaName);
+                    DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(DBUtils.getConnection()));
+            String serviceSchemaName = PropertiesUtil.getProperty("serviceSchema");
+            createServiceSchema(DBUtils.getConnection(), serviceSchemaName);
             database.setLiquibaseSchemaName(serviceSchemaName);
-            database.setDefaultSchemaName("my_schema");
+            database.setDefaultSchemaName(PropertiesUtil.getProperty("defaultSchema"));
             Liquibase liquibase =
                     new Liquibase("db/changelog/db.changelog-master.xml", new ClassLoaderResourceAccessor(), database);
             liquibase.update();

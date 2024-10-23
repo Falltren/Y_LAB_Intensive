@@ -6,6 +6,7 @@ import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
 import com.fallt.util.Fetch;
+import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
@@ -18,12 +19,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class HabitDaoImpl implements HabitDao {
 
-    private final Connection connection;
+    private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
 
     @Override
     public Habit save(Habit habit) {
-        String sql = "INSERT INTO habits (title, text, execution_rate, create_at, user_id) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO " + SCHEMA_NAME + "habits (title, text, execution_rate, create_at, user_id) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
@@ -35,7 +36,6 @@ public class HabitDaoImpl implements HabitDao {
                 long habitId = generatedKeys.getLong(1);
                 habit.setId(habitId);
             }
-            connection.commit();
             DBUtils.closeResultSet(generatedKeys);
             return habit;
         } catch (SQLException e) {
@@ -45,14 +45,13 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public void update(Habit habit) {
-        String sql = "UPDATE habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "UPDATE " + SCHEMA_NAME + "habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
             preparedStatement.setLong(4, habit.getId());
             preparedStatement.executeUpdate();
-            connection.commit();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
@@ -69,8 +68,8 @@ public class HabitDaoImpl implements HabitDao {
 
     private List<Habit> getAllHabitsWithoutExecutions(Long userId) {
         List<Habit> habits = new ArrayList<>();
-        String sql = "SELECT * FROM habits WHERE user_id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM " + SCHEMA_NAME + "habits WHERE user_id = ?";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -85,15 +84,10 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     private List<Habit> getAllHabitsWithExecutions(Long userId) {
-        String sql = """
-                SELECT h.*, e.date
-                FROM habits h
-                LEFT JOIN habit_execution e
-                ON e.habit_id = h.id
-                WHERE h.user_id = ?
-                """;
+        String sql = "SELECT h.*, e.date FROM " + SCHEMA_NAME + "habits h LEFT JOIN " +
+                SCHEMA_NAME + "habit_execution e ON e.habit_id = h.id WHERE h.user_id = ?";
         Map<Long, Habit> userHabits = new HashMap<>();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -107,6 +101,7 @@ public class HabitDaoImpl implements HabitDao {
                     userHabits.put(id, habit);
                 }
             }
+            DBUtils.closeResultSet(resultSet);
             return new ArrayList<>(userHabits.values());
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -115,14 +110,9 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Optional<Habit> findHabitByTitleAndUserId(Long userId, String title) {
-        String sql = """
-                SELECT * 
-                FROM habits h 
-                LEFT JOIN habit_execution e 
-                ON e.habit_id = h.id 
-                WHERE h.user_id = ? AND h.title = ?
-                """;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM " + SCHEMA_NAME + "habits h LEFT JOIN " +
+                SCHEMA_NAME + "habit_execution e ON e.habit_id = h.id WHERE h.user_id = ? AND h.title = ?";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -143,12 +133,11 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public void delete(Long userId, String title) {
-        String sql = "DELETE FROM habits WHERE user_id = ? AND title = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM " + SCHEMA_NAME + "habits WHERE user_id = ? AND title = ?";
+        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             preparedStatement.execute();
-            connection.commit();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }

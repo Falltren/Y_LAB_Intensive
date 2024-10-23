@@ -17,9 +17,9 @@ public class Main {
         LiquibaseRunner liquibaseRunner = new LiquibaseRunner();
         liquibaseRunner.run();
         ConsoleOutput consoleOutput = new ConsoleOutput();
-        UserDao userDao = new UserDaoImpl(DBUtils.getConnection());
-        HabitDao habitDao = new HabitDaoImpl(DBUtils.getConnection());
-        HabitExecutionDao executionDao = new HabitExecutionDaoImpl(DBUtils.getConnection());
+        UserDao userDao = new UserDaoImpl();
+        HabitDao habitDao = new HabitDaoImpl();
+        HabitExecutionDao executionDao = new HabitExecutionDaoImpl();
         UserInput userInput = new UserInput(consoleOutput);
         UserService userService = new UserService(userDao, consoleOutput);
         RegistrationService registrationService = new RegistrationService(userService, consoleOutput);

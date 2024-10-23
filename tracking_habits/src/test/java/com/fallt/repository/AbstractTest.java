@@ -7,6 +7,13 @@ import com.fallt.entity.User;
 import com.fallt.exception.DBException;
 import com.fallt.repository.impl.HabitDaoImpl;
 import com.fallt.repository.impl.UserDaoImpl;
+import com.fallt.util.DBUtils;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -28,22 +35,19 @@ public abstract class AbstractTest {
                 .withUsername("testUser")
                 .withPassword("testPassword")
                 .withDatabaseName("testBase")
-                .withInitScript("init_script_test.sql")
                 .withReuse(true);
     }
 
     protected Connection getConnection() {
         try {
-            Connection connection = DriverManager.getConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-            connection.setAutoCommit(false);
-            return connection;
+            return DriverManager.getConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
     }
 
     protected User addUserToDatabase() {
-        UserDao userDao = new UserDaoImpl(getConnection());
+        UserDao userDao = new UserDaoImpl();
         User userForCreate = User.builder()
                 .name("user")
                 .email("user@u.u")
@@ -55,7 +59,7 @@ public abstract class AbstractTest {
     }
 
     protected Habit addHabitToDatabase() {
-        HabitDao habitDao = new HabitDaoImpl(getConnection());
+        HabitDao habitDao = new HabitDaoImpl();
         User user = addUserToDatabase();
         Habit habit = Habit.builder()
                 .title("test habit")
@@ -68,8 +72,25 @@ public abstract class AbstractTest {
     }
 
     protected void clearDatabase() {
-        UserDao userDao = new UserDaoImpl(getConnection());
+        UserDao userDao = new UserDaoImpl();
         userDao.deleteAll();
+    }
+
+    protected static void migrateDatabase(){
+        try (Connection connection = DBUtils.getConnection()) {
+            connection.createStatement().execute("CREATE SCHEMA if not exists service_schema;");
+
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            database.setLiquibaseSchemaName("service_schema");
+            database.setDefaultSchemaName("my_schema");
+            Liquibase liquibase =
+                    new Liquibase("db/changelog/db.test-changelog-master.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase.update();
+        } catch (LiquibaseException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 

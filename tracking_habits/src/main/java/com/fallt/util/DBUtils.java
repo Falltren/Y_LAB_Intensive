@@ -2,18 +2,26 @@ package com.fallt.util;
 
 import com.fallt.exception.DBException;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
-import java.util.Properties;
 
 /**
  * Утилитарный класс для получения соединения с базой данных, с указанными в файле конфигурации настройками
  */
 public class DBUtils {
-    private static Connection connection;
+
+    private static String url;
+
+    private static String user;
+
+    private static String password;
 
     private DBUtils() {
+    }
+
+    static {
+        url = PropertiesUtil.getProperty("url");
+        user = PropertiesUtil.getProperty("username");
+        password = PropertiesUtil.getProperty("password");
     }
 
     /**
@@ -22,42 +30,17 @@ public class DBUtils {
      * @return Настроенный объект Connection
      */
     public static Connection getConnection() {
-        if (connection == null) {
-            try {
-                Properties props = loadProperties();
-                String url = props.getProperty("url");
-                String user = props.getProperty("username");
-                String password = props.getProperty("password");
-                connection = DriverManager.getConnection(url, user, password);
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return connection;
-    }
-
-    /**
-     * Метод закрытия соединения с базой данных
-     */
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-    private static Properties loadProperties() {
-        try (InputStream inputStream = DBUtils.class.getResourceAsStream("/liquibase.properties")) {
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            return properties;
-        } catch (IOException e) {
+        try {
+            return DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
+    }
+
+    public static void useTestConnection(String testUrl, String testUser, String testPassword) {
+        url = testUrl;
+        user = testUser;
+        password = testPassword;
     }
 
     /**
