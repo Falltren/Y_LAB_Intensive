@@ -1,16 +1,25 @@
 package com.fallt.service;
 
 import com.fallt.dto.UserDto;
+import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import com.fallt.out.ConsoleOutput;
+import com.fallt.repository.UserDao;
+import com.fallt.util.Fetch;
 import com.fallt.util.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
@@ -18,31 +27,50 @@ class UserServiceTest {
 
     private ConsoleOutput consoleOutput;
 
+    private UserDao userDao;
+
     @BeforeEach
     void setup() {
+        userDao = Mockito.mock(UserDao.class);
         consoleOutput = Mockito.mock(ConsoleOutput.class);
-        userService = new UserService(consoleOutput);
+        userService = new UserService(userDao, consoleOutput);
+    }
+
+    @Test
+    @DisplayName("Получение всех пользователей")
+    void testGetAllUsers(){
+        List<User> habits = List.of(
+                User.builder().name("user1").password("pwd1").email("email1").build(),
+                User.builder().name("user2").password("pwd2").email("email2").build()
+        );
+        when(userDao.findAll()).thenReturn(habits);
+
+        List<User> expected = userService.getAllUsers();
+
+        assertThat(expected).hasSize(2);
+        assertThat(habits).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("Получение пользователя по email")
     void testGetUserByEmail() {
-        UserDto userDto = createUserDto("user@user.user", "user");
-        userService.createUser(userDto);
+        String email = "user@user.user";
+        User userFromDatabase = getUserFromDatabase();
+        when(userDao.getUserByEmail("user@user.user")).thenReturn(Optional.of(userFromDatabase));
 
-        User existedUser = userService.getUserByEmail(userDto.getEmail());
+        User existedUser = userService.getUserByEmail(email);
 
         assertThat(existedUser.getEmail()).isEqualTo("user@user.user");
-        assertThat(existedUser.getPassword()).isEqualTo("user");
+        assertThat(existedUser.getPassword()).isEqualTo("pwd");
     }
 
     @Test
     @DisplayName("Попытка получения пользователя по отсутствующему email")
     void testGetUserByIncorrectEmail() {
-        UserDto userDto = createUserDto("user@user.user", "user");
-        userService.createUser(userDto);
+        String email = "incorrectEmail";
+        when(userDao.getUserByEmail(email)).thenReturn(Optional.empty());
 
-        User existedUser = userService.getUserByEmail("some@email.email");
+        User existedUser = userService.getUserByEmail(email);
 
         assertThat(existedUser).isNull();
         verify(consoleOutput).printMessage(Message.INCORRECT_EMAIL);
@@ -51,97 +79,107 @@ class UserServiceTest {
     @Test
     @DisplayName("Успешное добавление пользователя")
     void testCreateUser() {
-        UserDto userDto = createUserDto("user@user.user", "user");
+        UserDto userDto = createUserDto("user@user.user", "pwd");
+        when(userDao.create(any(User.class))).thenReturn(getUserFromDatabase());
 
-        userService.createUser(userDto);
+        User result = userService.createUser(userDto);
 
-        assertThat(userService.getAllUsers).hasSize(1);
+        assertEquals(userDto.getName(), result.getName());
+        assertEquals(userDto.getPassword(), result.getPassword());
+        assertEquals(userDto.getEmail(), result.getEmail());
     }
 
     @Test
     @DisplayName("Попытка сохранения пользователя с существующим email")
     void testCreateUserWithDuplicateEmail() {
-        UserDto user1 = createUserDto("user@user.user", "user1");
-        UserDto user2 = createUserDto("user@user.user", "user2");
-        userService.createUser(user1);
+        UserDto user = createUserDto("user@user.user", "user1");
+        when(userDao.getUserByEmail(user.getEmail())).thenReturn(Optional.of(new User()));
 
-        userService.createUser(user2);
+        User result = userService.createUser(user);
 
+        assertNull(result);
         verify(consoleOutput).printMessage(Message.EMAIL_EXIST);
-        assertThat(userService.getAllUsers).hasSize(1);
     }
 
     @Test
     @DisplayName("Попытка сохранения пользователя с существующим паролем")
     void testCreateUserWithDuplicatePassword() {
-        UserDto user1 = createUserDto("user1@user.user", "user");
-        UserDto user2 = createUserDto("user2@user.user", "user");
-        userService.createUser(user1);
+        UserDto user = createUserDto("user1@user.user", "user");
+        when(userDao.getUserByPassword(user.getPassword())).thenReturn(Optional.of(new User()));
 
-        userService.createUser(user2);
+        User result = userService.createUser(user);
 
+        assertNull(result);
         verify(consoleOutput).printMessage(Message.PASSWORD_EXIST);
-        assertThat(userService.getAllUsers).hasSize(1);
     }
 
     @Test
     @DisplayName("Обновление данных о пользователе")
     void successUpdateUser() {
-        UserDto userDto = createUserDto("user@user.user", "user");
+        User user = getUserFromDatabase();
         UserDto updateDto = UserDto.builder().password("newPwd").name("newName").email("newEmail").build();
-        userService.createUser(userDto);
+        when(userDao.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userDao.getUserByEmail(updateDto.getEmail())).thenReturn(Optional.empty());
+        when(userDao.getUserByPassword(updateDto.getPassword())).thenReturn(Optional.empty());
 
-        userService.updateUser(userDto.getEmail(), updateDto);
-        User updatedUser = userService.getUserByEmail("newEmail");
 
-        assertThat(updatedUser.getPassword()).isEqualTo("newPwd");
-        assertThat(updatedUser.getName()).isEqualTo("newName");
-        assertThat(updatedUser.getEmail()).isEqualTo("newEmail");
-        assertThat(userService.getAllUsers).hasSize(1);
+        userService.updateUser(user.getEmail(), updateDto);
+        user.setPassword(updateDto.getPassword());
+        user.setName(updateDto.getName());
+        user.setEmail(updateDto.getEmail());
+
+        verify(userDao, times(1)).update(user);
     }
 
     @Test
     @DisplayName("Попытка обновления данных о пользователе с использованием существующего пароля")
     void testUpdateUserWithExistsPassword() {
-        UserDto userDto1 = createUserDto("user1@user.user", "user1");
-        UserDto userDto2 = createUserDto("user2@user.user", "user2");
-        UserDto updateDto = UserDto.builder().password("user2").build();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
+        User user = getUserFromDatabase();
+        UserDto updateDto = UserDto.builder().password("newPwd").name("newName").email("newEmail").build();
+        when(userDao.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userDao.getUserByEmail(updateDto.getEmail())).thenReturn(Optional.empty());
+        when(userDao.getUserByPassword(updateDto.getPassword())).thenReturn(Optional.of(new User()));
 
-        userService.updateUser("user1@user.user", updateDto);
-        User user = userService.getUserByEmail("user1@user.user");
+        userService.updateUser(user.getEmail(), updateDto);
 
-        assertThat(user.getPassword()).isEqualTo("user1");
         verify(consoleOutput).printMessage(Message.PASSWORD_EXIST);
+        verify(userDao, times(0)).update(any(User.class));
     }
 
     @Test
     @DisplayName("Попытка обновления данных о пользователе с использованием существующего email")
     void testUpdateUserWithExistsEmail() {
-        UserDto userDto1 = createUserDto("user1@user.user", "user1");
-        UserDto userDto2 = createUserDto("user2@user.user", "user2");
-        UserDto updateDto = UserDto.builder().email("user2@user.user").build();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
+        User user = getUserFromDatabase();
+        UserDto updateDto = UserDto.builder().password("newPwd").name("newName").email("newEmail").build();
+        when(userDao.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userDao.getUserByEmail(updateDto.getEmail())).thenReturn(Optional.of(new User()));
+        when(userDao.getUserByPassword(updateDto.getPassword())).thenReturn(Optional.empty());
 
-        userService.updateUser("user1@user.user", updateDto);
-        User user = userService.getUserByEmail("user1@user.user");
+        userService.updateUser(user.getEmail(), updateDto);
 
-        assertThat(user.getPassword()).isEqualTo("user1");
         verify(consoleOutput).printMessage(Message.EMAIL_EXIST);
+        verify(userDao, times(0)).update(any(User.class));
     }
 
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUser() {
-        UserDto userDto = createUserDto("user@user.user", "user");
-        userService.createUser(userDto);
-        assertThat(userService.getAllUsers).hasSize(1);
+        User existedUser = getUserFromDatabase();
 
-        userService.deleteUser(userDto.getEmail());
+        userService.deleteUser(existedUser);
 
-        assertThat(userService.getAllUsers).isEmpty();
+        verify(userDao, times(1)).delete(existedUser);
+    }
+
+    @Test
+    @DisplayName("Блокировка пользователя")
+    void blockUser(){
+        User user = getUserFromDatabase();
+
+        userService.blockingUser(user);
+
+        assertThat(user.isBlocked()).isTrue();
+        verify(userDao, times(1)).update(user);
     }
 
     private UserDto createUserDto(String email, String password) {
@@ -149,6 +187,15 @@ class UserServiceTest {
                 .name("user")
                 .email(email)
                 .password(password)
+                .build();
+    }
+
+    private User getUserFromDatabase() {
+        return User.builder()
+                .id(1L)
+                .name("user")
+                .password("pwd")
+                .email("user@user.user")
                 .build();
     }
 }

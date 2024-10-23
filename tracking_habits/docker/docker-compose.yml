@@ -1,0 +1,20 @@
+version: '3.9'
+
+name: tracking_habit
+services:
+
+  psql:
+    container_name: tracking_habit_db
+    image: postgres:15.4
+    ports:
+      - "5432:5432"
+    restart: on-failure
+    environment:
+      POSTGRES_USER: y_lab_user
+      POSTGRES_PASSWORD: y_lab_password
+      POSTGRES_DB: habit_db
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+volumes:
+  database-data:

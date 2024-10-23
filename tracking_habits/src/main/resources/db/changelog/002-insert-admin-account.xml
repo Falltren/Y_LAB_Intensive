@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+                   logicalFilePath="db/changelog/changelog-master.xml">
+
+    <changeSet id="002-insert-admin-account" author="fallt">
+        <insert tableName="users" schemaName="my_schema">
+            <column name="id" value="1"/>
+            <column name="name" value="admin"/>
+            <column name="password" value="admin"/>
+            <column name="email" value="admin@admin.admin"/>
+            <column name="role" value="ROLE_ADMIN"/>
+            <column name="create_at" value="2022-01-30 00:00:00.000000"/>
+            <column name="update_at" value="null"/>
+            <column name="is_blocked" value="false"/>
+
+        </insert>
+    </changeSet>
+</databaseChangeLog>

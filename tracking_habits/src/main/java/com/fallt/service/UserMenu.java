@@ -9,11 +9,15 @@ import com.fallt.entity.User;
 import com.fallt.in.UserInput;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.util.DateHandler;
+import com.fallt.util.Fetch;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Содержит логику перехода между различными меню программы
+ */
 @RequiredArgsConstructor
 public class UserMenu {
 
@@ -33,6 +37,9 @@ public class UserMenu {
 
     private final StatisticService statisticService;
 
+    /**
+     * Запуск
+     */
     public void start() {
         while (!isStop) {
             consoleOutput.printMessage(Message.MAIN_MENU);
@@ -63,7 +70,7 @@ public class UserMenu {
         if (registerUser == null) {
             return;
         }
-        if (registerUser.getRole().equals(Role.ADMIN)) {
+        if (registerUser.getRole().equals(Role.ROLE_ADMIN)) {
             getAdminMenu();
         } else {
             getUserMenu(registerUser);
@@ -75,7 +82,7 @@ public class UserMenu {
             consoleOutput.printMessage(Message.ADMIN_MENU);
             String selection = userInput.getUserInput();
             switch (selection) {
-                case "1" -> consoleOutput.printCollection(userService.getAllUsers);
+                case "1" -> consoleOutput.printCollection(userService.getAllUsers());
                 case "2" -> viewUserHabitsMenu();
                 case "3" -> deleteUserMenu();
                 case "4" -> blockingUserMenu();
@@ -100,7 +107,7 @@ public class UserMenu {
         String email = userInput.inputEmail();
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            userService.deleteUser(user.getEmail());
+            userService.deleteUser(user);
             consoleOutput.printMessage(Message.SUCCESS_ACTION);
         }
     }
@@ -109,7 +116,7 @@ public class UserMenu {
         String email = userInput.inputEmail();
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            user.setBlocked(true);
+            userService.blockingUser(user);
             consoleOutput.printMessage(Message.SUCCESS_ACTION);
         }
     }
@@ -121,13 +128,13 @@ public class UserMenu {
             switch (selection) {
                 case "1" -> editAccount(user);
                 case "2" -> {
-                    userService.deleteUser(user.getName());
+                    userService.deleteUser(user);
                     return;
                 }
                 case "3" -> inputHabitMenu(user);
                 case "4" -> deleteHabitMenu(user);
                 case "5" -> editHabitMenu(user);
-                case "6" -> consoleOutput.printCollection(habitService.getAllHabits(user));
+                case "6" -> consoleOutput.printCollection(habitService.getAllHabits(user, Fetch.LAZY));
                 case "7" -> confirmHabitMenu(user);
                 case "8" -> getStatisticMenu(user);
                 case "0" -> {
@@ -138,12 +145,21 @@ public class UserMenu {
         }
     }
 
-    private void editAccount(User user){
+    private void editAccount(User user) {
         String name = userInput.inputName();
         String password = userInput.inputPassword();
         String email = userInput.inputEmail();
-        UserDto dto = new UserDto(name, password, email);
-        userService.updateUser(user.getName(), dto);
+        UserDto dto = new UserDto();
+        if (!name.isBlank()) {
+            dto.setName(name);
+        }
+        if (!password.isBlank()) {
+            dto.setPassword(password);
+        }
+        if (!email.isBlank()) {
+            dto.setEmail(email);
+        }
+        userService.updateUser(user.getEmail(), dto);
     }
 
     private void inputHabitMenu(User user) {
@@ -248,7 +264,7 @@ public class UserMenu {
             return;
         }
         LocalDate dateTo = DateHandler.getDateFromString(to);
-        for (Habit h : user.getHabits()) {
+        for (Habit h : habitService.getAllHabits(user, Fetch.EAGER)) {
             consoleOutput.printObject(statisticService.getHabitProgress(h, dateFrom, dateTo));
         }
     }

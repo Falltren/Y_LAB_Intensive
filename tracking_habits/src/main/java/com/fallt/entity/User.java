@@ -2,7 +2,7 @@ package com.fallt.entity;
 
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +14,8 @@ import java.util.List;
 @ToString
 public class User {
 
+    private Long id;
+
     private String name;
 
     private String email;
@@ -23,9 +25,9 @@ public class User {
 
     private Role role;
 
-    private Instant createAt;
+    private LocalDateTime createAt;
 
-    private Instant updateAt;
+    private LocalDateTime updateAt;
 
     private boolean isBlocked;
 
