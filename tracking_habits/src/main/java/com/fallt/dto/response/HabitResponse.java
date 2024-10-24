@@ -1,20 +1,17 @@
-package com.fallt.dto.request;
+package com.fallt.dto.response;
 
-import com.fallt.entity.ExecutionRate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class HabitDto {
+public class HabitResponse {
 
     private String title;
 
     private String text;
-
-    private ExecutionRate rate;
 }

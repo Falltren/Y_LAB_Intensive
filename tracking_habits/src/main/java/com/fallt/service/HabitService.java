@@ -1,9 +1,12 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitDto;
+import com.fallt.dto.request.UpsertHabitRequest;
+import com.fallt.dto.response.HabitResponse;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
+import com.fallt.exception.AlreadyExistException;
+import com.fallt.mapper.HabitMapper;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
@@ -27,43 +30,41 @@ public class HabitService {
 
     private final HabitExecutionDao executionDao;
 
+    private final UserService userService;
+
     /**
      * Метод создания привычки
      *
-     * @param user Пользователь
-     * @param dto  Объект с данными по новой привычке
+     * @param userEmail Электронная почта пользователя
+     * @param request   Объект с данными по новой привычке
      */
-    public void createHabit(User user, HabitDto dto) {
-        if (findHabit(user, dto.getTitle()).isPresent()) {
-            consoleOutput.printMessage(Message.HABIT_EXIST);
-        } else {
-            Habit habit = Habit.builder()
-                    .title(dto.getTitle())
-                    .text(dto.getText())
-                    .executionRate(dto.getRate())
-                    .user(user)
-                    .createAt(LocalDate.now())
-                    .build();
-            habitDao.save(habit);
+    public HabitResponse createHabit(String userEmail, UpsertHabitRequest request) {
+        User user = userService.getUserByEmail(userEmail);
+        if (findHabit(user, request.getTitle()).isPresent()) {
+            throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
+        Habit habit = HabitMapper.INSTANCE.toEntity(request);
+        habit.setUser(user);
+        return HabitMapper.INSTANCE.toResponse(habitDao.save(habit));
     }
 
     /**
      * Обновление привычки
      *
-     * @param user  Пользователь
-     * @param title Название привычки. Если будет передано название привычки, отсутствующее у пользователя
-     *              в консоль будет выведено соответствующее сообщение
-     * @param dto   Объект с данными по редактируемой привычке
+     * @param user    Пользователь
+     * @param title   Название привычки. Если будет передано название привычки, отсутствующее у пользователя
+     *                в консоль будет выведено соответствующее сообщение
+     * @param request Объект с данными по редактируемой привычке
      */
-    public void updateHabit(User user, String title, HabitDto dto) {
+    public void updateHabit(User user, String title, UpsertHabitRequest request) {
         Optional<Habit> optionalHabit = findHabit(user, title);
         if (optionalHabit.isEmpty()) {
             consoleOutput.printMessage(Message.INCORRECT_HABIT_TITLE);
             return;
         }
         Habit habit = optionalHabit.get();
-        habitDao.update(updateNotNullableFields(habit, dto));
+        HabitMapper.INSTANCE.updateHabitFromDto(request, habit);
+        habitDao.update(habit);
     }
 
     /**
@@ -123,16 +124,4 @@ public class HabitService {
         return findHabit(user, title).orElse(null);
     }
 
-    private Habit updateNotNullableFields(Habit habit, HabitDto dto) {
-        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
-            habit.setTitle(dto.getTitle());
-        }
-        if (dto.getText() != null && !dto.getText().isBlank()) {
-            habit.setText(dto.getText());
-        }
-        if (dto.getRate() != null && !dto.getRate().name().isBlank()) {
-            habit.setExecutionRate(dto.getRate());
-        }
-        return habit;
-    }
 }

@@ -1,6 +1,6 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitDto;
+import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
@@ -33,22 +33,25 @@ class HabitServiceTest {
 
     private HabitExecutionDao executionDao;
 
+    private UserService userService;
+
     @BeforeEach
     void setup() {
         executionDao = Mockito.mock(HabitExecutionDao.class);
         habitDao = Mockito.mock(HabitDaoImpl.class);
+        userService = Mockito.mock(UserService.class);
         consoleOutput = Mockito.mock(ConsoleOutput.class);
-        habitService = new HabitService(consoleOutput, habitDao, executionDao);
+        habitService = new HabitService(consoleOutput, habitDao, executionDao, userService);
     }
 
     @Test
     @DisplayName("Успешное добавление привычки")
     void createHabit() {
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), habitDto.getTitle())).thenReturn(Optional.empty());
+        UpsertHabitRequest upsertHabitRequest = createHabitDto();
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.empty());
 
-        habitService.createHabit(user, habitDto);
+        habitService.createHabit(user.getEmail(), upsertHabitRequest);
 
         verify(habitDao, times(1)).save(any(Habit.class));
     }
@@ -57,10 +60,10 @@ class HabitServiceTest {
     @DisplayName("Попытка добавления привычки с дублирующимся названием")
     void createHabitWithDuplicateTitle() {
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), habitDto.getTitle())).thenReturn(Optional.of(new Habit()));
+        UpsertHabitRequest upsertHabitRequest = createHabitDto();
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.of(new Habit()));
 
-        habitService.createHabit(user, habitDto);
+        habitService.createHabit(user.getEmail(), upsertHabitRequest);
 
         verify(consoleOutput).printMessage(Message.HABIT_EXIST);
         verify(habitDao, times(0)).save(any(Habit.class));
@@ -95,10 +98,10 @@ class HabitServiceTest {
     @DisplayName("Удаление привычки")
     void testDeleteHabit() {
         User user = createUser();
-        HabitDto habitDto = createHabitDto();
-        habitService.createHabit(user, habitDto);
+        UpsertHabitRequest upsertHabitRequest = createHabitDto();
+        habitService.createHabit(user.getEmail(), upsertHabitRequest);
 
-        habitService.deleteHabit(user, habitDto.getTitle());
+        habitService.deleteHabit(user, upsertHabitRequest.getTitle());
 
         assertThat(user.getHabits()).isEmpty();
     }
@@ -109,10 +112,10 @@ class HabitServiceTest {
         String newTitle = "new title";
         User user = createUser();
         Habit habit = createHabit("old title");
-        HabitDto habitDto = HabitDto.builder().title(newTitle).build();
+        UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
 
-        habitService.updateHabit(user, habit.getTitle(), habitDto);
+        habitService.updateHabit(user, habit.getTitle(), upsertHabitRequest);
 
         verify(habitDao, times(1)).update(habit);
     }
@@ -123,10 +126,10 @@ class HabitServiceTest {
         String newTitle = "new title";
         User user = createUser();
         Habit habit = createHabit("old title");
-        HabitDto habitDto = HabitDto.builder().title(newTitle).build();
+        UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.empty());
 
-        habitService.updateHabit(user, habit.getTitle(), habitDto);
+        habitService.updateHabit(user, habit.getTitle(), upsertHabitRequest);
 
         verify(habitDao, times(0)).update(habit);
         verify(consoleOutput).printMessage(Message.INCORRECT_HABIT_TITLE);
@@ -169,11 +172,11 @@ class HabitServiceTest {
                 .build();
     }
 
-    private HabitDto createHabitDto() {
-        return HabitDto.builder()
+    private UpsertHabitRequest createHabitDto() {
+        return UpsertHabitRequest.builder()
                 .title("habit")
                 .text("text")
-                .rate(ExecutionRate.WEEKLY)
+                .rate("WEEKLY")
                 .build();
     }
 
