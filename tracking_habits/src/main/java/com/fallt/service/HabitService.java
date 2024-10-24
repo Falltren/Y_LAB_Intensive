@@ -1,6 +1,6 @@
 package com.fallt.service;
 
-import com.fallt.dto.HabitDto;
+import com.fallt.dto.request.HabitDto;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;

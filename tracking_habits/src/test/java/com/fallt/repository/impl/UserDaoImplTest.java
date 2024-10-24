@@ -103,7 +103,7 @@ class UserDaoImplTest extends AbstractTest {
         User user2 = createUser("user2");
         User existedUser = userDao.create(user1);
         userDao.create(user2);
-        userDao.delete(existedUser);
+        userDao.delete(existedUser.getEmail());
 
         List<User> users = userDao.findAll();
 

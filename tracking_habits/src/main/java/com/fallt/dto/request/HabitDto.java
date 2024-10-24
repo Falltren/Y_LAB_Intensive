@@ -1,4 +1,4 @@
-package com.fallt.dto;
+package com.fallt.dto.request;
 
 import com.fallt.entity.ExecutionRate;
 import lombok.AllArgsConstructor;

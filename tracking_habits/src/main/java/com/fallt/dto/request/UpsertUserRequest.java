@@ -1,4 +1,4 @@
-package com.fallt.dto;
+package com.fallt.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class UpsertUserRequest {
 
     private String name;
 

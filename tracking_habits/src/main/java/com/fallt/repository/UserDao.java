@@ -22,14 +22,14 @@ public interface UserDao {
      *
      * @param user Объект класса User
      */
-    void update(User user);
+    User update(User user);
 
     /**
      * Удаление пользователя из базы данных
      *
-     * @param user Объект класса User
+     * @param email Электронная почта пользователя
      */
-    void delete(User user);
+    void delete(String email);
 
     /**
      * Получение списка пользователей из базы данных

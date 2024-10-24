@@ -1,8 +1,13 @@
 package com.fallt.service;
 
+import com.fallt.dto.request.LoginRequest;
+import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.User;
+import com.fallt.exception.SecurityException;
+import com.fallt.mapper.UserMapper;
 import com.fallt.out.ConsoleOutput;
-import com.fallt.util.Message;
+import com.fallt.util.AuthenticationContext;
+import com.fallt.util.UserDetails;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -18,20 +23,19 @@ public class AuthService {
     /**
      * Проверка наличия пользователя в базе данных
      *
-     * @param email    Электронный адрес пользователя
-     * @param password Пароль пользователя
-     * @return Возвращает объект класса User в случае успешной аутентификации или null если аутентификация завершилась неудачно
+     * @param request Дто, содержащий электронную почту и пароль пользователя
+     * @return Возвращает объект класса User в случае успешной аутентификации
+     * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
      */
-    public User login(String email, String password) {
-        User user = userService.getUserByEmail(email);
-        if (user == null || !user.getPassword().equals(password)) {
-            consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
-            return null;
+    public UserResponse login(LoginRequest request, AuthenticationContext authenticationContext) {
+        User user = userService.getUserByEmail(request.getEmail());
+        if (user == null || !user.getPassword().equals(request.getPassword())) {
+            throw new SecurityException("Ошибка аутентификации, проверьте электронную почту и пароль");
         }
         if (user.isBlocked()) {
-            consoleOutput.printMessage(Message.BLOCKED_USER);
-            return null;
+            throw new SecurityException("Ваша учетная запись заблокирована");
         }
-        return user;
+        authenticationContext.authenticate(UserDetails.createUserDetails(user));
+        return UserMapper.INSTANCE.toResponse(user);
     }
 }

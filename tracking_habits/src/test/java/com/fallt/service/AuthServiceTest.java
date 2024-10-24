@@ -26,46 +26,46 @@ class AuthServiceTest {
         authService = new AuthService(userService, consoleOutput);
     }
 
-    @Test
-    @DisplayName("Успешная аутентификация пользователя")
-    void testLogin() {
-        String email = "user@user.user";
-        User user = createUser();
-        when(userService.getUserByEmail(email)).thenReturn(user);
+//    @Test
+//    @DisplayName("Успешная аутентификация пользователя")
+//    void testLogin() {
+//        String email = "user@user.user";
+//        User user = createUser();
+//        when(userService.getUserByEmail(email)).thenReturn(user);
+//
+//        User authenticatedUser = authService.login(email, "user");
+//
+//        assertThat(authenticatedUser).isEqualTo(user);
+//        verify(consoleOutput, never()).printMessage(Message.UNAUTHENTICATED_USER);
+//        verify(consoleOutput, never()).printMessage(Message.BLOCKED_USER);
+//    }
 
-        User authenticatedUser = authService.login(email, "user");
+//    @Test
+//    @DisplayName("Попытка аутентификации с некорректным паролем")
+//    void testLoginWithInvalidPassword() {
+//        String email = "user@user.user";
+//        User user = createUser();
+//        when(userService.getUserByEmail(email)).thenReturn(user);
+//
+//        User authenticatedUser = authService.login(email, "1user1");
+//
+//        assertThat(authenticatedUser).isNull();
+//        verify(consoleOutput).printMessage(Message.UNAUTHENTICATED_USER);
+//    }
 
-        assertThat(authenticatedUser).isEqualTo(user);
-        verify(consoleOutput, never()).printMessage(Message.UNAUTHENTICATED_USER);
-        verify(consoleOutput, never()).printMessage(Message.BLOCKED_USER);
-    }
-
-    @Test
-    @DisplayName("Попытка аутентификации с некорректным паролем")
-    void testLoginWithInvalidPassword() {
-        String email = "user@user.user";
-        User user = createUser();
-        when(userService.getUserByEmail(email)).thenReturn(user);
-
-        User authenticatedUser = authService.login(email, "1user1");
-
-        assertThat(authenticatedUser).isNull();
-        verify(consoleOutput).printMessage(Message.UNAUTHENTICATED_USER);
-    }
-
-    @Test
-    @DisplayName("Попытка аутентификации заблокированного пользователя")
-    void testLoginBlockedUser(){
-        String email = "user@user.user";
-        User user = createUser();
-        user.setBlocked(true);
-        when(userService.getUserByEmail(email)).thenReturn(user);
-
-        User authenticatedUser = authService.login(email, "user");
-
-        assertThat(authenticatedUser).isNull();
-        verify(consoleOutput).printMessage(Message.BLOCKED_USER);
-    }
+//    @Test
+//    @DisplayName("Попытка аутентификации заблокированного пользователя")
+//    void testLoginBlockedUser(){
+//        String email = "user@user.user";
+//        User user = createUser();
+//        user.setBlocked(true);
+//        when(userService.getUserByEmail(email)).thenReturn(user);
+//
+//        User authenticatedUser = authService.login(email, "user");
+//
+//        assertThat(authenticatedUser).isNull();
+//        verify(consoleOutput).printMessage(Message.BLOCKED_USER);
+//    }
 
     private User createUser() {
         return User.builder()

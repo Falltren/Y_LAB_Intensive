@@ -1,8 +1,8 @@
 package com.fallt.service;
 
-import com.fallt.dto.UserDto;
+import com.fallt.dto.request.UpsertUserRequest;
+import com.fallt.dto.response.UserResponse;
 import com.fallt.out.ConsoleOutput;
-import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -13,8 +13,6 @@ public class RegistrationService {
 
     private final UserService userService;
 
-    private final ConsoleOutput consoleOutput;
-
     /**
      * Регистрация пользователя
      *
@@ -23,12 +21,7 @@ public class RegistrationService {
      * @param email    Электронный адрес пользователя
      * @return true, если пользователь успешно зарегистрирован и false в обратном случае
      */
-    public boolean register(String name, String password, String email) {
-        if (name.isBlank() || password.isBlank() || email.isBlank()) {
-            consoleOutput.printMessage(Message.INCORRECT_INPUT);
-            return false;
-        }
-        UserDto userDto = new UserDto(name, password, email);
-        return userService.createUser(userDto) != null;
+    public UserResponse register(UpsertUserRequest request) {
+        return userService.createUser(request);
     }
 }

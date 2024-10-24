@@ -31,9 +31,12 @@ public class DBUtils {
      */
     public static Connection getConnection() {
         try {
+            Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Не найден драйвер postgresql");
         }
     }
 

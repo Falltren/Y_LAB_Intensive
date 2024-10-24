@@ -47,7 +47,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         String sql = "UPDATE " + SCHEMA_NAME + "users SET name = ?, password = ?, email = ?, role = ?, update_at = ?, is_blocked = ? WHERE id = ?";
         try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getName());
@@ -58,6 +58,7 @@ public class UserDaoImpl implements UserDao {
             preparedStatement.setBoolean(6, user.isBlocked());
             preparedStatement.setLong(7, user.getId());
             preparedStatement.executeUpdate();
+            return user;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
@@ -65,10 +66,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(String email) {
         String sql = "DELETE FROM " + SCHEMA_NAME + "users WHERE email = ?";
         try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(1, email);
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

@@ -6,24 +6,31 @@
 
     <groupId>org.example</groupId>
     <artifactId>tracking_habits</artifactId>
+    <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
+<!--    <name>tracking_habits Maven Webapp</name>-->
+<!--    <url>http://maven.apache.org</url>-->
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.32</lombok.version>
+        <mapstruct.version>1.5.5.FINAL</mapstruct.version>
+        <postgres.version>42.6.2</postgres.version>
+        <liquibase.version>4.26.0</liquibase.version>
+        <servlet.version>6.0.0</servlet.version>
+        <jackson.version>2.15.4</jackson.version>
         <mockito.version>5.3.1</mockito.version>
         <assertj.version>3.22.0</assertj.version>
         <junit.version>5.9.3</junit.version>
-        <postgres.version>42.6.2</postgres.version>
-        <liquibase.version>4.26.0</liquibase.version>
         <testcontainers.version>1.19.3</testcontainers.version>
         <maven.surefire.version>3.2.5</maven.surefire.version>
 
     </properties>
 
     <build>
+        <finalName>tracking_habits</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -47,6 +54,32 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgres.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
