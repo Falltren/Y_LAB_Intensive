@@ -1,20 +1,22 @@
 package com.fallt.service;
 
+import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
+import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.dto.response.HabitResponse;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.HabitMapper;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
 import com.fallt.util.Fetch;
-import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,61 +53,67 @@ public class HabitService {
     /**
      * Обновление привычки
      *
-     * @param user    Пользователь
-     * @param title   Название привычки. Если будет передано название привычки, отсутствующее у пользователя
-     *                в консоль будет выведено соответствующее сообщение
-     * @param request Объект с данными по редактируемой привычке
+     * @param userEmail Электронная почта пользователя
+     * @param title     Название привычки. Если будет передано название привычки, отсутствующее у пользователя
+     *                  в консоль будет выведено соответствующее сообщение
+     * @param request   Объект с данными по редактируемой привычке
      */
-    public void updateHabit(User user, String title, UpsertHabitRequest request) {
+    public HabitResponse updateHabit(String userEmail, String title, UpsertHabitRequest request) {
+        User user = userService.getUserByEmail(userEmail);
         Optional<Habit> optionalHabit = findHabit(user, title);
         if (optionalHabit.isEmpty()) {
-            consoleOutput.printMessage(Message.INCORRECT_HABIT_TITLE);
-            return;
+            throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title));
+        }
+        if (request.getTitle() != null && findHabit(user, request.getTitle()).isPresent()) {
+            throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
         Habit habit = optionalHabit.get();
         HabitMapper.INSTANCE.updateHabitFromDto(request, habit);
-        habitDao.update(habit);
+        return HabitMapper.INSTANCE.toResponse(habitDao.update(habit));
     }
 
     /**
      * Удаление привычки
      *
-     * @param user  Пользователь
+     * @param email Электронная почта пользователя
      * @param title Название привычки
      */
-    public void deleteHabit(User user, String title) {
+    public void deleteHabit(String email, String title) {
+        User user = userService.getUserByEmail(email);
         habitDao.delete(user.getId(), title);
     }
 
     /**
      * Получение всех привычек пользователя
      *
-     * @param user      Пользователь
+     * @param email     Электронный адрес пользователя
      * @param fetchType Параметр, определяющий необходимость получения данных по выполнению привычек
      * @return Список привычек
      */
-    public List<Habit> getAllHabits(User user, Fetch fetchType) {
-        return habitDao.getAllUserHabits(user.getId(), fetchType);
+    public List<HabitResponse> getAllHabits(String email, Fetch fetchType) {
+        User user = userService.getUserByEmail(email);
+        return HabitMapper.INSTANCE.toResponseList(habitDao.getAllUserHabits(user.getId(), fetchType));
     }
 
     /**
      * Добавление данных о выполнении привычки
      *
-     * @param user  Пользователь
-     * @param title Название привычки
-     * @param date  Дата выполнения привычки
+     * @param email   Электронная почта пользователь
+     * @param request Объект, содержащий информацию о названии привычки и дате выполнения
      */
-    public void confirmHabit(User user, String title, LocalDate date) {
-        Optional<Habit> optionalHabit = findHabit(user, title);
+    public HabitExecutionResponse confirmHabit(String email, HabitConfirmRequest request) {
+        User user = userService.getUserByEmail(email);
+        Optional<Habit> optionalHabit = findHabit(user, request.getTitle());
         if (optionalHabit.isEmpty()) {
-            consoleOutput.printMessage(Message.INCORRECT_HABIT_TITLE);
-            return;
+            throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", request.getTitle()));
         }
         HabitExecution habitExecution = HabitExecution.builder()
                 .habit(optionalHabit.get())
-                .date(date)
+                .date(request.getDate())
                 .build();
-        executionDao.save(habitExecution);
+        HabitExecutionResponse response = HabitMapper.INSTANCE.toExecutionResponse(executionDao.save(habitExecution));
+        response.setTitle(request.getTitle());
+        return response;
     }
 
     private Optional<Habit> findHabit(User user, String title) {

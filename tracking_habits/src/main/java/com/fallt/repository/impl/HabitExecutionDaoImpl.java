@@ -18,7 +18,7 @@ public class HabitExecutionDaoImpl implements HabitExecutionDao {
     private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
 
     @Override
-    public void save(HabitExecution execution) {
+    public HabitExecution save(HabitExecution execution) {
         String sql = "INSERT INTO " + SCHEMA_NAME + "habit_execution (date, habit_id) VALUES (?, ?)";
         try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, execution.getDate());
@@ -30,6 +30,7 @@ public class HabitExecutionDaoImpl implements HabitExecutionDao {
                 execution.setId(habitId);
             }
             DBUtils.closeResultSet(generatedKeys);
+            return execution;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }

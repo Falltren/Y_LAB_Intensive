@@ -23,7 +23,7 @@ public interface HabitDao {
      *
      * @param habit Объект класса Habit
      */
-    void update(Habit habit);
+    Habit update(Habit habit);
 
     /**
      * Получение списка привычек пользователя

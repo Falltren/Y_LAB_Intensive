@@ -20,12 +20,18 @@ import java.io.IOException;
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
 
+    private static final String OBJECT_MAPPER = "objectMapper";
+
+    private static final String USER_SERVICE = "userService";
+
+    private static final String AUTH_CONTEXT = "authContext";
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletContext context = getServletContext();
-        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute("objectMapper");
-        UserService userService = (UserService) context.getAttribute("userService");
-        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute("authContext");
+        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute(OBJECT_MAPPER);
+        UserService userService = (UserService) context.getAttribute(USER_SERVICE);
+        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute(AUTH_CONTEXT);
         String emailCurrentUser = SessionUtils.getCurrentUserEmail(req);
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
@@ -42,9 +48,9 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletContext context = getServletContext();
-        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute("objectMapper");
-        UserService userService = (UserService) context.getAttribute("userService");
-        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute("authContext");
+        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute(OBJECT_MAPPER);
+        UserService userService = (UserService) context.getAttribute(USER_SERVICE);
+        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute(AUTH_CONTEXT);
         try {
             authenticationContext.checkAuthentication(SessionUtils.getCurrentUserEmail(req));
             UpsertUserRequest request = objectMapper.readValue(req.getInputStream(), UpsertUserRequest.class);

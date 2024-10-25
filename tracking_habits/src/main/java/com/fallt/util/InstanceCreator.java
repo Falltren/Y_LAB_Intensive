@@ -10,6 +10,7 @@ import com.fallt.repository.impl.UserDaoImpl;
 import com.fallt.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -34,6 +35,7 @@ public class InstanceCreator implements ServletContextListener {
         AuthenticationContext authenticationContext = new AuthenticationContext();
 
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         ServletContext context = sce.getServletContext();

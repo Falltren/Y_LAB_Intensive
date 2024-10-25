@@ -44,7 +44,7 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     @Override
-    public void update(Habit habit) {
+    public Habit update(Habit habit) {
         String sql = "UPDATE " + SCHEMA_NAME + "habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
         try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, habit.getTitle());
@@ -52,6 +52,7 @@ public class HabitDaoImpl implements HabitDao {
             preparedStatement.setString(3, habit.getExecutionRate().name());
             preparedStatement.setLong(4, habit.getId());
             preparedStatement.executeUpdate();
+            return habit;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }

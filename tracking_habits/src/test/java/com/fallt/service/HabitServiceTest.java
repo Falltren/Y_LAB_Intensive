@@ -1,7 +1,8 @@
 package com.fallt.service;
 
+import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.entity.ExecutionRate;
+import com.fallt.dto.response.HabitResponse;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
@@ -101,7 +102,7 @@ class HabitServiceTest {
         UpsertHabitRequest upsertHabitRequest = createHabitDto();
         habitService.createHabit(user.getEmail(), upsertHabitRequest);
 
-        habitService.deleteHabit(user, upsertHabitRequest.getTitle());
+        habitService.deleteHabit(user.getEmail(), upsertHabitRequest.getTitle());
 
         assertThat(user.getHabits()).isEmpty();
     }
@@ -115,7 +116,7 @@ class HabitServiceTest {
         UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
 
-        habitService.updateHabit(user, habit.getTitle(), upsertHabitRequest);
+        habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest);
 
         verify(habitDao, times(1)).update(habit);
     }
@@ -129,7 +130,7 @@ class HabitServiceTest {
         UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.empty());
 
-        habitService.updateHabit(user, habit.getTitle(), upsertHabitRequest);
+        habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest);
 
         verify(habitDao, times(0)).update(habit);
         verify(consoleOutput).printMessage(Message.INCORRECT_HABIT_TITLE);
@@ -140,9 +141,13 @@ class HabitServiceTest {
     void testConfirmHabit() {
         User user = createUser();
         Habit habit = createHabit("habit");
+        HabitConfirmRequest request = HabitConfirmRequest.builder()
+                .title(habit.getTitle())
+                .date(LocalDate.now())
+                .build();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
 
-        habitService.confirmHabit(user, habit.getTitle(), LocalDate.now());
+        habitService.confirmHabit(user.getEmail(), request);
 
         verify(executionDao, times(1)).save(any(HabitExecution.class));
     }
@@ -157,7 +162,7 @@ class HabitServiceTest {
         );
         when(habitDao.getAllUserHabits(user.getId(), Fetch.LAZY)).thenReturn(habits);
 
-        List<Habit> expected = habitService.getAllHabits(user, Fetch.LAZY);
+        List<HabitResponse> expected = habitService.getAllHabits(user.getEmail(), Fetch.LAZY);
 
         assertThat(expected).hasSize(2);
         assertThat(habits).isEqualTo(expected);
