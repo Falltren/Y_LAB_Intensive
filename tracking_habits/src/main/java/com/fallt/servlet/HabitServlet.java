@@ -45,7 +45,7 @@ public class HabitServlet extends HttpServlet {
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
             List<HabitResponse> response = habitService.getAllHabits(emailCurrentUser, Fetch.EAGER);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(CONTENT_TYPE);
             byte[] bytes = objectMapper.writeValueAsBytes(response);
             resp.getOutputStream().write(bytes);

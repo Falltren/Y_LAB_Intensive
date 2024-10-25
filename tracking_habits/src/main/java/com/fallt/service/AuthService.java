@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.Loggable;
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.User;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
  * Аутентификация пользователя
  */
 @RequiredArgsConstructor
+@Loggable
 public class AuthService {
 
     private final UserService userService;

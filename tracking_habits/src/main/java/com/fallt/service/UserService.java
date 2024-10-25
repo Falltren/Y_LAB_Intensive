@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.Loggable;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
@@ -20,6 +21,7 @@ import java.util.Optional;
  * Класс для работы с пользователями
  */
 @RequiredArgsConstructor
+@Loggable
 public class UserService {
 
     private final UserDao userDao;

@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.Loggable;
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.dto.response.HabitExecutionResponse;
@@ -24,9 +25,8 @@ import java.util.Optional;
  * Класс для работы с привычками
  */
 @RequiredArgsConstructor
+@Loggable
 public class HabitService {
-
-    private final ConsoleOutput consoleOutput;
 
     private final HabitDao habitDao;
 

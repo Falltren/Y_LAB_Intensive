@@ -1,14 +1,15 @@
 package com.fallt.service;
 
+import com.fallt.aop.Loggable;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
-import com.fallt.out.ConsoleOutput;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Регистрация пользователя
  */
 @RequiredArgsConstructor
+@Loggable
 public class RegistrationService {
 
     private final UserService userService;
@@ -16,9 +17,7 @@ public class RegistrationService {
     /**
      * Регистрация пользователя
      *
-     * @param name     Имя пользователя
-     * @param password Пароль пользователя
-     * @param email    Электронный адрес пользователя
+     * @param request Объект, содержащий данные об имени, пароле, электронной почте пользователя
      * @return true, если пользователь успешно зарегистрирован и false в обратном случае
      */
     public UserResponse register(UpsertUserRequest request) {

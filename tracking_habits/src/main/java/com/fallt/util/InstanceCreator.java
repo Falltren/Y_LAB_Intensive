@@ -27,7 +27,7 @@ public class InstanceCreator implements ServletContextListener {
         HabitDao habitDao = new HabitDaoImpl();
         HabitExecutionDao habitExecutionDao = new HabitExecutionDaoImpl();
         UserService userService = new UserService(userDao, consoleOutput);
-        HabitService habitService = new HabitService(consoleOutput, habitDao, habitExecutionDao, userService);
+        HabitService habitService = new HabitService(habitDao, habitExecutionDao, userService);
         RegistrationService registrationService = new RegistrationService(userService);
         AuthService authService = new AuthService(userService, consoleOutput);
         StatisticService statisticService = new StatisticService();
