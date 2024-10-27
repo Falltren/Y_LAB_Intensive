@@ -21,6 +21,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Сервлет, предназначенный для выполнения CRUD операций с привычками
+ */
 @WebServlet("/habits")
 public class HabitServlet extends HttpServlet {
 

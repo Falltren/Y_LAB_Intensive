@@ -18,6 +18,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет, предназначенный для аутентификации пользователя
+ */
 @WebServlet("/users/auth")
 public class AuthServlet extends HttpServlet {
 

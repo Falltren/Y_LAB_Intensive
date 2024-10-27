@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Класс, содержащий данные аутентифицированного пользователя
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

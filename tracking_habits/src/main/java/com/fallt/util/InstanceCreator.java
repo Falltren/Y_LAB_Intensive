@@ -16,6 +16,9 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
+/**
+ * Класс, предназначенный для настройки компонентов приложения
+ */
 public class InstanceCreator implements ServletContextListener {
 
     @Override

@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Сервис предназначенный для валидации данных в запросах
+ */
 @RequiredArgsConstructor
 public class ValidationService {
 

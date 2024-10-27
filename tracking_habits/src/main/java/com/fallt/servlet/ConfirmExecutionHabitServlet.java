@@ -19,6 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлен, предназначенный для отметки выполнения привычки
+ */
 @WebServlet("/habits/confirm")
 public class ConfirmExecutionHabitServlet extends HttpServlet {
 

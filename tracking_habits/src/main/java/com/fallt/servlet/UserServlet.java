@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет, используемый для удаления и обновления данных о пользователе
+ */
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
 

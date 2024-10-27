@@ -19,6 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет, используемый для получения статистики по привычкам
+ */
 @WebServlet("/reports/full")
 public class StatisticServlet extends HttpServlet {
 

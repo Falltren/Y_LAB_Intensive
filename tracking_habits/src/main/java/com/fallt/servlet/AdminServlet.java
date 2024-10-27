@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Сервлет, предназначенный для администрирования пользователей (просмотр списка пользователей, блокировка пользователей)
+ */
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
 
