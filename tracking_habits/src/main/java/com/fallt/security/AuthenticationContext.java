@@ -1,4 +1,4 @@
-package com.fallt.util;
+package com.fallt.security;
 
 import com.fallt.entity.Role;
 import com.fallt.exception.SecurityException;

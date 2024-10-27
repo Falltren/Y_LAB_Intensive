@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.dto.request.UpsertUserRequest;
@@ -48,6 +49,16 @@ public class ValidationService {
         }
         if (!getExistedExecutionValue().contains(request.getRate())) {
             throw new ValidationException("Указана некорректная частота. Возможные значения: " + getExistedExecutionValue());
+        }
+        return true;
+    }
+
+    public boolean checkHabitConfirmRequest(HabitConfirmRequest request) {
+        if (request.getDate() != null) {
+            throw new ValidationException("Дата выполнения привычки должны быть указана");
+        }
+        if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {
+            throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
         }
         return true;
     }

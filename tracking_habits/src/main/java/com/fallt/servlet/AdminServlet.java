@@ -4,7 +4,7 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.exception.SecurityException;
 import com.fallt.service.UserService;
-import com.fallt.util.AuthenticationContext;
+import com.fallt.security.AuthenticationContext;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContext;

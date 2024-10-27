@@ -8,7 +8,7 @@ import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
-import com.fallt.util.AuthenticationContext;
+import com.fallt.security.AuthenticationContext;
 import com.fallt.util.Fetch;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +44,7 @@ public class HabitServlet extends HttpServlet {
         String emailCurrentUser = SessionUtils.getCurrentUserEmail(req);
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
-            List<HabitResponse> response = habitService.getAllHabits(emailCurrentUser, Fetch.EAGER);
+            List<HabitResponse> response = habitService.getAllHabits(emailCurrentUser);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(CONTENT_TYPE);
             byte[] bytes = objectMapper.writeValueAsBytes(response);
@@ -112,6 +112,7 @@ public class HabitServlet extends HttpServlet {
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
             habitService.deleteHabit(emailCurrentUser, habitTitle);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (SecurityException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, objectMapper, e.getMessage());
         }

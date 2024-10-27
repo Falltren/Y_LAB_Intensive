@@ -87,12 +87,11 @@ public class HabitService {
      * Получение всех привычек пользователя
      *
      * @param email     Электронный адрес пользователя
-     * @param fetchType Параметр, определяющий необходимость получения данных по выполнению привычек
      * @return Список привычек
      */
-    public List<HabitResponse> getAllHabits(String email, Fetch fetchType) {
+    public List<HabitResponse> getAllHabits(String email) {
         User user = userService.getUserByEmail(email);
-        return HabitMapper.INSTANCE.toResponseList(habitDao.getAllUserHabits(user.getId(), fetchType));
+        return HabitMapper.INSTANCE.toResponseList(habitDao.getAllUserHabits(user.getId()));
     }
 
     /**

@@ -53,7 +53,7 @@ class HabitExecutionDaoImplTest extends AbstractTest {
 
         executionDao.save(habitExecution);
 
-        List<Habit> habits = habitDao.getAllUserHabits(userId, Fetch.EAGER);
+        List<Habit> habits = habitDao.getAllUserHabits(userId);
 
         assertThat(habits.get(0).getSuccessfulExecution()).hasSize(1);
     }

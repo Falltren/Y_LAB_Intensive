@@ -7,8 +7,8 @@ import com.fallt.entity.User;
 import com.fallt.exception.SecurityException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.out.ConsoleOutput;
-import com.fallt.util.AuthenticationContext;
-import com.fallt.util.UserDetails;
+import com.fallt.security.AuthenticationContext;
+import com.fallt.security.UserDetails;
 import lombok.RequiredArgsConstructor;
 
 /**

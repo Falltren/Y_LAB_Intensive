@@ -6,7 +6,7 @@ import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.AuthService;
 import com.fallt.service.ValidationService;
-import com.fallt.util.AuthenticationContext;
+import com.fallt.security.AuthenticationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;

@@ -42,7 +42,7 @@ class HabitServiceTest {
         habitDao = Mockito.mock(HabitDaoImpl.class);
         userService = Mockito.mock(UserService.class);
         consoleOutput = Mockito.mock(ConsoleOutput.class);
-        habitService = new HabitService(consoleOutput, habitDao, executionDao, userService);
+        habitService = new HabitService(habitDao, executionDao, userService);
     }
 
     @Test
@@ -160,9 +160,9 @@ class HabitServiceTest {
                 createHabit("habit1"),
                 createHabit("habit2")
         );
-        when(habitDao.getAllUserHabits(user.getId(), Fetch.LAZY)).thenReturn(habits);
+        when(habitDao.getAllUserHabits(user.getId())).thenReturn(habits);
 
-        List<HabitResponse> expected = habitService.getAllHabits(user.getEmail(), Fetch.LAZY);
+        List<HabitResponse> expected = habitService.getAllHabits(user.getEmail());
 
         assertThat(expected).hasSize(2);
         assertThat(habits).isEqualTo(expected);

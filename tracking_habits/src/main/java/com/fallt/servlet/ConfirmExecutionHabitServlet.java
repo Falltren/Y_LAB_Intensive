@@ -4,9 +4,10 @@ import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.SecurityException;
+import com.fallt.exception.ValidationException;
+import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
-import com.fallt.util.AuthenticationContext;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContext;
@@ -42,12 +43,13 @@ public class ConfirmExecutionHabitServlet extends HttpServlet {
         HabitConfirmRequest request = objectMapper.readValue(req.getInputStream(), HabitConfirmRequest.class);
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
+            validationService.checkHabitConfirmRequest(request);
             HabitExecutionResponse response = habitService.confirmHabit(emailCurrentUser, request);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setContentType(CONTENT_TYPE);
             byte[] bytes = objectMapper.writeValueAsBytes(response);
             resp.getOutputStream().write(bytes);
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | ValidationException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, objectMapper, e.getMessage());
         } catch (SecurityException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, objectMapper, e.getMessage());

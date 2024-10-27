@@ -7,6 +7,7 @@ import com.fallt.repository.UserDao;
 import com.fallt.repository.impl.HabitDaoImpl;
 import com.fallt.repository.impl.HabitExecutionDaoImpl;
 import com.fallt.repository.impl.UserDaoImpl;
+import com.fallt.security.AuthenticationContext;
 import com.fallt.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

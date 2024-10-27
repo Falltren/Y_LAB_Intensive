@@ -28,11 +28,10 @@ public interface HabitDao {
     /**
      * Получение списка привычек пользователя
      *
-     * @param userId    Идентификатор пользователя
-     * @param fetchType Параметр, указывающий необходимость выгрузки данных по выполнению привычек вместе с привычками
+     * @param userId Идентификатор пользователя
      * @return Список привычек
      */
-    List<Habit> getAllUserHabits(Long userId, Fetch fetchType);
+    List<Habit> getAllUserHabits(Long userId);
 
     /**
      * Поиск привычки по названию

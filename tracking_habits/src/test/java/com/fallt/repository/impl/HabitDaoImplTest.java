@@ -48,7 +48,7 @@ class HabitDaoImplTest extends AbstractTest {
         habit.setUser(user);
         habitDao.save(habit);
 
-        List<Habit> habits = habitDao.getAllUserHabits(user.getId(), Fetch.LAZY);
+        List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
         assertThat(habits).hasSize(1);
     }
@@ -77,7 +77,7 @@ class HabitDaoImplTest extends AbstractTest {
         habitDao.save(habit1);
         habitDao.save(habit2);
 
-        List<Habit> habits = habitDao.getAllUserHabits(user.getId(), Fetch.LAZY);
+        List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
         assertThat(habits).hasSize(2);
         assertThat(habits.get(0).getTitle()).isEqualTo("habit1");
@@ -110,7 +110,7 @@ class HabitDaoImplTest extends AbstractTest {
         habitDao.save(habit2);
         habitDao.delete(user.getId(), "habit1");
 
-        List<Habit> habits = habitDao.getAllUserHabits(user.getId(), Fetch.EAGER);
+        List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
         assertThat(habits).hasSize(1);
         assertThat(habits.get(0).getTitle()).isEqualTo("habit2");
