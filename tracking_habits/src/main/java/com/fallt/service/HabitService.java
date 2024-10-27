@@ -1,6 +1,7 @@
 package com.fallt.service;
 
-import com.fallt.aop.Loggable;
+import com.fallt.aop.audit.Auditable;
+import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.dto.response.HabitExecutionResponse;
@@ -24,6 +25,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 @Loggable
+@Auditable
 public class HabitService {
 
     private final HabitDao habitDao;
@@ -38,7 +40,7 @@ public class HabitService {
      * @param userEmail Электронная почта пользователя
      * @param request   Объект с данными по новой привычке
      */
-    public HabitResponse createHabit(String userEmail, UpsertHabitRequest request) {
+    public HabitResponse saveHabit(String userEmail, UpsertHabitRequest request) {
         User user = userService.getUserByEmail(userEmail);
         if (findHabit(user, request.getTitle()).isPresent()) {
             throw new AlreadyExistException("Привычка с указанным названием уже существует");

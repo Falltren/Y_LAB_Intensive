@@ -28,7 +28,11 @@ public class AuthenticationContext {
         checkAuthentication(userEmail);
         Role currentUserRole = context.get(userEmail).getRole();
         if (!currentUserRole.equals(requiredRole)){
-            throw new SecurityException("У вас недостаточно прав для выполнения данного действия");
+            throw new SecurityException("У вас недостаточно прав для выполнения данного действия"); // при использовании spring будет приводить к статусу 403 в ответе
         }
+    }
+
+    public UserDetails getCurrentUser(){
+        return context.values().stream().findFirst().orElseThrow(() -> new SecurityException("Ошибка аутентификации"));
     }
 }

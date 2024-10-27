@@ -1,4 +1,4 @@
-package com.fallt.aop;
+package com.fallt.aop.logging;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class LoggableAspect {
 
-    @Pointcut("within(@com.fallt.aop.Loggable *) && execution(* *(..))")
+    @Pointcut("within(@com.fallt.aop.logging.Loggable *) && execution(* *(..))")
     public void annotatedByLoggable() {
     }
 

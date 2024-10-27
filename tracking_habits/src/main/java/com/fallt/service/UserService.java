@@ -1,6 +1,7 @@
 package com.fallt.service;
 
-import com.fallt.aop.Loggable;
+import com.fallt.aop.audit.Auditable;
+import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
@@ -22,6 +23,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 @Loggable
+@Auditable
 public class UserService {
 
     private final UserDao userDao;
@@ -59,7 +61,7 @@ public class UserService {
      * @param request Объект с данным пользователя
      * @return Сохраненный в базе данных пользователь с идентификатором
      */
-    public UserResponse createUser(UpsertUserRequest request) {
+    public UserResponse saveUser(UpsertUserRequest request) {
         if (isExistsEmail(request.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", request.getEmail()));
         }

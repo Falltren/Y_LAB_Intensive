@@ -112,7 +112,7 @@ class HabitServletTest {
         habitServlet.doPost(req, resp);
 
         verify(resp).setStatus(HttpServletResponse.SC_CREATED);
-        verify(habitService, times(1)).createHabit(currentEmail, request);
+        verify(habitService, times(1)).saveHabit(currentEmail, request);
     }
 
     @Test

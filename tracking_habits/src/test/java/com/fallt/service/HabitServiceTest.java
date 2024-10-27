@@ -57,7 +57,7 @@ class HabitServiceTest {
         when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.empty());
         when(habitDao.save(any(Habit.class))).thenReturn(habit);
 
-        HabitResponse response = habitService.createHabit(user.getEmail(), request);
+        HabitResponse response = habitService.saveHabit(user.getEmail(), request);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -70,7 +70,7 @@ class HabitServiceTest {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.of(new Habit()));
 
-        assertThrows(AlreadyExistException.class, () -> habitService.createHabit(user.getEmail(), upsertHabitRequest));
+        assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(user.getEmail(), upsertHabitRequest));
     }
 
     @Test

@@ -28,7 +28,7 @@ public class RegistrationServlet extends HttpServlet {
         UpsertUserRequest request = objectMapper.readValue(req.getInputStream(), UpsertUserRequest.class);
         try {
             if (validationService.checkUpsertUserRequest(request)) {
-                UserResponse response = userService.createUser(request);
+                UserResponse response = userService.saveUser(request);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.setContentType("application/json");
                 byte[] bytes = objectMapper.writeValueAsBytes(response);

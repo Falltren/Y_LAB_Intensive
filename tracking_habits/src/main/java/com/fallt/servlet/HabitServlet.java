@@ -65,7 +65,7 @@ public class HabitServlet extends HttpServlet {
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
             validationService.checkUpsertHabitRequest(request);
-            HabitResponse response = habitService.createHabit(emailCurrentUser, request);
+            HabitResponse response = habitService.saveHabit(emailCurrentUser, request);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setContentType(CONTENT_TYPE);
             byte[] bytes = objectMapper.writeValueAsBytes(response);

@@ -69,7 +69,7 @@ class RegistrationServletTest {
         registrationServlet.doPost(req, resp);
 
         verify(resp).setStatus(HttpServletResponse.SC_CREATED);
-        verify(userService).createUser((request));
+        verify(userService).saveUser((request));
     }
 
     @Test
@@ -83,7 +83,7 @@ class RegistrationServletTest {
         registrationServlet.doPost(req, resp);
 
         verify(resp).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        verify(userService, never()).createUser(request);
+        verify(userService, never()).saveUser(request);
     }
 
     @Test
@@ -93,7 +93,7 @@ class RegistrationServletTest {
         when(validationService.checkUpsertUserRequest(request)).thenReturn(true);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        when(userService.createUser(request)).thenThrow(AlreadyExistException.class);
+        when(userService.saveUser(request)).thenThrow(AlreadyExistException.class);
 
         registrationServlet.doPost(req, resp);
 

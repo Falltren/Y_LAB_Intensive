@@ -87,7 +87,7 @@ class UserServiceTest {
         UpsertUserRequest upsertUserRequest = createRequest("user@user.user", "pwd");
         when(userDao.create(any(User.class))).thenReturn(userFromDb);
 
-        UserResponse response = userService.createUser(upsertUserRequest);
+        UserResponse response = userService.saveUser(upsertUserRequest);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -98,7 +98,7 @@ class UserServiceTest {
         UpsertUserRequest request = createRequest("user@user.user", "user1");
         when(userDao.getUserByEmail(request.getEmail())).thenReturn(Optional.of(new User()));
 
-        assertThrows(AlreadyExistException.class, () -> userService.createUser(request));
+        assertThrows(AlreadyExistException.class, () -> userService.saveUser(request));
     }
 
     @Test
@@ -107,7 +107,7 @@ class UserServiceTest {
         UpsertUserRequest request = createRequest("user1@user.user", "user");
         when(userDao.getUserByPassword(request.getPassword())).thenReturn(Optional.of(new User()));
 
-        assertThrows(AlreadyExistException.class, () -> userService.createUser(request));
+        assertThrows(AlreadyExistException.class, () -> userService.saveUser(request));
     }
 
     @Test

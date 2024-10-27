@@ -1,6 +1,6 @@
 package com.fallt.service;
 
-import com.fallt.aop.Loggable;
+import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitProgress;
 import com.fallt.dto.request.ReportRequest;
