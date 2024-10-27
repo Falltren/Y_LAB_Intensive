@@ -2,6 +2,7 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
@@ -93,6 +94,20 @@ class AuthServletTest {
     void whenAuthenticateUserWithoutPassword_thenReturnBadRequest() throws Exception {
         LoginRequest request = createRequest("email", null);
         when(validationService.checkLoginRequest(request)).thenThrow(ValidationException.class);
+        when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
+        when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
+
+        authServlet.doPost(req, resp);
+
+        verify(resp).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("Попытка аутентификации с некорректной электронной почтой")
+    void whenAuthenticateUserWithIncorrectEmail_thenReturnBadRequest() throws Exception {
+        LoginRequest request = createRequest("incorrectEmail", "password");
+        when(validationService.checkLoginRequest(request)).thenReturn(true);
+        when(authService.login(request, authenticationContext)).thenThrow(EntityNotFoundException.class);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
 

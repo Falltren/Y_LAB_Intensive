@@ -2,11 +2,12 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
+import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
 import com.fallt.service.ValidationService;
-import com.fallt.security.AuthenticationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -37,7 +38,7 @@ public class AuthServlet extends HttpServlet {
                 byte[] bytes = objectMapper.writeValueAsBytes(response);
                 resp.getOutputStream().write(bytes);
             }
-        } catch (ValidationException e) {
+        } catch (ValidationException | EntityNotFoundException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, objectMapper, e.getMessage());
         } catch (SecurityException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, objectMapper, e.getMessage());

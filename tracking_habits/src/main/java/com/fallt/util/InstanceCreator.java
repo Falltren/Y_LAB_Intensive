@@ -29,8 +29,7 @@ public class InstanceCreator implements ServletContextListener {
         HabitExecutionDao habitExecutionDao = new HabitExecutionDaoImpl();
         UserService userService = new UserService(userDao, consoleOutput);
         HabitService habitService = new HabitService(habitDao, habitExecutionDao, userService);
-        RegistrationService registrationService = new RegistrationService(userService);
-        AuthService authService = new AuthService(userService, consoleOutput);
+        AuthService authService = new AuthService(userService);
         StatisticService statisticService = new StatisticService();
         ValidationService validationService = new ValidationService();
         AuthenticationContext authenticationContext = new AuthenticationContext();
@@ -43,7 +42,6 @@ public class InstanceCreator implements ServletContextListener {
         context.setAttribute("objectMapper", objectMapper);
         context.setAttribute("habitService", habitService);
         context.setAttribute("userService", userService);
-        context.setAttribute("registrationService", registrationService);
         context.setAttribute("authService", authService);
         context.setAttribute("statisticService", statisticService);
         context.setAttribute("validationService", validationService);

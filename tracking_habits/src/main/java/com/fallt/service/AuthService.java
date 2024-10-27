@@ -4,6 +4,7 @@ import com.fallt.aop.Loggable;
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.User;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.SecurityException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.out.ConsoleOutput;
@@ -20,19 +21,18 @@ public class AuthService {
 
     private final UserService userService;
 
-    private final ConsoleOutput consoleOutput;
-
     /**
      * Проверка наличия пользователя в базе данных
      *
      * @param request Дто, содержащий электронную почту и пароль пользователя
+     * @param authenticationContext Контекст аутентификации, хранящий данные о пользователе, который вошел в приложение
      * @return Возвращает объект класса User в случае успешной аутентификации
      * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
      */
     public UserResponse login(LoginRequest request, AuthenticationContext authenticationContext) {
         User user = userService.getUserByEmail(request.getEmail());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
-            throw new SecurityException("Ошибка аутентификации, проверьте электронную почту и пароль");
+            throw new EntityNotFoundException("Проверьте электронную почту и пароль");
         }
         if (user.isBlocked()) {
             throw new SecurityException("Ваша учетная запись заблокирована");

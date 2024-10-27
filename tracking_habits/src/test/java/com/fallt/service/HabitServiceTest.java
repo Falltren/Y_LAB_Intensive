@@ -2,59 +2,64 @@ package com.fallt.service;
 
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
+import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.dto.response.HabitResponse;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
+import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.repository.impl.HabitDaoImpl;
-import com.fallt.util.Fetch;
-import com.fallt.util.Message;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class HabitServiceTest {
 
+    @InjectMocks
     private HabitService habitService;
 
+    @Mock
     private ConsoleOutput consoleOutput;
 
+    @Mock
     private HabitDao habitDao;
 
+    @Mock
     private HabitExecutionDao executionDao;
 
+    @Mock
     private UserService userService;
-
-    @BeforeEach
-    void setup() {
-        executionDao = Mockito.mock(HabitExecutionDao.class);
-        habitDao = Mockito.mock(HabitDaoImpl.class);
-        userService = Mockito.mock(UserService.class);
-        consoleOutput = Mockito.mock(ConsoleOutput.class);
-        habitService = new HabitService(habitDao, executionDao, userService);
-    }
 
     @Test
     @DisplayName("Успешное добавление привычки")
     void createHabit() {
         User user = createUser();
-        UpsertHabitRequest upsertHabitRequest = createHabitDto();
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.empty());
+        Habit habit = createHabit("habit");
+        UpsertHabitRequest request = createHabitDto();
+        HabitResponse expected = new HabitResponse(request.getTitle(), request.getText(), new ArrayList<>());
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.empty());
+        when(habitDao.save(any(Habit.class))).thenReturn(habit);
 
-        habitService.createHabit(user.getEmail(), upsertHabitRequest);
+        HabitResponse response = habitService.createHabit(user.getEmail(), request);
 
-        verify(habitDao, times(1)).save(any(Habit.class));
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -62,12 +67,10 @@ class HabitServiceTest {
     void createHabitWithDuplicateTitle() {
         User user = createUser();
         UpsertHabitRequest upsertHabitRequest = createHabitDto();
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.of(new Habit()));
 
-        habitService.createHabit(user.getEmail(), upsertHabitRequest);
-
-        verify(consoleOutput).printMessage(Message.HABIT_EXIST);
-        verify(habitDao, times(0)).save(any(Habit.class));
+        assertThrows(AlreadyExistException.class, () -> habitService.createHabit(user.getEmail(), upsertHabitRequest));
     }
 
     @Test
@@ -98,27 +101,30 @@ class HabitServiceTest {
     @Test
     @DisplayName("Удаление привычки")
     void testDeleteHabit() {
+        String title = "title";
         User user = createUser();
-        UpsertHabitRequest upsertHabitRequest = createHabitDto();
-        habitService.createHabit(user.getEmail(), upsertHabitRequest);
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
 
-        habitService.deleteHabit(user.getEmail(), upsertHabitRequest.getTitle());
+        habitService.deleteHabit(user.getEmail(), title);
 
-        assertThat(user.getHabits()).isEmpty();
+        verify(habitDao, times(1)).delete(user.getId(), title);
     }
 
     @Test
     @DisplayName("Обновление данных о привычке")
     void testUpdateHabit() {
-        String newTitle = "new title";
         User user = createUser();
         Habit habit = createHabit("old title");
-        UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
+        UpsertHabitRequest request = createHabitDto();
+        HabitResponse expected = new HabitResponse(request.getTitle(), request.getText(), new ArrayList<>());
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
+        when(habitDao.update(any(Habit.class))).thenReturn(habit);
 
-        habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest);
+        HabitResponse response = habitService.updateHabit(user.getEmail(), habit.getTitle(), request);
 
         verify(habitDao, times(1)).update(habit);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -128,12 +134,24 @@ class HabitServiceTest {
         User user = createUser();
         Habit habit = createHabit("old title");
         UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(newTitle).build();
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.empty());
 
-        habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest);
+        assertThrows(EntityNotFoundException.class, () -> habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest));
 
-        verify(habitDao, times(0)).update(habit);
-        verify(consoleOutput).printMessage(Message.INCORRECT_HABIT_TITLE);
+    }
+
+    @Test
+    @DisplayName("Попытка обновления привычки с использованием названия уже имеющейся привычки")
+    void testUpdateHabitWithExistsTitle(){
+        String title = "exists title";
+        User user = createUser();
+        Habit habit = createHabit("exists title");
+        UpsertHabitRequest request = UpsertHabitRequest.builder().title(title).build();
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.of(habit));
+
+        assertThrows(AlreadyExistException.class, () -> habitService.updateHabit(user.getEmail(), title, request));
     }
 
     @Test
@@ -141,15 +159,34 @@ class HabitServiceTest {
     void testConfirmHabit() {
         User user = createUser();
         Habit habit = createHabit("habit");
+        LocalDate execution = LocalDate.of(2024, 10, 20);
+        HabitExecution habitExecution = new HabitExecution(1L, execution, habit);
         HabitConfirmRequest request = HabitConfirmRequest.builder()
                 .title(habit.getTitle())
                 .date(LocalDate.now())
                 .build();
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
+        HabitExecutionResponse expected = new HabitExecutionResponse(request.getTitle(), execution);
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.of(habit));
+        when(executionDao.save(any(HabitExecution.class))).thenReturn(habitExecution);
 
-        habitService.confirmHabit(user.getEmail(), request);
+        HabitExecutionResponse response = habitService.confirmHabit(user.getEmail(), request);
 
-        verify(executionDao, times(1)).save(any(HabitExecution.class));
+        assertThat(response).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Попытка отметки выполнения несуществующей привычки")
+    void testConformHabitWithIncorrectTitle() {
+        User user = createUser();
+        HabitConfirmRequest request = HabitConfirmRequest.builder()
+                .title("incorrectTitle")
+                .date(LocalDate.now())
+                .build();
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(user.getEmail(), request));
     }
 
     @Test
@@ -160,12 +197,16 @@ class HabitServiceTest {
                 createHabit("habit1"),
                 createHabit("habit2")
         );
+        List<HabitResponse> expected = List.of(
+                new HabitResponse("habit1", "text", new ArrayList<>()),
+                new HabitResponse("habit2", "text", new ArrayList<>())
+        );
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(habitDao.getAllUserHabits(user.getId())).thenReturn(habits);
 
-        List<HabitResponse> expected = habitService.getAllHabits(user.getEmail());
+        List<HabitResponse> response = habitService.getAllHabits(user.getEmail());
 
-        assertThat(expected).hasSize(2);
-        assertThat(habits).isEqualTo(expected);
+        assertThat(response).isEqualTo(expected);
     }
 
     private User createUser() {

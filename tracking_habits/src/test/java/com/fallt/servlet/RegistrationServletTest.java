@@ -3,7 +3,7 @@ package com.fallt.servlet;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.ValidationException;
-import com.fallt.service.RegistrationService;
+import com.fallt.service.UserService;
 import com.fallt.service.ValidationService;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -36,7 +36,7 @@ class RegistrationServletTest {
     private ServletContext servletContext;
 
     @Mock
-    private RegistrationService registrationService;
+    private UserService userService;
 
     @Mock
     private ValidationService validationService;
@@ -52,7 +52,7 @@ class RegistrationServletTest {
     @BeforeEach
     void setup() throws ServletException {
         registrationServlet.init(servletConfig);
-        when(servletContext.getAttribute("registrationService")).thenReturn(registrationService);
+        when(servletContext.getAttribute("userService")).thenReturn(userService);
         when(servletContext.getAttribute("validationService")).thenReturn(validationService);
         when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
         when(registrationServlet.getServletContext()).thenReturn(servletContext);
@@ -69,7 +69,7 @@ class RegistrationServletTest {
         registrationServlet.doPost(req, resp);
 
         verify(resp).setStatus(HttpServletResponse.SC_CREATED);
-        verify(registrationService).register((request));
+        verify(userService).createUser((request));
     }
 
     @Test
@@ -83,7 +83,7 @@ class RegistrationServletTest {
         registrationServlet.doPost(req, resp);
 
         verify(resp).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        verify(registrationService, never()).register(request);
+        verify(userService, never()).createUser(request);
     }
 
     @Test
@@ -93,7 +93,7 @@ class RegistrationServletTest {
         when(validationService.checkUpsertUserRequest(request)).thenReturn(true);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        when(registrationService.register(request)).thenThrow(AlreadyExistException.class);
+        when(userService.createUser(request)).thenThrow(AlreadyExistException.class);
 
         registrationServlet.doPost(req, resp);
 
