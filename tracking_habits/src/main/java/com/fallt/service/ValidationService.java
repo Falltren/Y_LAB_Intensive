@@ -54,7 +54,7 @@ public class ValidationService {
     }
 
     public boolean checkHabitConfirmRequest(HabitConfirmRequest request) {
-        if (request.getDate() != null) {
+        if (request.getDate() == null) {
             throw new ValidationException("Дата выполнения привычки должны быть указана");
         }
         if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {

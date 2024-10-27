@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.Loggable;
 import com.fallt.dto.ExecutionDto;
 import com.fallt.dto.HabitProgress;
 import com.fallt.entity.Habit;
@@ -13,6 +14,7 @@ import java.util.List;
  * Класс для расчета различной статистики по выполнению привычек пользователем
  */
 @RequiredArgsConstructor
+@Loggable
 public class StatisticService {
     /**
      * Получение общей статистики по выполнению привычки пользователем, включая название привычки,
