@@ -5,7 +5,6 @@ import com.fallt.entity.Habit;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
-import com.fallt.util.Fetch;
 import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 

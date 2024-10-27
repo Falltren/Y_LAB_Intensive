@@ -6,10 +6,8 @@ import com.fallt.entity.User;
 import com.fallt.repository.AbstractTest;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
-import com.fallt.util.Fetch;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

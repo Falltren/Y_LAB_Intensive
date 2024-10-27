@@ -93,9 +93,7 @@ class HabitServiceTest {
         User user = createUser();
         when(habitDao.findHabitByTitleAndUserId(user.getId(), title)).thenReturn(Optional.empty());
 
-        Habit existedHAbit = habitService.getHabitByTitle(user, title);
-
-        assertThat(existedHAbit).isNull();
+        assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByTitle(user, title));
     }
 
     @Test
@@ -143,7 +141,7 @@ class HabitServiceTest {
 
     @Test
     @DisplayName("Попытка обновления привычки с использованием названия уже имеющейся привычки")
-    void testUpdateHabitWithExistsTitle(){
+    void testUpdateHabitWithExistsTitle() {
         String title = "exists title";
         User user = createUser();
         Habit habit = createHabit("exists title");

@@ -1,7 +1,6 @@
 package com.fallt.repository;
 
 import com.fallt.entity.Habit;
-import com.fallt.util.Fetch;
 
 import java.util.List;
 import java.util.Optional;

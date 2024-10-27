@@ -11,10 +11,8 @@ import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.HabitMapper;
-import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.util.Fetch;
 import lombok.RequiredArgsConstructor;
 
 import java.text.MessageFormat;
@@ -86,7 +84,7 @@ public class HabitService {
     /**
      * Получение всех привычек пользователя
      *
-     * @param email     Электронный адрес пользователя
+     * @param email Электронный адрес пользователя
      * @return Список привычек
      */
     public List<HabitResponse> getAllHabits(String email) {
@@ -128,7 +126,11 @@ public class HabitService {
      * если привычка у пользователя отсутствует
      */
     public Habit getHabitByTitle(User user, String title) {
-        return findHabit(user, title).orElse(null);
+        Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), title);
+        if (optionalHabit.isEmpty()) {
+            throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title));
+        }
+        return optionalHabit.get();
     }
 
 }

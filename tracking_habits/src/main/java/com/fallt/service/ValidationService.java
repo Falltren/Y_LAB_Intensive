@@ -1,9 +1,6 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.request.UpsertUserRequest;
+import com.fallt.dto.request.*;
 import com.fallt.entity.ExecutionRate;
 import com.fallt.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +56,19 @@ public class ValidationService {
         }
         if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {
             throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
+        }
+        return true;
+    }
+
+    public boolean checkReportRequest(ReportRequest request) {
+        if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {
+            throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
+        }
+        if (request.getStart() == null || request.getEnd() == null) {
+            throw new ValidationException("Дата начала и окончания отчетного периода должны быть указаны");
+        }
+        if (request.getStart().isAfter(request.getEnd())) {
+            throw new ValidationException("Дата начала периода не может быть после даты окончания");
         }
         return true;
     }

@@ -1,9 +1,11 @@
 package com.fallt.service;
 
 import com.fallt.aop.Loggable;
-import com.fallt.dto.ExecutionDto;
-import com.fallt.dto.HabitProgress;
+import com.fallt.dto.response.ExecutionDto;
+import com.fallt.dto.response.HabitProgress;
+import com.fallt.dto.request.ReportRequest;
 import com.fallt.entity.Habit;
+import com.fallt.entity.User;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -16,19 +18,25 @@ import java.util.List;
 @RequiredArgsConstructor
 @Loggable
 public class StatisticService {
+
+    private final HabitService habitService;
+
+    private final UserService userService;
+
     /**
      * Получение общей статистики по выполнению привычки пользователем, включая название привычки,
      * % успешного выполнения и серии выполнения
      *
-     * @param habit Привычка
-     * @param start Дата начала периода
-     * @param end   Дата окончания периода
+     * @param userEmail Электронный адрес пользователя
+     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
      * @return Прогресс выполнения пользователем привычки
      */
-    public HabitProgress getHabitProgress(Habit habit, LocalDate start, LocalDate end) {
+    public HabitProgress getHabitProgress(String userEmail, ReportRequest request) {
+        User user = userService.getUserByEmail(userEmail);
+        Habit habit = habitService.getHabitByTitle(user, request.getTitle());
         HabitProgress progress = new HabitProgress();
         progress.setTitle(habit.getTitle());
-        List<ExecutionDto> executions = getHabitStreak(habit, start, end);
+        List<ExecutionDto> executions = getHabitStreak(userEmail, request);
         progress.setSuccessRate(calculateSuccessRate(executions));
         progress.setExecution(executions);
         return progress;
@@ -37,29 +45,29 @@ public class StatisticService {
     /**
      * Расчет % успешного выполнения привычки за указанный период
      *
-     * @param habit Привычка пользователя
-     * @param start Дата начала периода
-     * @param end   Дата окончания периода
+     * @param userEmail Электронный адрес пользователя
+     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
      * @return % успешного выполнения привычки
      */
-    public int getSuccessHabitRate(Habit habit, LocalDate start, LocalDate end) {
-        List<ExecutionDto> executions = getHabitStreak(habit, start, end);
+    public int getSuccessHabitRate(String userEmail, ReportRequest request) {
+        List<ExecutionDto> executions = getHabitStreak(userEmail, request);
         return calculateSuccessRate(executions);
     }
 
     /**
      * Расчет серии выполнения привычки
      *
-     * @param habit Привычка пользователя
-     * @param start Дата начала периода
-     * @param end   Дата окончания периода
+     * @param userEmail Электронный адрес пользователя
+     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
      * @return Список с данными по выполнению привычки за указанны период
      */
-    public List<ExecutionDto> getHabitStreak(Habit habit, LocalDate start, LocalDate end) {
+    public List<ExecutionDto> getHabitStreak(String userEmail, ReportRequest request) {
+        User user = userService.getUserByEmail(userEmail);
+        Habit habit = habitService.getHabitByTitle(user, request.getTitle());
         return switch (habit.getExecutionRate()) {
-            case DAILY -> getDailyHabitStreak(habit, start, end);
-            case WEEKLY -> getWeeklyHabitStreak(habit, start, end);
-            case MONTHLY -> getMonthlyHabitStreak(habit, start, end);
+            case DAILY -> getDailyHabitStreak(habit, request.getStart(), request.getEnd());
+            case WEEKLY -> getWeeklyHabitStreak(habit, request.getStart(), request.getEnd());
+            case MONTHLY -> getMonthlyHabitStreak(habit, request.getStart(), request.getEnd());
         };
     }
 
