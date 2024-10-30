@@ -6,6 +6,7 @@ import com.fallt.repository.HabitExecutionDao;
 import com.fallt.util.DBUtils;
 import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 
@@ -13,6 +14,7 @@ import java.sql.*;
  * Класс предназначен для взаимодействия с таблицей habit_execution посредствам SQL запросов
  */
 @RequiredArgsConstructor
+@Repository
 public class HabitExecutionDaoImpl implements HabitExecutionDao {
 
     private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";

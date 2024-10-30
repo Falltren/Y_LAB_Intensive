@@ -76,7 +76,6 @@ class UserServiceTest {
         User existedUser = userService.getUserByEmail(email);
 
         assertThat(existedUser).isNull();
-        verify(consoleOutput).printMessage(Message.INCORRECT_EMAIL);
     }
 
     @Test

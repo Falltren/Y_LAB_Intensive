@@ -12,6 +12,7 @@ import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.UserDao;
 import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -24,11 +25,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Loggable
 @Auditable
+@Service
 public class UserService {
 
     private final UserDao userDao;
-
-    private final ConsoleOutput consoleOutput;
 
     /**
      * Получение всех пользователей (доступно только пользователям с ролью ROLE_ADMIN)
@@ -49,7 +49,7 @@ public class UserService {
     public User getUserByEmail(String email) {
         Optional<User> user = userDao.getUserByEmail(email);
         if (user.isEmpty()) {
-            consoleOutput.printMessage(Message.INCORRECT_EMAIL);
+            System.out.println(Message.INCORRECT_EMAIL);
             return null;
         }
         return user.get();

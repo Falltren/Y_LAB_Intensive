@@ -1,12 +1,13 @@
 package com.fallt.service;
 
 import com.fallt.aop.logging.Loggable;
+import com.fallt.dto.request.ReportRequest;
 import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitProgress;
-import com.fallt.dto.request.ReportRequest;
 import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class StatisticService {
 
     private final HabitService habitService;

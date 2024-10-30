@@ -11,6 +11,7 @@ import com.fallt.mapper.UserMapper;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.security.UserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Аутентификация пользователя
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Loggable
 @Auditable
+@Service
 public class AuthService {
 
     private final UserService userService;
@@ -30,7 +32,7 @@ public class AuthService {
      * @return Возвращает объект класса User в случае успешной аутентификации
      * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
      */
-    public UserResponse login(LoginRequest request, AuthenticationContext authenticationContext) {
+    public UserResponse login(LoginRequest request, String sessionId, AuthenticationContext authenticationContext) {
         User user = userService.getUserByEmail(request.getEmail());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             throw new EntityNotFoundException("Проверьте электронную почту и пароль");
@@ -38,7 +40,7 @@ public class AuthService {
         if (user.isBlocked()) {
             throw new SecurityException("Ваша учетная запись заблокирована");
         }
-        authenticationContext.authenticate(UserDetails.createUserDetails(user));
+        authenticationContext.authenticate(sessionId, UserDetails.createUserDetails(user));
         return UserMapper.INSTANCE.toResponse(user);
     }
 }

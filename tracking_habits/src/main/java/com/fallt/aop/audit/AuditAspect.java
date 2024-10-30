@@ -6,10 +6,12 @@ import com.fallt.dto.request.UpsertUserRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Aspect
+@Component
 public class AuditAspect {
 
     private final AuditWriter writer;

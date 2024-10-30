@@ -1,0 +1,7 @@
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/habit_db
+#    username: y_lab_user
+#    password: y_lab_password
+#  liquibase:
+#    change-log: classpath:config/liquibase/master.xml

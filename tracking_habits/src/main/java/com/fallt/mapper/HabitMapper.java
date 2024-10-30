@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface HabitMapper {
 
     HabitMapper INSTANCE = getMapper(HabitMapper.class);

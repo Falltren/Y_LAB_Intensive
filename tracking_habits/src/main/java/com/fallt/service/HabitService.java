@@ -15,6 +15,7 @@ import com.fallt.mapper.HabitMapper;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Loggable
 @Auditable
+@Service
 public class HabitService {
 
     private final HabitDao habitDao;

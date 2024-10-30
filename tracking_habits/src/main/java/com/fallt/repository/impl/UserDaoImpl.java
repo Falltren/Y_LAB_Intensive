@@ -7,6 +7,7 @@ import com.fallt.repository.UserDao;
 import com.fallt.util.DBUtils;
 import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.Optional;
  * Класс предназначен для взаимодействия с таблицей users посредствам SQL запросов
  */
 @RequiredArgsConstructor
+@Repository
 public class UserDaoImpl implements UserDao {
 
     private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";

@@ -4,7 +4,7 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
-  <listener>
-    <listener-class>com.fallt.util.InstanceCreator</listener-class>
-  </listener>
+<!--  <listener>-->
+<!--    <listener-class>com.fallt.util.InstanceCreator</listener-class>-->
+<!--  </listener>-->
 </web-app>

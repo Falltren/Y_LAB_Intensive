@@ -7,6 +7,7 @@ import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
 import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.*;
  * Класс предназначен для взаимодействия с таблицей habits посредствам SQL запросов
  */
 @RequiredArgsConstructor
+@Repository
 public class HabitDaoImpl implements HabitDao {
 
     private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";

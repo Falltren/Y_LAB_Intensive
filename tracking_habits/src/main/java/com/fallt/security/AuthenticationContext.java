@@ -2,6 +2,7 @@ package com.fallt.security;
 
 import com.fallt.entity.Role;
 import com.fallt.exception.SecurityException;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Класс предназначенный для хранения данных об аутентифицированных пользователях
  */
+@Component
 public class AuthenticationContext {
 
     private final Map<String, UserDetails> context = new ConcurrentHashMap<>();
@@ -18,8 +20,8 @@ public class AuthenticationContext {
      *
      * @param userDetails Класс, содержащий данные о пользователе
      */
-    public void authenticate(UserDetails userDetails) {
-        context.put(userDetails.getEmail(), userDetails);
+    public void authenticate(String sessionId, UserDetails userDetails) {
+        context.put(sessionId, userDetails);
     }
 
     /**
@@ -34,10 +36,10 @@ public class AuthenticationContext {
     /**
      * Проверка наличия пользователя в контексте аутентификации
      *
-     * @param email Электронный адрес пользователя
+     * @param sessionId Id сессии
      */
-    public void checkAuthentication(String email) {
-        if (!context.containsKey(email)) {
+    public void checkAuthentication(String sessionId) {
+        if (!context.containsKey(sessionId)) {
             throw new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться");
         }
     }
@@ -54,5 +56,9 @@ public class AuthenticationContext {
         if (!currentUserRole.equals(requiredRole)) {
             throw new SecurityException("У вас недостаточно прав для выполнения данного действия"); // при использовании spring будет приводить к статусу 403 в ответе
         }
+    }
+
+    public String getEmailCurrentUser(String sessionId) {
+        return context.get(sessionId).getEmail();
     }
 }

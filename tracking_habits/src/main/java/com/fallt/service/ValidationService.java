@@ -3,7 +3,7 @@ package com.fallt.service;
 import com.fallt.dto.request.*;
 import com.fallt.entity.ExecutionRate;
 import com.fallt.exception.ValidationException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Сервис предназначенный для валидации данных в запросах
  */
-@RequiredArgsConstructor
+@Service
 public class ValidationService {
 
     public boolean checkUpsertUserRequest(UpsertUserRequest request) {
