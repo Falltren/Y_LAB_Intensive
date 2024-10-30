@@ -4,6 +4,7 @@ import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
+import com.fallt.service.ValidationService;
 import com.fallt.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,13 @@ public class AuthController {
 
     private final AuthenticationContext authenticationContext;
 
+    private final ValidationService validationService;
+
     private final SessionUtils sessionUtils;
 
     @PostMapping("/login")
     public UserResponse login(@RequestBody LoginRequest request) {
+        validationService.checkLoginRequest(request);
         String sessionId = sessionUtils.getSessionIdFromContext();
         return authService.login(request, sessionId, authenticationContext);
     }

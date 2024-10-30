@@ -5,9 +5,9 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.UserDao;
-import com.fallt.util.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,9 +73,7 @@ class UserServiceTest {
         String email = "incorrectEmail";
         when(userDao.getUserByEmail(email)).thenReturn(Optional.empty());
 
-        User existedUser = userService.getUserByEmail(email);
-
-        assertThat(existedUser).isNull();
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserByEmail(email));
     }
 
     @Test

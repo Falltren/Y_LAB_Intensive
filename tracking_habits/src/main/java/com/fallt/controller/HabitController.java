@@ -9,7 +9,7 @@ import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
 import com.fallt.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +34,7 @@ public class HabitController {
     }
 
     @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
     public HabitResponse createHabit(@RequestBody UpsertHabitRequest request) {
         validationService.checkUpsertHabitRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
@@ -41,6 +42,7 @@ public class HabitController {
     }
 
     @PostMapping("/confirm")
+    @ResponseStatus(HttpStatus.CREATED)
     public HabitExecutionResponse confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
         validationService.checkHabitConfirmRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
@@ -54,6 +56,7 @@ public class HabitController {
     }
 
     @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteHabit(@RequestParam(name = "title") String title) {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         habitService.deleteHabit(userEmail, title);

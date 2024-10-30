@@ -53,6 +53,10 @@ class UserControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final String SESSION_ID = "sessionId";
+
+    private static final String USER_EMAIL = "email";
+
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
@@ -109,14 +113,12 @@ class UserControllerTest {
     @Test
     @DisplayName("Обновление данных о пользователе")
     void whenUpdateUser_thenReturnOk() throws Exception {
-        String userEmail = "email";
-        String sessionId = "sessionId";
         UpsertUserRequest request = createRequest();
         UserResponse response = createResponse();
         String content = objectMapper.writeValueAsString(request);
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(sessionId);
-        when(authenticationContext.getEmailCurrentUser(sessionId)).thenReturn(userEmail);
-        when(userService.updateUser(userEmail, request)).thenReturn(response);
+        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
+        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
+        when(userService.updateUser(USER_EMAIL, request)).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,13 +131,11 @@ class UserControllerTest {
     @Test
     @DisplayName("Попытка обновления данных о пользователе с указанием используемого email")
     void whenUpdateUserWithExistsEmail_thenReturnBadRequest() throws Exception {
-        String userEmail = "email";
-        String sessionId = "sessionId";
         UpsertUserRequest request = createRequest();
         String content = objectMapper.writeValueAsString(request);
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(sessionId);
-        when(authenticationContext.getEmailCurrentUser(sessionId)).thenReturn(userEmail);
-        when(userService.updateUser(userEmail, request)).thenThrow(AlreadyExistException.class);
+        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
+        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
+        when(userService.updateUser(USER_EMAIL, request)).thenThrow(AlreadyExistException.class);
 
         mockMvc.perform(put("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,9 +162,8 @@ class UserControllerTest {
     @Test
     @DisplayName("Получение данных о всех пользователях")
     void whenUserWithoutRoleAdminGetAllUsers_thenReturnForbidden() throws Exception {
-        String sessionId = "sessionId";
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(sessionId);
-        doThrow(AuthorizationException.class).when(authenticationContext).checkRole(sessionId, Role.ROLE_ADMIN);
+        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
+        doThrow(AuthorizationException.class).when(authenticationContext).checkRole(SESSION_ID, Role.ROLE_ADMIN);
 
         mockMvc.perform(get("/api/v1/users"))
                 .andDo(print())
@@ -174,10 +173,8 @@ class UserControllerTest {
     @Test
     @DisplayName("Удаление пользователя")
     void whenDeleteUser_thenReturnNoContent() throws Exception {
-        String userEmail = "email";
-        String sessionId = "sessionId";
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(sessionId);
-        when(authenticationContext.getEmailCurrentUser(sessionId)).thenReturn(userEmail);
+        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
+        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
         mockMvc.perform(delete("/api/v1/users"))
                 .andDo(print())

@@ -7,10 +7,9 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.UserMapper;
-import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.UserDao;
-import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +48,7 @@ public class UserService {
     public User getUserByEmail(String email) {
         Optional<User> user = userDao.getUserByEmail(email);
         if (user.isEmpty()) {
-            System.out.println(Message.INCORRECT_EMAIL);
-            return null;
+            throw new EntityNotFoundException(MessageFormat.format("Пользователь с email: {0} не найден", email));
         }
         return user.get();
     }
