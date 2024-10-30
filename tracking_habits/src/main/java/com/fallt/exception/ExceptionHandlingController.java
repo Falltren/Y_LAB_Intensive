@@ -19,14 +19,25 @@ public class ExceptionHandlingController {
                 .body(body);
     }
 
-    @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<ExceptionResponse> handleSecurityException(Exception e) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ExceptionResponse> handleAuthenticationException(Exception e) {
         ExceptionResponse body = ExceptionResponse.builder()
                 .error("UNAUTHORIZED")
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(body);
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ExceptionResponse> handleAuthorizationException(Exception e) {
+        ExceptionResponse body = ExceptionResponse.builder()
+                .error("FORBIDDEN")
+                .timestamp(System.currentTimeMillis())
+                .errorDescription(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(body);
     }
 

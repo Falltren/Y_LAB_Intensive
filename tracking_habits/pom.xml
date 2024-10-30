@@ -29,6 +29,7 @@
         <aspectj.plugin.version>1.14.0</aspectj.plugin.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <plugin.war.version>3.4.0</plugin.war.version>
+        <json-path.version>2.9.0</json-path.version>
     </properties>
 
     <dependencies>
@@ -138,6 +139,17 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-framework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json-path.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -173,14 +185,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${plugin.war.version}</version>
-<!--                <configuration>-->
-<!--                    <webResources>-->
-<!--                        <resource>-->
-<!--                            <directory>${project.build.directory}/WEB-INF/classes</directory>-->
-<!--                            <targetPath>WEB-INF/classes</targetPath>-->
-<!--                        </resource>-->
-<!--                    </webResources>-->
-<!--                </configuration>-->
             </plugin>
         </plugins>
     </build>

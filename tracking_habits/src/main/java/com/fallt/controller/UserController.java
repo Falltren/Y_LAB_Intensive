@@ -2,6 +2,7 @@ package com.fallt.controller;
 
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
+import com.fallt.entity.Role;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
 import com.fallt.service.ValidationService;
@@ -27,6 +28,8 @@ public class UserController {
 
     @GetMapping
     public List<UserResponse> getAllUsers() {
+        String sessionId = sessionUtils.getSessionIdFromContext();
+        authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
         return userService.getAllUsers();
     }
 

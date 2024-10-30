@@ -6,7 +6,7 @@ import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.User;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.security.UserDetails;
@@ -38,7 +38,7 @@ public class AuthService {
             throw new EntityNotFoundException("Проверьте электронную почту и пароль");
         }
         if (user.isBlocked()) {
-            throw new SecurityException("Ваша учетная запись заблокирована");
+            throw new AuthenticationException("Ваша учетная запись заблокирована");
         }
         authenticationContext.authenticate(sessionId, UserDetails.createUserDetails(user));
         return UserMapper.INSTANCE.toResponse(user);
