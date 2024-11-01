@@ -171,6 +171,28 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Блокировка пользователя")
+    void whenBlockingUser_thenReturnOk() throws Exception {
+        String email = "user";
+
+        mockMvc.perform(put("/api/v1/users/block?email=" + email))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Попытка блокировки пользователя пользователем без роли ADMIN")
+    void whenUserWithoutRoleAdminBlockingUser_thenReturnForbidden() throws Exception{
+        String email = "user";
+        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
+        doThrow(AuthorizationException.class).when(authenticationContext).checkRole(SESSION_ID, Role.ROLE_ADMIN);
+
+        mockMvc.perform(put("/api/v1/users/block?email=" + email))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("Удаление пользователя")
     void whenDeleteUser_thenReturnNoContent() throws Exception {
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);

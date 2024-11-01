@@ -6,7 +6,6 @@ import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.UserDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,6 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
-    @Mock
-    private ConsoleOutput consoleOutput;
 
     @Mock
     private UserDao userDao;

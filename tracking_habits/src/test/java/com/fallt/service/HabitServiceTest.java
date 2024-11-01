@@ -9,7 +9,6 @@ import com.fallt.entity.HabitExecution;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +32,6 @@ class HabitServiceTest {
 
     @InjectMocks
     private HabitService habitService;
-
-    @Mock
-    private ConsoleOutput consoleOutput;
 
     @Mock
     private HabitDao habitDao;

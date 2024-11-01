@@ -2,12 +2,24 @@ package com.fallt.controller;
 
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
+import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.dto.response.HabitResponse;
+import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.AuthenticationException;
+import com.fallt.exception.EntityNotFoundException;
+import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
 import com.fallt.util.SessionUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/habits")
 @RequiredArgsConstructor
+@Tag(name = "Контроллер управления привычками")
 public class HabitController {
 
     private final HabitService habitService;
@@ -27,12 +40,45 @@ public class HabitController {
 
     private final ValidationService validationService;
 
+    @Operation(
+            summary = "Получение списка привычек",
+            description = "Возвращает список привычек пользователя"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получение списка привычек", content = {
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = HabitResponse.class)), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
+                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
+                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+            })
+    })
     @GetMapping
     public List<HabitResponse> getAllHabits() {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         return habitService.getAllHabits(userEmail);
     }
 
+    @Operation(
+            summary = "Добавление новой привычки",
+            description = "Добавляет новую привычку пользователю"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Добавление привычки", content = {
+                    @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
+                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
+                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
+                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+            })
+    })
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public HabitResponse createHabit(@RequestBody UpsertHabitRequest request) {
@@ -41,6 +87,24 @@ public class HabitController {
         return habitService.saveHabit(userEmail, request);
     }
 
+    @Operation(
+            summary = "Подтверждение выполнения привычки",
+            description = "Отмечает выполнение привычки в определенную дату"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Подтверждение выполнения привычки", content = {
+                    @Content(schema = @Schema(implementation = HabitExecutionResponse.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
+                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
+                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
+                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+            })
+    })
     @PostMapping("/confirm")
     @ResponseStatus(HttpStatus.CREATED)
     public HabitExecutionResponse confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
@@ -49,12 +113,43 @@ public class HabitController {
         return habitService.confirmHabit(userEmail, request);
     }
 
+    @Operation(
+            summary = "Обновление привычки",
+            description = "Обновляет данные о привычке"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Обновление привычки", content = {
+                    @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
+                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
+                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
+                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "404", description = "Указание отсутствующей для обновления привычки", content = {
+                    @Content(schema = @Schema(implementation = EntityNotFoundException.class), mediaType = "application/json")
+            })
+    })
     @PutMapping
     public HabitResponse updateHabit(@RequestParam(name = "title") String title, @RequestBody UpsertHabitRequest request) {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         return habitService.updateHabit(userEmail, title, request);
     }
 
+    @Operation(
+            summary = "Удаление привычки",
+            description = "Удаление привычки"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Удаление привычки"),
+            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
+                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+            })
+    })
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteHabit(@RequestParam(name = "title") String title) {
