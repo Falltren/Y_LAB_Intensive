@@ -9,15 +9,16 @@
 * Получение статистики по привычкам.
 
 #### Используемые технологии, фреймворки, библиотеки:
-Java 17, Testcontainers, Liquibase, Junit, Mockito, AspectJ, Mapstruct
+Java 17, Testcontainers, Liquibase, Junit, Mockito, AspectJ, Mapstruct, Swagger, Spring
 
 ## Настройки для запуска
 - Предварительно необходимо развернуть базу данных, для чего необходимо запустить файл `docker-compose.yml`, расположенный в директории docker. Настройки для подключения к базе данных
-указаны в файле конфигурации liquibase `src/main/resources/liquibase.properties.
+указаны в файле конфигурации `application.yaml`
 - Подготовить сервер Tomcat
-- Выполнить команду `mvn clean package`, далее скопировать директорию `target/tracking_habits` и вставить в директорию `webapps` подготовленного сервера Tomcat
+- Выполнить команду `mvn clean package`, далее скопировать сформированный war файл в директорию `webapps` подготовленного сервера Tomcat
 
 
 ## Запуск программы
 Запустить сервер Tomcat c с помощью файла `startup`, расположенного в директории `bin`
 После запуска, взаимодействие с приложением осуществляется с помощью отправки соответствующих http запросов
+Документация API доступна по адресу: url приложения/swagger-ui/index.html (например, localhost:8080/tracking_habits/swagger-ui/index.html)
