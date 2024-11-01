@@ -4,10 +4,7 @@ import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.dto.response.HabitResponse;
-import com.fallt.exception.AlreadyExistException;
-import com.fallt.exception.AuthenticationException;
-import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.ValidationException;
+import com.fallt.exception.*;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
@@ -48,10 +45,10 @@ public class HabitController {
                     @Content(array = @ArraySchema(schema = @Schema(implementation = HabitResponse.class)), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @GetMapping
@@ -69,13 +66,13 @@ public class HabitController {
                     @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PostMapping("/create")
@@ -95,13 +92,13 @@ public class HabitController {
                     @Content(schema = @Schema(implementation = HabitExecutionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PostMapping("/confirm")
@@ -121,16 +118,16 @@ public class HabitController {
                     @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "404", description = "Указание отсутствующей для обновления привычки", content = {
-                    @Content(schema = @Schema(implementation = EntityNotFoundException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PutMapping
@@ -146,7 +143,7 @@ public class HabitController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Удаление привычки"),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @DeleteMapping

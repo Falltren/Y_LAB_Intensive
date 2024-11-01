@@ -3,8 +3,7 @@ package com.fallt.controller;
 import com.fallt.dto.request.ReportRequest;
 import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitProgress;
-import com.fallt.exception.AuthenticationException;
-import com.fallt.exception.ValidationException;
+import com.fallt.exception.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.StatisticService;
 import com.fallt.service.ValidationService;
@@ -47,10 +46,10 @@ public class StatisticController {
                     @Content(schema = @Schema(implementation = HabitProgress.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @GetMapping("/full")
@@ -69,10 +68,10 @@ public class StatisticController {
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ExecutionDto.class)), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @GetMapping("/streak")

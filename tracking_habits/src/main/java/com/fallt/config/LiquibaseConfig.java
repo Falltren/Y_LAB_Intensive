@@ -8,6 +8,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 @Configuration
 @PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
@@ -46,11 +49,21 @@ public class LiquibaseConfig {
 
     @Bean
     public SpringLiquibase liquibase() {
+        createSchema(dataSource(), serviceSchema);
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setChangeLog(changeLog);
         liquibase.setDataSource(dataSource());
         liquibase.setLiquibaseSchema(serviceSchema);
         liquibase.setDefaultSchema(defaultSchema);
         return liquibase;
+    }
+
+    private void createSchema(DataSource dataSource, String schemaName) {
+        String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

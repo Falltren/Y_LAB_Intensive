@@ -4,9 +4,10 @@ import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.DBException;
 import com.fallt.repository.UserDao;
-import com.fallt.util.DBUtils;
-import com.fallt.util.PropertiesUtil;
+import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -22,12 +23,16 @@ import java.util.Optional;
 @Repository
 public class UserDaoImpl implements UserDao {
 
-    private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
+    private final DbConnectionManager connectionManager;
+
+    @Setter
+    @Value("${spring.liquibase.default-schema}")
+    private String schema;
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO " + SCHEMA_NAME + "users (name, password, email, role, create_at, update_at, is_blocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO " + schema + ".users (name, password, email, role, create_at, update_at, is_blocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getEmail());
@@ -41,7 +46,7 @@ public class UserDaoImpl implements UserDao {
                 long userId = generatedKeys.getLong(1);
                 user.setId(userId);
             }
-            DBUtils.closeResultSet(generatedKeys);
+            connectionManager.closeResultSet(generatedKeys);
             return user;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -50,8 +55,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        String sql = "UPDATE " + SCHEMA_NAME + "users SET name = ?, password = ?, email = ?, role = ?, update_at = ?, is_blocked = ? WHERE id = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "UPDATE " + schema + ".users SET name = ?, password = ?, email = ?, role = ?, update_at = ?, is_blocked = ? WHERE id = ?";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getEmail());
@@ -69,8 +74,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void delete(String email) {
-        String sql = "DELETE FROM " + SCHEMA_NAME + "users WHERE email = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM " + schema + ".users WHERE email = ?";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, email);
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -81,14 +86,14 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM " + SCHEMA_NAME + "users";
-        try (Connection connection = DBUtils.getConnection(); Statement statement = connection.createStatement()) {
+        String sql = "SELECT * FROM " + schema + ".users";
+        try (Connection connection = connectionManager.getConnection(); Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 User user = instantiateUser(resultSet);
                 users.add(user);
             }
-            DBUtils.closeResultSet(resultSet);
+            connectionManager.closeResultSet(resultSet);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
@@ -97,15 +102,15 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        String sql = "SELECT * FROM " + SCHEMA_NAME + "users WHERE email = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM " + schema + ".users WHERE email = ?";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
             while (resultSet.next()) {
                 user = instantiateUser(resultSet);
             }
-            DBUtils.closeResultSet(resultSet);
+            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -114,15 +119,15 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByPassword(String password) {
-        String sql = "SELECT * FROM " + SCHEMA_NAME + "users WHERE password = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM " + schema + ".users WHERE password = ?";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, password);
             ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
             while (resultSet.next()) {
                 user = instantiateUser(resultSet);
             }
-            DBUtils.closeResultSet(resultSet);
+            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -131,8 +136,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteAll() {
-        String sql = "DELETE FROM " + SCHEMA_NAME + "users";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM " + schema + ".users";
+        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

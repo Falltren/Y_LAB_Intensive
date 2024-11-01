@@ -3,10 +3,7 @@ package com.fallt.controller;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
-import com.fallt.exception.AlreadyExistException;
-import com.fallt.exception.AuthenticationException;
-import com.fallt.exception.AuthorizationException;
-import com.fallt.exception.ValidationException;
+import com.fallt.exception.*;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
 import com.fallt.service.ValidationService;
@@ -47,10 +44,10 @@ public class UserController {
                     @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class)), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "403", description = "Запрос от пользователя, не имеющего роль ROLE_ADMIN", content = {
-                    @Content(schema = @Schema(implementation = AuthorizationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @GetMapping
@@ -69,10 +66,10 @@ public class UserController {
                     @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Email/пароль уже используется другим пользователем", content = {
-                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PostMapping("/register")
@@ -91,13 +88,13 @@ public class UserController {
                     @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Email/пароль уже используется другим пользователем", content = {
-                    @Content(schema = @Schema(implementation = AlreadyExistException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PutMapping
@@ -113,10 +110,10 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Блокировка пользователя"),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "403", description = "Запрос от пользователя, не имеющего роль ROLE_ADMIN", content = {
-                    @Content(schema = @Schema(implementation = AuthorizationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PutMapping("/block")
@@ -133,7 +130,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Удаление аккаунта"),
             @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @DeleteMapping

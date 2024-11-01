@@ -8,13 +8,3 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
     default-schema: my_schema
     liquibase-schema: service_schema
-
-
-#springdoc:
-#  version: '@springdoc.version@'
-#  api-docs:
-#    enabled: true
-#    path: /api-docs/**
-#  swagger-ui:
-#    enabled: true
-#    path: /swagger-ui.html

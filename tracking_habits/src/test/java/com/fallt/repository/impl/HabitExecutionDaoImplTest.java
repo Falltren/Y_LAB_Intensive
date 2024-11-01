@@ -5,7 +5,7 @@ import com.fallt.entity.HabitExecution;
 import com.fallt.repository.AbstractTest;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.util.DBUtils;
+import com.fallt.util.DbConnectionManager;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
@@ -15,15 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HabitExecutionDaoImplTest extends AbstractTest {
 
-    private HabitExecutionDao executionDao;
+    private HabitExecutionDaoImpl executionDao;
 
-    private HabitDao habitDao;
+    private HabitDaoImpl habitDao;
 
     @BeforeAll
     static void beforeAll() {
         postgreSQLContainer.start();
-        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        migrateDatabase();
+        migrateDatabase(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        connectionManager.setConnectionSettings(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword(), DRIVER_NAME);
     }
 
     @AfterAll
@@ -33,8 +33,10 @@ class HabitExecutionDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        executionDao = new HabitExecutionDaoImpl();
-        habitDao = new HabitDaoImpl();
+        executionDao = new HabitExecutionDaoImpl(connectionManager);
+        habitDao = new HabitDaoImpl(connectionManager);
+        executionDao.setSchema(SCHEMA);
+        habitDao.setSchema(SCHEMA);
     }
 
     @Test

@@ -3,9 +3,8 @@ package com.fallt.repository.impl;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.repository.AbstractTest;
-import com.fallt.repository.UserDao;
-import com.fallt.util.DBUtils;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,23 +14,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserDaoImplTest extends AbstractTest {
 
-    private UserDao userDao;
+    @Autowired
+    private UserDaoImpl userDao;
 
     @BeforeEach
     void setup() {
-        userDao = new UserDaoImpl();
-    }
-
-    @AfterEach
-    void afterEach() {
-        clearDatabase();
+        userDao = new UserDaoImpl(connectionManager);
+        userDao.setSchema("my_schema");
+        clearDatabase(userDao);
     }
 
     @BeforeAll
     static void startContainer() {
         postgreSQLContainer.start();
-        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        migrateDatabase();
+        migrateDatabase(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        connectionManager.setConnectionSettings(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword(), DRIVER_NAME);
     }
 
     @AfterAll

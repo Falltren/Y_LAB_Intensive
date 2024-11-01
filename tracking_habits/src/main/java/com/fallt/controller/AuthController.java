@@ -2,9 +2,7 @@ package com.fallt.controller;
 
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
-import com.fallt.exception.AuthenticationException;
-import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.ValidationException;
+import com.fallt.exception.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
 import com.fallt.service.ValidationService;
@@ -44,13 +42,13 @@ public class AuthController {
                     @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ValidationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "401", description = "Вход заблокированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = AuthenticationException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "404", description = "Пользователь отсутствует в системе", content = {
-                    @Content(schema = @Schema(implementation = EntityNotFoundException.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
     @PostMapping("/login")
