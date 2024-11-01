@@ -1,32 +1,56 @@
 package com.fallt.config;
 
 import liquibase.integration.spring.SpringLiquibase;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
 @Configuration
+@PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
 public class LiquibaseConfig {
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String driver;
+
+    @Value("${spring.liquibase.change-log}")
+    private String changeLog;
+
+    @Value("${spring.liquibase.default-schema}")
+    private String defaultSchema;
+
+    @Value("${spring.liquibase.liquibase-schema}")
+    private String serviceSchema;
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/habit_db");
-        dataSource.setUsername("y_lab_user");
-        dataSource.setPassword("y_lab_password");
-        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName(driver);
         return dataSource;
     }
 
     @Bean
     public SpringLiquibase liquibase() {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
+        liquibase.setChangeLog(changeLog);
         liquibase.setDataSource(dataSource());
-        liquibase.setLiquibaseSchema("service_schema");
-        liquibase.setDefaultSchema("my_schema");
+        liquibase.setLiquibaseSchema(serviceSchema);
+        liquibase.setDefaultSchema(defaultSchema);
         return liquibase;
     }
 }

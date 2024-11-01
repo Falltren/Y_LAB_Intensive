@@ -30,6 +30,7 @@
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <plugin.war.version>3.3.1</plugin.war.version>
         <json-path.version>2.9.0</json-path.version>
+        <springdoc.version>2.2.0</springdoc.version>
     </properties>
 
     <dependencies>
@@ -150,47 +151,16 @@
             <artifactId>json-path</artifactId>
             <version>${json-path.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.core.v3</groupId>-->
-<!--            <artifactId>swagger-core-jakarta</artifactId>-->
-<!--            <version>2.2.25</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.core.v3</groupId>-->
-<!--            <artifactId>swagger-models-jakarta</artifactId>-->
-<!--            <version>2.2.25</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.core.v3</groupId>-->
-<!--            <artifactId>swagger-jaxrs2-jakarta</artifactId>-->
-<!--            <version>2.2.25</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>jakarta.ws.rs</groupId>-->
-<!--            <artifactId>jakarta.ws.rs-api</artifactId>-->
-<!--            <version>3.0.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.webjars</groupId>-->
-<!--            <artifactId>swagger-ui</artifactId>-->
-<!--            <version>5.17.14</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version>
+            <version>${springdoc.version}</version>
         </dependency>
     </dependencies>
 
     <build>
         <finalName>tracking_habits</finalName>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-surefire-plugin</artifactId>-->
-<!--                <version>${maven.surefire.version}</version>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -218,29 +188,6 @@
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>io.swagger.core.v3</groupId>-->
-<!--                <artifactId>swagger-maven-plugin-jakarta</artifactId>-->
-<!--                <version>2.2.25</version>-->
-<!--                <configuration>-->
-<!--                    <outputFileName>openapi</outputFileName>-->
-<!--                    <outputPath>${project.build.directory}/swagger</outputPath>-->
-<!--                    <outputFormat>JSON</outputFormat>-->
-<!--                    <resourcePackages>-->
-<!--                        <package>src.main.java.com.fallt.controller</package>-->
-<!--                    </resourcePackages>-->
-<!--                    <resourceClasses>com.fallt.controller.AuthController</resourceClasses>-->
-<!--                    <prettyPrint>true</prettyPrint>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>resolve</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 

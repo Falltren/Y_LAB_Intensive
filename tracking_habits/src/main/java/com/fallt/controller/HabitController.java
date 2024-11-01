@@ -2,7 +2,6 @@ package com.fallt.controller;
 
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitExecutionResponse;
 import com.fallt.dto.response.HabitResponse;
 import com.fallt.exception.AlreadyExistException;
