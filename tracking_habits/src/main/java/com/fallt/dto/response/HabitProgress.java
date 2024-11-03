@@ -12,8 +12,6 @@ import java.util.List;
 public class HabitProgress {
 
     private String title;
-
     private int successRate;
-
     private List<ExecutionDto> execution;
 }

@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.HabitConfirmRequest;
@@ -25,7 +26,6 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 @Loggable
-@Auditable
 public class HabitService {
 
     private final HabitDao habitDao;
@@ -40,6 +40,7 @@ public class HabitService {
      * @param userEmail Электронная почта пользователя
      * @param request   Объект с данными по новой привычке
      */
+    @Auditable(action = ActionType.CREATE)
     public HabitResponse saveHabit(String userEmail, UpsertHabitRequest request) {
         User user = userService.getUserByEmail(userEmail);
         if (findHabit(user, request.getTitle()).isPresent()) {
@@ -58,6 +59,7 @@ public class HabitService {
      *                  в консоль будет выведено соответствующее сообщение
      * @param request   Объект с данными по редактируемой привычке
      */
+    @Auditable(action = ActionType.UPDATE)
     public HabitResponse updateHabit(String userEmail, String title, UpsertHabitRequest request) {
         User user = userService.getUserByEmail(userEmail);
         Optional<Habit> optionalHabit = findHabit(user, title);
@@ -78,6 +80,7 @@ public class HabitService {
      * @param email Электронная почта пользователя
      * @param title Название привычки
      */
+    @Auditable(action = ActionType.DELETE)
     public void deleteHabit(String email, String title) {
         User user = userService.getUserByEmail(email);
         habitDao.delete(user.getId(), title);
@@ -89,6 +92,7 @@ public class HabitService {
      * @param email Электронный адрес пользователя
      * @return Список привычек
      */
+    @Auditable(action = ActionType.GET)
     public List<HabitResponse> getAllHabits(String email) {
         User user = userService.getUserByEmail(email);
         return HabitMapper.INSTANCE.toResponseList(habitDao.getAllUserHabits(user.getId()));
@@ -100,6 +104,7 @@ public class HabitService {
      * @param email   Электронная почта пользователь
      * @param request Объект, содержащий информацию о названии привычки и дате выполнения
      */
+    @Auditable(action = ActionType.CREATE)
     public HabitExecutionResponse confirmHabit(String email, HabitConfirmRequest request) {
         User user = userService.getUserByEmail(email);
         Optional<Habit> optionalHabit = findHabit(user, request.getTitle());
@@ -115,6 +120,7 @@ public class HabitService {
         return response;
     }
 
+    @Auditable(action = ActionType.GET)
     private Optional<Habit> findHabit(User user, String title) {
         return habitDao.findHabitByTitleAndUserId(user.getId(), title);
     }
@@ -127,6 +133,7 @@ public class HabitService {
      * @return Объект класса Habit, если соответствующая привычка найдена в базе данных или null,
      * если привычка у пользователя отсутствует
      */
+    @Auditable(action = ActionType.GET)
     public Habit getHabitByTitle(User user, String title) {
         Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), title);
         if (optionalHabit.isEmpty()) {

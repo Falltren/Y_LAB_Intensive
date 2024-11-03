@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 public class UpsertHabitRequest {
 
     private String title;
-
     private String text;
-
     private String rate;
 }

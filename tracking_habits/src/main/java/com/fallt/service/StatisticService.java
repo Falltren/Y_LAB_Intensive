@@ -1,5 +1,7 @@
 package com.fallt.service;
 
+import com.fallt.aop.audit.ActionType;
+import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.response.ExecutionDto;
 import com.fallt.dto.response.HabitProgress;
@@ -31,6 +33,7 @@ public class StatisticService {
      * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
      * @return Прогресс выполнения пользователем привычки
      */
+    @Auditable(action = ActionType.GET)
     public HabitProgress getHabitProgress(String userEmail, ReportRequest request) {
         User user = userService.getUserByEmail(userEmail);
         Habit habit = habitService.getHabitByTitle(user, request.getTitle());
@@ -61,6 +64,7 @@ public class StatisticService {
      * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
      * @return Список с данными по выполнению привычки за указанны период
      */
+    @Auditable(action = ActionType.GET)
     public List<ExecutionDto> getHabitStreak(String userEmail, ReportRequest request) {
         User user = userService.getUserByEmail(userEmail);
         Habit habit = habitService.getHabitByTitle(user, request.getTitle());

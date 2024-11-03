@@ -16,7 +16,7 @@ public class LoggableAspect {
 
     @Around("annotatedByLoggable()")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        String methodName = proceedingJoinPoint.getSignature().getName();
+        String methodName = proceedingJoinPoint.getSignature().getDeclaringTypeName() + proceedingJoinPoint.getSignature().getName();
         log.info("Calling method " + methodName);
         long start = System.currentTimeMillis();
         Object result = proceedingJoinPoint.proceed();

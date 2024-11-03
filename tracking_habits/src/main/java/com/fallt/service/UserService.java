@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.UpsertUserRequest;
@@ -23,7 +24,6 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 @Loggable
-@Auditable
 public class UserService {
 
     private final UserDao userDao;
@@ -35,6 +35,7 @@ public class UserService {
      *
      * @return Список пользователей
      */
+    @Auditable(action = ActionType.GET)
     public List<UserResponse> getAllUsers() {
         return UserMapper.INSTANCE.toResponseList(userDao.findAll());
     }
@@ -46,6 +47,7 @@ public class UserService {
      * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой
      * или null, если пользователь не найден
      */
+    @Auditable(action = ActionType.GET)
     public User getUserByEmail(String email) {
         Optional<User> user = userDao.getUserByEmail(email);
         if (user.isEmpty()) {
@@ -61,6 +63,7 @@ public class UserService {
      * @param request Объект с данным пользователя
      * @return Сохраненный в базе данных пользователь с идентификатором
      */
+    @Auditable(action = ActionType.CREATE)
     public UserResponse saveUser(UpsertUserRequest request) {
         if (isExistsEmail(request.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", request.getEmail()));
@@ -81,6 +84,7 @@ public class UserService {
      *
      * @param email Почта пользователя
      */
+    @Auditable(action = ActionType.UPDATE)
     public void blockingUser(String email) {
         User user = getUserByEmail(email);
         user.setBlocked(true);
@@ -94,6 +98,7 @@ public class UserService {
      * @param email      Электронный адрес обновляемого пользователя
      * @param updateUser Объект с обновляемыми данными пользователя
      */
+    @Auditable(action = ActionType.UPDATE)
     public UserResponse updateUser(String email, UpsertUserRequest updateUser) {
         User user = getUserByEmail(email);
         if (updateUser.getEmail() != null && isExistsEmail(updateUser.getEmail())) {
@@ -113,6 +118,7 @@ public class UserService {
      *
      * @param email Электронная почта пользователя
      */
+    @Auditable(action = ActionType.DELETE)
     public void deleteUser(String email) {
         userDao.delete(email);
     }

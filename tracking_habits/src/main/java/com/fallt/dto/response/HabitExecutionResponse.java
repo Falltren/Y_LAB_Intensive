@@ -14,6 +14,5 @@ import java.time.LocalDate;
 public class HabitExecutionResponse {
 
     private String title;
-
     private LocalDate date;
 }

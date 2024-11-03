@@ -15,20 +15,16 @@ import java.util.List;
 public class User {
 
     private Long id;
-
     private String name;
-
     private String email;
 
     @ToString.Exclude
     private String password;
-
     private Role role;
 
-    private LocalDateTime createAt;
-
+    @Builder.Default
+    private LocalDateTime createAt = LocalDateTime.now();
     private LocalDateTime updateAt;
-
     private boolean isBlocked;
 
     @Builder.Default

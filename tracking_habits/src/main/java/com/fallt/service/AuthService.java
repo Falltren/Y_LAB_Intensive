@@ -1,5 +1,6 @@
 package com.fallt.service;
 
+import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.LoginRequest;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Loggable
-@Auditable
 public class AuthService {
 
     private final UserService userService;
@@ -30,6 +30,7 @@ public class AuthService {
      * @return Возвращает объект класса User в случае успешной аутентификации
      * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
      */
+    @Auditable(action = ActionType.LOGIN)
     public UserResponse login(LoginRequest request, AuthenticationContext authenticationContext) {
         User user = userService.getUserByEmail(request.getEmail());
         if (user == null || !user.getPassword().equals(request.getPassword())) {

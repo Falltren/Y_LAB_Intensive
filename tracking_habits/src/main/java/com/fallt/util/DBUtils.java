@@ -10,9 +10,7 @@ import java.sql.*;
 public class DBUtils {
 
     private static String url;
-
     private static String user;
-
     private static String password;
 
     private DBUtils() {
