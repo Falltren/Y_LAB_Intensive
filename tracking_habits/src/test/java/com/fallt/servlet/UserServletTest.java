@@ -3,9 +3,10 @@ package com.fallt.servlet;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.exception.AlreadyExistException;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
@@ -35,7 +36,6 @@ class UserServletTest {
     @Mock
     private UserService userService;
 
-
     @Mock
     private ServletConfig servletConfig;
 
@@ -53,16 +53,15 @@ class UserServletTest {
 
     @Mock
     private HttpSession session;
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() throws ServletException {
-        userServlet.init(servletConfig);
-        when(servletContext.getAttribute("userService")).thenReturn(userService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.USER_SERVICE)).thenReturn(userService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
         when(userServlet.getServletContext()).thenReturn(servletContext);
+        userServlet.init(servletConfig);
     }
 
     @Test
@@ -83,7 +82,7 @@ class UserServletTest {
         String currentEmail = "email";
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
-        doThrow(new SecurityException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
 
         userServlet.doDelete(req, resp);
@@ -130,7 +129,7 @@ class UserServletTest {
         String currentEmail = "email";
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
-        doThrow(new SecurityException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
 
         userServlet.doPut(req, resp);

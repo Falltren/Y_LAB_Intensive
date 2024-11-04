@@ -7,7 +7,6 @@ import com.fallt.exception.ValidationException;
 import com.fallt.service.UserService;
 import com.fallt.service.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,24 +15,34 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static com.fallt.util.Constant.*;
+
 /**
  * Сервлет, используемый для регистрации новых пользователей
  */
 @WebServlet("/register")
 public class RegistrationServlet extends HttpServlet {
 
+    private ObjectMapper objectMapper;
+    private UserService userService;
+    private ValidationService validationService;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        objectMapper = (ObjectMapper) getServletContext().getAttribute(OBJECT_MAPPER);
+        userService = (UserService) getServletContext().getAttribute(USER_SERVICE);
+        validationService = (ValidationService) getServletContext().getAttribute(VALIDATION_SERVICE);
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ServletContext servletContext = getServletContext();
-        UserService userService = (UserService) servletContext.getAttribute("userService");
-        ValidationService validationService = (ValidationService) servletContext.getAttribute("validationService");
-        ObjectMapper objectMapper = (ObjectMapper) servletContext.getAttribute("objectMapper");
         UpsertUserRequest request = objectMapper.readValue(req.getInputStream(), UpsertUserRequest.class);
         try {
             if (validationService.checkUpsertUserRequest(request)) {
                 UserResponse response = userService.saveUser(request);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.setContentType("application/json");
+                resp.setContentType(CONTENT_TYPE);
                 byte[] bytes = objectMapper.writeValueAsBytes(response);
                 resp.getOutputStream().write(bytes);
             }

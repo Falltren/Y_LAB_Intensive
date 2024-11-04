@@ -8,16 +8,15 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
+import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.UserDao;
-import com.fallt.util.Message;
 import lombok.RequiredArgsConstructor;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Класс для работы с пользователями
@@ -28,8 +27,6 @@ public class UserService {
 
     private final UserDao userDao;
 
-    private final ConsoleOutput consoleOutput;
-
     /**
      * Получение всех пользователей (доступно только пользователям с ролью ROLE_ADMIN)
      *
@@ -38,23 +35,6 @@ public class UserService {
     @Auditable(action = ActionType.GET)
     public List<UserResponse> getAllUsers() {
         return UserMapper.INSTANCE.toResponseList(userDao.findAll());
-    }
-
-    /**
-     * Получение пользователя по электронной почте
-     *
-     * @param email Электронная почта
-     * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой
-     * или null, если пользователь не найден
-     */
-    @Auditable(action = ActionType.GET)
-    public User getUserByEmail(String email) {
-        Optional<User> user = userDao.getUserByEmail(email);
-        if (user.isEmpty()) {
-            consoleOutput.printMessage(Message.INCORRECT_EMAIL);
-            return null;
-        }
-        return user.get();
     }
 
     /**
@@ -121,6 +101,19 @@ public class UserService {
     @Auditable(action = ActionType.DELETE)
     public void deleteUser(String email) {
         userDao.delete(email);
+    }
+
+    /**
+     * Получение пользователя по электронной почте
+     *
+     * @param email Электронная почта
+     * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой
+     * или null, если пользователь не найден
+     */
+    @Auditable(action = ActionType.GET)
+    public User getUserByEmail(String email) {
+        return userDao.getUserByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(MessageFormat.format("Пользователь с email: {0} не найден", email)));
     }
 
     /**

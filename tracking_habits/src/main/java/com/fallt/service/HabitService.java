@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Класс для работы с привычками
@@ -43,7 +42,7 @@ public class HabitService {
     @Auditable(action = ActionType.CREATE)
     public HabitResponse saveHabit(String userEmail, UpsertHabitRequest request) {
         User user = userService.getUserByEmail(userEmail);
-        if (findHabit(user, request.getTitle()).isPresent()) {
+        if (isExistedHabit(user.getId(), request.getTitle())) {
             throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
         Habit habit = HabitMapper.INSTANCE.toEntity(request);
@@ -62,14 +61,13 @@ public class HabitService {
     @Auditable(action = ActionType.UPDATE)
     public HabitResponse updateHabit(String userEmail, String title, UpsertHabitRequest request) {
         User user = userService.getUserByEmail(userEmail);
-        Optional<Habit> optionalHabit = findHabit(user, title);
-        if (optionalHabit.isEmpty()) {
+        if (!isExistedHabit(user.getId(), title)) {
             throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title));
         }
-        if (request.getTitle() != null && findHabit(user, request.getTitle()).isPresent()) {
+        if (request.getTitle() != null && isExistedHabit(user.getId(), request.getTitle())) {
             throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
-        Habit habit = optionalHabit.get();
+        Habit habit = getHabitByTitle(user, title);
         HabitMapper.INSTANCE.updateHabitFromDto(request, habit);
         return HabitMapper.INSTANCE.toResponse(habitDao.update(habit));
     }
@@ -107,22 +105,17 @@ public class HabitService {
     @Auditable(action = ActionType.CREATE)
     public HabitExecutionResponse confirmHabit(String email, HabitConfirmRequest request) {
         User user = userService.getUserByEmail(email);
-        Optional<Habit> optionalHabit = findHabit(user, request.getTitle());
-        if (optionalHabit.isEmpty()) {
+        if (!isExistedHabit(user.getId(), request.getTitle())) {
             throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", request.getTitle()));
         }
+        Habit habit = getHabitByTitle(user, request.getTitle());
         HabitExecution habitExecution = HabitExecution.builder()
-                .habit(optionalHabit.get())
+                .habit(habit)
                 .date(request.getDate())
                 .build();
         HabitExecutionResponse response = HabitMapper.INSTANCE.toExecutionResponse(executionDao.save(habitExecution));
         response.setTitle(request.getTitle());
         return response;
-    }
-
-    @Auditable(action = ActionType.GET)
-    private Optional<Habit> findHabit(User user, String title) {
-        return habitDao.findHabitByTitleAndUserId(user.getId(), title);
     }
 
     /**
@@ -135,11 +128,13 @@ public class HabitService {
      */
     @Auditable(action = ActionType.GET)
     public Habit getHabitByTitle(User user, String title) {
-        Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), title);
-        if (optionalHabit.isEmpty()) {
-            throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title));
-        }
-        return optionalHabit.get();
+        return habitDao.findHabitByTitleAndUserId(user.getId(), title).orElseThrow(
+                () -> new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title))
+        );
+    }
+
+    public boolean isExistedHabit(Long userId, String title) {
+        return habitDao.findHabitByTitleAndUserId(userId, title).isPresent();
     }
 
 }

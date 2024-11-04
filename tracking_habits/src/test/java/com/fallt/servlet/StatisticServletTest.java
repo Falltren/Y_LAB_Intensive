@@ -1,11 +1,12 @@
 package com.fallt.servlet;
 
 import com.fallt.dto.request.ReportRequest;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.StatisticService;
 import com.fallt.service.ValidationService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
@@ -63,13 +64,13 @@ class StatisticServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
-        statisticServlet.init(servletConfig);
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
-        when(servletContext.getAttribute("statisticService")).thenReturn(statisticService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.VALIDATION_SERVICE)).thenReturn(validationService);
+        when(servletContext.getAttribute(Constant.STATISTIC_SERVICE)).thenReturn(statisticService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
         when(statisticServlet.getServletContext()).thenReturn(servletContext);
         objectMapper.registerModule(new JavaTimeModule());
+        statisticServlet.init(servletConfig);
     }
 
     @Test
@@ -97,7 +98,7 @@ class StatisticServletTest {
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
 
         statisticServlet.doGet(req, resp);
 

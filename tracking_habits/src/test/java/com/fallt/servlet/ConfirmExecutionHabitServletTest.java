@@ -2,11 +2,12 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
@@ -64,13 +65,13 @@ class ConfirmExecutionHabitServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
-        confirmExecutionHabitServlet.init(servletConfig);
-        when(servletContext.getAttribute("habitService")).thenReturn(habitService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
+        when(servletContext.getAttribute(Constant.HABIT_SERVICE)).thenReturn(habitService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.VALIDATION_SERVICE)).thenReturn(validationService);
         when(confirmExecutionHabitServlet.getServletContext()).thenReturn(servletContext);
         objectMapper.registerModule(new JavaTimeModule());
+        confirmExecutionHabitServlet.init(servletConfig);
     }
 
     @Test
@@ -116,7 +117,7 @@ class ConfirmExecutionHabitServletTest {
         HabitConfirmRequest request = new HabitConfirmRequest("title", LocalDate.now());
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkAuthentication(currentEmail);
 
         confirmExecutionHabitServlet.doPost(req, resp);
 

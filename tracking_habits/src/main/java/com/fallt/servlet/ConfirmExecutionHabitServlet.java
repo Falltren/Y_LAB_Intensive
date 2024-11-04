@@ -2,15 +2,14 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.HabitConfirmRequest;
 import com.fallt.dto.response.HabitExecutionResponse;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,29 +18,30 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static com.fallt.util.Constant.*;
+
 /**
- * Сервлен, предназначенный для отметки выполнения привычки
+ * Сервлет, предназначенный для отметки выполнения привычки
  */
 @WebServlet("/habits/confirm")
 public class ConfirmExecutionHabitServlet extends HttpServlet {
 
-    private static final String OBJECT_MAPPER = "objectMapper";
+    private ObjectMapper objectMapper;
+    private HabitService habitService;
+    private ValidationService validationService;
+    private AuthenticationContext authenticationContext;
 
-    private static final String VALIDATION_SERVICE = "validationService";
-
-    private static final String AUTH_CONTEXT = "authContext";
-
-    private static final String HABIT_SERVICE = "habitService";
-
-    private static final String CONTENT_TYPE = "application/json";
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        objectMapper = (ObjectMapper) getServletContext().getAttribute(OBJECT_MAPPER);
+        habitService = (HabitService) getServletContext().getAttribute(HABIT_SERVICE);
+        authenticationContext = (AuthenticationContext) getServletContext().getAttribute(AUTH_CONTEXT);
+        validationService = (ValidationService) getServletContext().getAttribute(VALIDATION_SERVICE);
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ServletContext servletContext = getServletContext();
-        ObjectMapper objectMapper = (ObjectMapper) servletContext.getAttribute(OBJECT_MAPPER);
-        HabitService habitService = (HabitService) servletContext.getAttribute(HABIT_SERVICE);
-        ValidationService validationService = (ValidationService) servletContext.getAttribute(VALIDATION_SERVICE);
-        AuthenticationContext authenticationContext = (AuthenticationContext) servletContext.getAttribute(AUTH_CONTEXT);
         String emailCurrentUser = SessionUtils.getCurrentUserEmail(req);
         HabitConfirmRequest request = objectMapper.readValue(req.getInputStream(), HabitConfirmRequest.class);
         try {
@@ -54,7 +54,7 @@ public class ConfirmExecutionHabitServlet extends HttpServlet {
             resp.getOutputStream().write(bytes);
         } catch (EntityNotFoundException | ValidationException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, objectMapper, e.getMessage());
-        } catch (SecurityException e) {
+        } catch (AuthenticationException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, objectMapper, e.getMessage());
         }
     }

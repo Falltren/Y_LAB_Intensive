@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
+import static com.fallt.TestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,7 +23,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка UpsertUserRequest")
     void testCheckUpsertUserRequest() {
-        UpsertUserRequest request = new UpsertUserRequest("user", "pwd", "email");
+        UpsertUserRequest request = new UpsertUserRequest(FIRST_USER_NAME, FIRST_USER_PASSWORD, FIRST_USER_EMAIL);
 
         boolean result = validationService.checkUpsertUserRequest(request);
 
@@ -32,7 +33,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertUserRequest с некорректным именем")
     void testCheckUpsertUserWithIncorrectName() {
-        UpsertUserRequest request = new UpsertUserRequest(null, "pwd", "email");
+        UpsertUserRequest request = new UpsertUserRequest(null, FIRST_USER_PASSWORD, FIRST_USER_EMAIL);
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertUserRequest(request));
     }
@@ -48,7 +49,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertUserRequest с некорректной электронной почтой")
     void testCheckUpsertUserWithIncorrectEmail() {
-        UpsertUserRequest request = new UpsertUserRequest("user", "pwd", null);
+        UpsertUserRequest request = new UpsertUserRequest(FIRST_USER_NAME, FIRST_USER_PASSWORD, null);
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertUserRequest(request));
     }
@@ -56,7 +57,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка LoginRequest")
     void testCheckLoginRequest() {
-        LoginRequest request = new LoginRequest("email", "pwd");
+        LoginRequest request = new LoginRequest(SECOND_USER_EMAIL, SECOND_USER_PASSWORD);
 
         boolean result = validationService.checkLoginRequest(request);
 
@@ -66,7 +67,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка LoginRequest с некорректной электронной почтой")
     void testCheckLoginRequestWithIncorrectEmail() {
-        LoginRequest request = new LoginRequest("", "pwd");
+        LoginRequest request = new LoginRequest("", SECOND_USER_PASSWORD);
 
         assertThrows(ValidationException.class, () -> validationService.checkLoginRequest(request));
     }
@@ -74,7 +75,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка LoginRequest с некорректным паролем")
     void testCheckLoginRequestWithIncorrectPassword() {
-        LoginRequest request = new LoginRequest("email", "");
+        LoginRequest request = new LoginRequest(SECOND_USER_EMAIL, "");
 
         assertThrows(ValidationException.class, () -> validationService.checkLoginRequest(request));
     }
@@ -82,7 +83,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка UpsertHabitRequest")
     void testCheckUpsertHabitRequest() {
-        UpsertHabitRequest request = new UpsertHabitRequest("title", "text", "DAILY");
+        UpsertHabitRequest request = new UpsertHabitRequest(FIRST_HABIT_TITLE, HABIT_TEXT, DAILY_HABIT);
 
         boolean result = validationService.checkUpsertHabitRequest(request);
 
@@ -92,7 +93,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertHabitRequest с некорректным названием")
     void testCheckUpsertHabitRequestWithIncorrectTitle() {
-        UpsertHabitRequest request = new UpsertHabitRequest("t", "text", "WEEKLY");
+        UpsertHabitRequest request = new UpsertHabitRequest("t", HABIT_TEXT, WEEKLY_HABIT);
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertHabitRequest(request));
     }
@@ -100,7 +101,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertHabitRequest с некорректным описанием")
     void testCheckUpsertHabitRequestWithIncorrectText() {
-        UpsertHabitRequest request = new UpsertHabitRequest("title", "te", "WEEKLY");
+        UpsertHabitRequest request = new UpsertHabitRequest(FIRST_HABIT_TITLE, "te", WEEKLY_HABIT);
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertHabitRequest(request));
     }
@@ -108,7 +109,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertHabitRequest с отсутствующей частотой выполнения привычки")
     void testCheckUpsertHabitRequestWithMissingRate() {
-        UpsertHabitRequest request = new UpsertHabitRequest("title", "te", null);
+        UpsertHabitRequest request = new UpsertHabitRequest(FIRST_HABIT_TITLE, HABIT_TEXT, null);
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertHabitRequest(request));
     }
@@ -116,7 +117,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка UpsertHabitRequest с некорректной частотой выполнения привычки")
     void testCheckUpsertHabitRequestWithIncorrectRate() {
-        UpsertHabitRequest request = new UpsertHabitRequest("title", "text", "YEARLY");
+        UpsertHabitRequest request = new UpsertHabitRequest(SECOND_HABIT_TITLE, HABIT_TEXT, "YEARLY");
 
         assertThrows(ValidationException.class, () -> validationService.checkUpsertHabitRequest(request));
     }
@@ -124,7 +125,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка HabitConfirmRequest")
     void testCheckHabitConfirmRequest() {
-        HabitConfirmRequest request = new HabitConfirmRequest("title", LocalDate.now());
+        HabitConfirmRequest request = new HabitConfirmRequest(FIRST_HABIT_TITLE, LocalDate.now());
 
         boolean result = validationService.checkHabitConfirmRequest(request);
 
@@ -142,7 +143,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка HabitConfirmRequest с отсутствием даты выполнения")
     void testCheckHabitConfirmRequestWithIncorrectDate() {
-        HabitConfirmRequest request = new HabitConfirmRequest("title", null);
+        HabitConfirmRequest request = new HabitConfirmRequest(FIRST_HABIT_TITLE, null);
 
         assertThrows(ValidationException.class, () -> validationService.checkHabitConfirmRequest(request));
     }
@@ -150,7 +151,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка ReportRequest")
     void testCheckReportRequest() {
-        ReportRequest request = new ReportRequest("title",
+        ReportRequest request = new ReportRequest(SECOND_HABIT_TITLE,
                 LocalDate.of(2024, 10, 1),
                 LocalDate.of(2024, 10, 10));
 

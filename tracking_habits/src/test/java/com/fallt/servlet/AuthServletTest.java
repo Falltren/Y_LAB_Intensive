@@ -2,12 +2,13 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.SecurityException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
 import com.fallt.service.ValidationService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,12 +63,12 @@ class AuthServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
-        authServlet.init(servletConfig);
-        when(servletContext.getAttribute("authService")).thenReturn(authService);
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.AUTH_SERVICE)).thenReturn(authService);
+        when(servletContext.getAttribute(Constant.VALIDATION_SERVICE)).thenReturn(validationService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
         when(authServlet.getServletContext()).thenReturn(servletContext);
+        authServlet.init(servletConfig);
     }
 
     @Test
@@ -123,7 +124,7 @@ class AuthServletTest {
         when(validationService.checkLoginRequest(request)).thenReturn(true);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        when(authService.login(request, authenticationContext)).thenThrow(SecurityException.class);
+        when(authService.login(request, authenticationContext)).thenThrow(AuthenticationException.class);
 
         authServlet.doPost(req, resp);
 

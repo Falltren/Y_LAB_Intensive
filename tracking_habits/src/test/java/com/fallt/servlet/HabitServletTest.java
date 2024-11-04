@@ -2,11 +2,12 @@ package com.fallt.servlet;
 
 import com.fallt.dto.request.UpsertHabitRequest;
 import com.fallt.exception.AlreadyExistException;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.ValidationService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
@@ -36,7 +37,6 @@ class HabitServletTest {
     @Mock
     private HabitService habitService;
 
-
     @Mock
     private ServletConfig servletConfig;
 
@@ -57,16 +57,16 @@ class HabitServletTest {
 
     @Mock
     private HttpSession session;
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() throws ServletException {
-        habitServlet.init(servletConfig);
-        when(servletContext.getAttribute("habitService")).thenReturn(habitService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.VALIDATION_SERVICE)).thenReturn(validationService);
+        when(servletContext.getAttribute(Constant.HABIT_SERVICE)).thenReturn(habitService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
         when(habitServlet.getServletContext()).thenReturn(servletContext);
+        habitServlet.init(servletConfig);
     }
 
     @Test
@@ -90,7 +90,7 @@ class HabitServletTest {
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
 
         habitServlet.doGet(req, resp);
 
@@ -102,7 +102,6 @@ class HabitServletTest {
     void whenCreateHabit_thenReturnCreated() throws Exception {
         String currentEmail = "email";
         UpsertHabitRequest request = createRequest();
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
@@ -120,7 +119,6 @@ class HabitServletTest {
     void whenCreateHabitWithIncorrectRequest_thenReturnBadRequest() throws Exception {
         String currentEmail = "email";
         UpsertHabitRequest request = createRequest();
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
@@ -137,12 +135,11 @@ class HabitServletTest {
     void whenAnonymousUserCreateHabit_thenReturnUnauthorized() throws Exception {
         String currentEmail = "email";
         UpsertHabitRequest request = createRequest();
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
 
         habitServlet.doPost(req, resp);
 
@@ -192,7 +189,7 @@ class HabitServletTest {
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(req.getInputStream()).thenReturn(new DelegatingServletInputStream(objectMapper.writeValueAsBytes(request)));
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
 
         habitServlet.doPut(req, resp);
 
@@ -218,7 +215,7 @@ class HabitServletTest {
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
-        doThrow(new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
+        doThrow(new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться")).when(authenticationContext).checkAuthentication(currentEmail);
 
         habitServlet.doDelete(req, resp);
 

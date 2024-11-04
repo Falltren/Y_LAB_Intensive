@@ -1,7 +1,8 @@
 package com.fallt.security;
 
 import com.fallt.entity.Role;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
+import com.fallt.exception.AuthorizationException;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +39,7 @@ public class AuthenticationContext {
      */
     public void checkAuthentication(String email) {
         if (!context.containsKey(email)) {
-            throw new SecurityException("Для выполнения данного действия вам необходимо аутентифицироваться");
+            throw new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться");
         }
     }
 
@@ -52,7 +53,7 @@ public class AuthenticationContext {
         checkAuthentication(userEmail);
         Role currentUserRole = context.get(userEmail).getRole();
         if (!currentUserRole.equals(requiredRole)) {
-            throw new SecurityException("У вас недостаточно прав для выполнения данного действия"); // при использовании spring будет приводить к статусу 403 в ответе
+            throw new AuthorizationException("У вас недостаточно прав для выполнения данного действия");
         }
     }
 

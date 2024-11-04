@@ -5,6 +5,7 @@ import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.UserService;
 import com.fallt.service.ValidationService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,11 +52,11 @@ class RegistrationServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
-        registrationServlet.init(servletConfig);
-        when(servletContext.getAttribute("userService")).thenReturn(userService);
-        when(servletContext.getAttribute("validationService")).thenReturn(validationService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.USER_SERVICE)).thenReturn(userService);
+        when(servletContext.getAttribute(Constant.VALIDATION_SERVICE)).thenReturn(validationService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
         when(registrationServlet.getServletContext()).thenReturn(servletContext);
+        registrationServlet.init(servletConfig);
     }
 
     @Test

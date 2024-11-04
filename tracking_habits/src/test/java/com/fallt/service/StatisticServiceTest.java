@@ -37,7 +37,6 @@ class StatisticServiceTest {
     @Mock
     private UserService userService;
 
-
     @ParameterizedTest
     @MethodSource("dailyExecutionRate")
     @DisplayName("Получение статистики по привычке c дневной частотой выполнения")

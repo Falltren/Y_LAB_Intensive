@@ -2,9 +2,10 @@ package com.fallt.servlet;
 
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
+import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +36,6 @@ class AdminServletTest {
     @Mock
     private UserService userService;
 
-
     @Mock
     private ServletConfig servletConfig;
 
@@ -58,11 +58,11 @@ class AdminServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
-        adminServlet.init(servletConfig);
-        when(servletContext.getAttribute("userService")).thenReturn(userService);
-        when(servletContext.getAttribute("objectMapper")).thenReturn(objectMapper);
-        when(servletContext.getAttribute("authContext")).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(Constant.USER_SERVICE)).thenReturn(userService);
+        when(servletContext.getAttribute(Constant.OBJECT_MAPPER)).thenReturn(objectMapper);
+        when(servletContext.getAttribute(Constant.AUTH_CONTEXT)).thenReturn(authenticationContext);
         when(adminServlet.getServletContext()).thenReturn(servletContext);
+        adminServlet.init(servletConfig);
     }
 
     @Test
@@ -90,7 +90,7 @@ class AdminServletTest {
         when(req.getSession()).thenReturn(session);
         String currentEmail = "userEmail";
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
-        doThrow(new SecurityException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkRole(currentEmail, Role.ROLE_ADMIN);
+        doThrow(new AuthenticationException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkRole(currentEmail, Role.ROLE_ADMIN);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
 
         adminServlet.doGet(req, resp);
@@ -121,7 +121,7 @@ class AdminServletTest {
         String currentEmail = "adminEmail";
         when(req.getSession()).thenReturn(session);
         when(SessionUtils.getCurrentUserEmail(req)).thenReturn(currentEmail);
-        doThrow(new SecurityException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkRole(currentEmail, Role.ROLE_ADMIN);
+        doThrow(new AuthenticationException("У вас недостаточно прав для выполнения данного действия")).when(authenticationContext).checkRole(currentEmail, Role.ROLE_ADMIN);
         when(resp.getOutputStream()).thenReturn(new DelegatingServletOutputStream());
 
         adminServlet.doPut(req, resp);

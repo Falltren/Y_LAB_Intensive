@@ -9,14 +9,17 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 
+import static com.fallt.util.Constant.AUDIT_SERVICE;
+import static com.fallt.util.Constant.AUTH_CONTEXT;
+
 @Aspect
 public class AuditAspect {
 
     @Before("@annotation(auditable) && execution(* *(..))")
     public void auditing(JoinPoint joinPoint, Auditable auditable) {
         String methodName = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
-        AuthenticationContext context = (AuthenticationContext) InstanceCreator.getServletContext().getAttribute("authContext");
-        AuditService auditService = (AuditService) InstanceCreator.getServletContext().getAttribute("auditService");
+        AuthenticationContext context = (AuthenticationContext) InstanceCreator.getServletContext().getAttribute(AUTH_CONTEXT);
+        AuditService auditService = (AuditService) InstanceCreator.getServletContext().getAttribute(AUDIT_SERVICE);
         ActionType action = auditable.action();
         UserDetails userDetails = context.getCurrentUser();
         AuditLog audit = AuditLog.builder()

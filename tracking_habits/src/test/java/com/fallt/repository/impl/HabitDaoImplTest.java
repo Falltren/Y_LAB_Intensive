@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
+import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class HabitDaoImplTest extends AbstractTest {
@@ -41,8 +43,7 @@ class HabitDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Создание привычки")
     void whenCreateHabit_thenAddHabitToDataBase() {
-        String title = "new habit";
-        Habit habit = createHabit(title);
+        Habit habit = createHabit(FIRST_HABIT_TITLE);
         habit.setUser(user);
         habitDao.save(habit);
 
@@ -54,23 +55,22 @@ class HabitDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Получение привычки по названию")
     void whenGetHabitByTitle_thenGetHabitFromDatabase() {
-        String title = "new habit";
-        Habit habit = createHabit(title);
+        Habit habit = createHabit(SECOND_HABIT_TITLE);
         habit.setUser(user);
         habitDao.save(habit);
 
-        Optional<Habit> existedHabit = habitDao.findHabitByTitleAndUserId(user.getId(), title);
+        Optional<Habit> existedHabit = habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
 
         assertThat(existedHabit).isPresent();
-        assertThat(existedHabit.get().getTitle()).isEqualTo(title);
+        assertThat(existedHabit.get().getTitle()).isEqualTo(SECOND_HABIT_TITLE);
     }
 
     @Test
     @DisplayName("Получение всех привычек пользователя")
     void whenGetAllHabits_thenReturnListFromDatabase() {
-        Habit habit1 = createHabit("habit1");
+        Habit habit1 = createHabit(FIRST_HABIT_TITLE);
         habit1.setUser(user);
-        Habit habit2 = createHabit("habit2");
+        Habit habit2 = createHabit(SECOND_HABIT_TITLE);
         habit2.setUser(user);
         habitDao.save(habit1);
         habitDao.save(habit2);
@@ -78,21 +78,20 @@ class HabitDaoImplTest extends AbstractTest {
         List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
         assertThat(habits).hasSize(2);
-        assertThat(habits.get(0).getTitle()).isEqualTo("habit1");
-        assertThat(habits.get(1).getTitle()).isEqualTo("habit2");
+        assertThat(habits.get(0).getTitle()).isEqualTo(FIRST_HABIT_TITLE);
+        assertThat(habits.get(1).getTitle()).isEqualTo(SECOND_HABIT_TITLE);
     }
 
     @Test
     @DisplayName("Редактирование привычки")
     void whenUpdateHabit_thenUpdateDataInDatabase() {
-        String title = "habit";
-        Habit habit = createHabit(title);
+        Habit habit = createHabit(FIRST_HABIT_TITLE);
         habit.setUser(user);
         Habit existedHabit = habitDao.save(habit);
-        existedHabit.setTitle("newTitle");
+        existedHabit.setTitle(SECOND_HABIT_TITLE);
         habitDao.update(existedHabit);
 
-        Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), "newTitle");
+        Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
 
         assertThat(optionalHabit).isPresent();
     }
@@ -100,18 +99,18 @@ class HabitDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Удаление привычки")
     void whenDeleteHabit_thenRemoveFromDatabase() {
-        Habit habit1 = createHabit("habit1");
+        Habit habit1 = createHabit(FIRST_HABIT_TITLE);
         habit1.setUser(user);
-        Habit habit2 = createHabit("habit2");
+        Habit habit2 = createHabit(SECOND_HABIT_TITLE);
         habit2.setUser(user);
         habitDao.save(habit1);
         habitDao.save(habit2);
-        habitDao.delete(user.getId(), "habit1");
+        habitDao.delete(user.getId(), FIRST_HABIT_TITLE);
 
         List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
         assertThat(habits).hasSize(1);
-        assertThat(habits.get(0).getTitle()).isEqualTo("habit2");
+        assertThat(habits.get(0).getTitle()).isEqualTo(SECOND_HABIT_TITLE);
     }
 
     private Habit createHabit(String title) {

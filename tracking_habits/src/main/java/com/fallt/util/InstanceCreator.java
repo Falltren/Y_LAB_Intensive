@@ -1,6 +1,5 @@
 package com.fallt.util;
 
-import com.fallt.out.ConsoleOutput;
 import com.fallt.repository.AuditDao;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
@@ -18,6 +17,8 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
+import static com.fallt.util.Constant.*;
+
 /**
  * Класс, предназначенный для настройки компонентов приложения
  */
@@ -30,12 +31,11 @@ public class InstanceCreator implements ServletContextListener {
         ServletContextListener.super.contextInitialized(sce);
         LiquibaseRunner liquibaseRunner = new LiquibaseRunner();
         liquibaseRunner.run();
-        ConsoleOutput consoleOutput = new ConsoleOutput();
         UserDao userDao = new UserDaoImpl();
         HabitDao habitDao = new HabitDaoImpl();
         HabitExecutionDao habitExecutionDao = new HabitExecutionDaoImpl();
         AuditDao auditDao = new AuditDaoImpl();
-        UserService userService = new UserService(userDao, consoleOutput);
+        UserService userService = new UserService(userDao);
         HabitService habitService = new HabitService(habitDao, habitExecutionDao, userService);
         AuthService authService = new AuthService(userService);
         AuditService auditService = new AuditService(auditDao);
@@ -49,14 +49,14 @@ public class InstanceCreator implements ServletContextListener {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         ServletContext context = sce.getServletContext();
-        context.setAttribute("objectMapper", objectMapper);
-        context.setAttribute("habitService", habitService);
-        context.setAttribute("userService", userService);
-        context.setAttribute("authService", authService);
-        context.setAttribute("statisticService", statisticService);
-        context.setAttribute("validationService", validationService);
-        context.setAttribute("authContext", authenticationContext);
-        context.setAttribute("auditService", auditService);
+        context.setAttribute(OBJECT_MAPPER, objectMapper);
+        context.setAttribute(HABIT_SERVICE, habitService);
+        context.setAttribute(USER_SERVICE, userService);
+        context.setAttribute(AUTH_SERVICE, authService);
+        context.setAttribute(STATISTIC_SERVICE, statisticService);
+        context.setAttribute(VALIDATION_SERVICE, validationService);
+        context.setAttribute(AUTH_CONTEXT, authenticationContext);
+        context.setAttribute(AUDIT_SERVICE, auditService);
         appServletContext = context;
     }
 

@@ -3,12 +3,11 @@ package com.fallt.servlet;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.exception.AlreadyExistException;
-import com.fallt.exception.SecurityException;
-import com.fallt.service.UserService;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
+import com.fallt.service.UserService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,31 +16,36 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static com.fallt.util.Constant.*;
+
 /**
  * Сервлет, используемый для удаления и обновления данных о пользователе
  */
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
 
-    private static final String OBJECT_MAPPER = "objectMapper";
+    private ObjectMapper objectMapper;
+    private UserService userService;
+    private AuthenticationContext authenticationContext;
 
-    private static final String USER_SERVICE = "userService";
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        objectMapper = (ObjectMapper) getServletContext().getAttribute(OBJECT_MAPPER);
+        userService = (UserService) getServletContext().getAttribute(USER_SERVICE);
+        authenticationContext = (AuthenticationContext) getServletContext().getAttribute(AUTH_CONTEXT);
 
-    private static final String AUTH_CONTEXT = "authContext";
+    }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ServletContext context = getServletContext();
-        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute(OBJECT_MAPPER);
-        UserService userService = (UserService) context.getAttribute(USER_SERVICE);
-        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute(AUTH_CONTEXT);
         String emailCurrentUser = SessionUtils.getCurrentUserEmail(req);
         try {
             authenticationContext.checkAuthentication(emailCurrentUser);
             userService.deleteUser(emailCurrentUser);
             authenticationContext.logout(emailCurrentUser);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } catch (SecurityException e) {
+        } catch (AuthenticationException e) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             byte[] errorMessage = objectMapper.writeValueAsBytes(e.getMessage());
             resp.getOutputStream().write(errorMessage);
@@ -50,21 +54,17 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ServletContext context = getServletContext();
-        ObjectMapper objectMapper = (ObjectMapper) context.getAttribute(OBJECT_MAPPER);
-        UserService userService = (UserService) context.getAttribute(USER_SERVICE);
-        AuthenticationContext authenticationContext = (AuthenticationContext) context.getAttribute(AUTH_CONTEXT);
         try {
             authenticationContext.checkAuthentication(SessionUtils.getCurrentUserEmail(req));
             UpsertUserRequest request = objectMapper.readValue(req.getInputStream(), UpsertUserRequest.class);
             UserResponse response = userService.updateUser(SessionUtils.getCurrentUserEmail(req), request);
             resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             byte[] bytes = objectMapper.writeValueAsBytes(response);
             resp.getOutputStream().write(bytes);
         } catch (AlreadyExistException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, objectMapper, e.getMessage());
-        } catch (SecurityException e) {
+        } catch (AuthenticationException e) {
             handleErrorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, objectMapper, e.getMessage());
         }
     }

@@ -4,7 +4,7 @@ import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.User;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.SecurityException;
+import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +65,7 @@ class AuthServiceTest {
         user.setBlocked(true);
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
 
-        assertThrows(SecurityException.class, () -> authService.login(request, authenticationContext));
+        assertThrows(AuthenticationException.class, () -> authService.login(request, authenticationContext));
     }
 
     private LoginRequest createRequest() {
