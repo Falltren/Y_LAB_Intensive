@@ -14,8 +14,6 @@ import java.time.LocalDate;
 public class ReportRequest {
 
     private String title;
-
     private LocalDate start;
-
     private LocalDate end;
 }

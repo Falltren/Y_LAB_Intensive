@@ -6,6 +6,15 @@ import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
+import com.fallt.security.AuthenticationContext;
+import com.fallt.service.impl.AuditServiceImpl;
+import com.fallt.service.impl.HabitServiceImpl;
+import com.fallt.service.impl.StatisticServiceImpl;
+import com.fallt.service.impl.UserServiceImpl;
+import com.fallt.util.InstanceCreator;
+import jakarta.servlet.ServletContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +23,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -22,21 +32,47 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import static com.fallt.util.Constant.AUDIT_SERVICE;
+import static com.fallt.util.Constant.AUTH_CONTEXT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StatisticServiceTest {
 
+    private MockedStatic<InstanceCreator> mockedStatic;
+
     @InjectMocks
-    private StatisticService statisticService;
+    private StatisticServiceImpl statisticService;
 
     @Mock
-    private HabitService habitService;
+    private HabitServiceImpl habitService;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
+    @Mock
+    private AuthenticationContext authenticationContext;
+
+    @Mock
+    private AuditServiceImpl auditService;
+
+    @Mock
+    private ServletContext servletContext;
+
+    @BeforeEach
+    void setup(){
+        mockedStatic = mockStatic(InstanceCreator.class);
+        mockedStatic.when(InstanceCreator::getServletContext).thenReturn(servletContext);
+        when(servletContext.getAttribute(AUTH_CONTEXT)).thenReturn(authenticationContext);
+        when(servletContext.getAttribute(AUDIT_SERVICE)).thenReturn(auditService);
+    }
+
+    @AfterEach
+    void tearDown(){
+        mockedStatic.close();
+    }
 
     @ParameterizedTest
     @MethodSource("dailyExecutionRate")

@@ -13,7 +13,6 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(target = "createAt", expression = "java(java.time.LocalDateTime.now())")
     User toEntity(UpsertUserRequest request);
 
     UserResponse toResponse(User user);

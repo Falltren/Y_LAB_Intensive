@@ -17,9 +17,7 @@ import lombok.NoArgsConstructor;
 public class UserDetails {
 
     private String email;
-
     private String password;
-
     private Role role;
 
     public static UserDetails createUserDetails(User user) {

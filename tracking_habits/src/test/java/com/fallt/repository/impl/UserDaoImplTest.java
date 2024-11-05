@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fallt.TestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserDaoImplTest extends AbstractTest {
@@ -39,8 +40,8 @@ class UserDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Сохранение нового пользователя")
     void whenCreateNewUser_thenUserAddedToDatabase() {
-        User user1 = createUser("user1");
-        userDao.create(user1);
+        User user = createUser(FIRST_USER_EMAIL);
+        userDao.create(user);
 
         List<User> users = userDao.findAll();
 
@@ -50,15 +51,13 @@ class UserDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Обновление данных о пользователе")
     void whenUpdateUser_thenUpdateDataInDatabase() {
-        String oldEmail = "user@u.u";
-        String newEmail = "newEmail";
-        User user = createUser(oldEmail);
+        User user = createUser(FIRST_USER_EMAIL);
         User existedUser = userDao.create(user);
-        existedUser.setEmail(newEmail);
+        existedUser.setEmail(SECOND_USER_EMAIL);
         userDao.update(existedUser);
 
-        Optional<User> oldUser = userDao.getUserByEmail(oldEmail);
-        Optional<User> userFromDb = userDao.getUserByEmail(newEmail);
+        Optional<User> oldUser = userDao.getUserByEmail(FIRST_USER_EMAIL);
+        Optional<User> userFromDb = userDao.getUserByEmail(SECOND_USER_EMAIL);
 
         assertThat(oldUser).isEmpty();
         assertThat(userFromDb).isPresent();
@@ -68,27 +67,24 @@ class UserDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Получение пользователя по email")
     void whenGetUserByCorrectEmail_thenReturnUserFromDatabase() {
-        String email = "user@u.u";
-        User user = createUser(email);
+        User user = createUser(SECOND_USER_EMAIL);
         userDao.create(user);
 
-        Optional<User> existedUser = userDao.getUserByEmail(email);
+        Optional<User> existedUser = userDao.getUserByEmail(SECOND_USER_EMAIL);
 
         assertThat(existedUser).isPresent();
         assertThat(existedUser.get().getId()).isNotNull();
-        assertThat(existedUser.get().getEmail()).isEqualTo(email);
+        assertThat(existedUser.get().getEmail()).isEqualTo(SECOND_USER_EMAIL);
     }
-
 
     @Test
     @DisplayName("Получение пользователя по паролю")
     void whenGetUserByPassword_thenReturnUserFromDatabase() {
-        User user = createUser("email");
-        String password = "user1pwd";
-        user.setPassword(password);
+        User user = createUser(FIRST_USER_EMAIL);
+        user.setPassword(FIRST_USER_PASSWORD);
         userDao.create(user);
 
-        Optional<User> existedUser = userDao.getUserByPassword(password);
+        Optional<User> existedUser = userDao.getUserByPassword(FIRST_USER_PASSWORD);
 
         assertThat(existedUser).isPresent();
     }
@@ -96,8 +92,8 @@ class UserDaoImplTest extends AbstractTest {
     @Test
     @DisplayName("Удаление пользователя")
     void whenDeleteUser_thenRemoveUserFromDatabase() {
-        User user1 = createUser("user1");
-        User user2 = createUser("user2");
+        User user1 = createUser(FIRST_USER_EMAIL);
+        User user2 = createUser(SECOND_USER_EMAIL);
         User existedUser = userDao.create(user1);
         userDao.create(user2);
         userDao.delete(existedUser.getEmail());

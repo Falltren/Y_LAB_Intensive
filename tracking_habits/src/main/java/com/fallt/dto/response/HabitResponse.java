@@ -15,8 +15,6 @@ import java.util.List;
 public class HabitResponse {
 
     private String title;
-
     private String text;
-
     private List<LocalDate> successfulExecution;
 }
