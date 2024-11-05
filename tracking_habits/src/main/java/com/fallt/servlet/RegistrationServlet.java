@@ -5,7 +5,7 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.UserService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

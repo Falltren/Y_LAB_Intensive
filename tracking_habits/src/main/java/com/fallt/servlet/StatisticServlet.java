@@ -7,7 +7,7 @@ import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.StatisticService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

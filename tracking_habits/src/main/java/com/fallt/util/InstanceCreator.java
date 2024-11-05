@@ -10,6 +10,7 @@ import com.fallt.repository.impl.HabitExecutionDaoImpl;
 import com.fallt.repository.impl.UserDaoImpl;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.*;
+import com.fallt.service.impl.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -35,11 +36,11 @@ public class InstanceCreator implements ServletContextListener {
         HabitDao habitDao = new HabitDaoImpl();
         HabitExecutionDao habitExecutionDao = new HabitExecutionDaoImpl();
         AuditDao auditDao = new AuditDaoImpl();
-        UserService userService = new UserService(userDao);
-        HabitService habitService = new HabitService(habitDao, habitExecutionDao, userService);
-        AuthService authService = new AuthService(userService);
-        AuditService auditService = new AuditService(auditDao);
-        StatisticService statisticService = new StatisticService(habitService, userService);
+        UserService userService = new UserServiceImpl(userDao);
+        HabitService habitService = new HabitServiceImpl(habitDao, habitExecutionDao, userService);
+        AuthService authService = new AuthServiceImpl(userService);
+        AuditService auditService = new AuditServiceImpl(auditDao);
+        StatisticService statisticService = new StatisticServiceImpl(habitService, userService);
         ValidationService validationService = new ValidationService();
         AuthenticationContext authenticationContext = new AuthenticationContext();
 

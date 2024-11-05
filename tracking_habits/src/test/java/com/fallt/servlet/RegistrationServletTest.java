@@ -3,8 +3,8 @@ package com.fallt.servlet;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.ValidationException;
-import com.fallt.service.UserService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.UserServiceImpl;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -37,7 +37,7 @@ class RegistrationServletTest {
     private ServletContext servletContext;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private ValidationService validationService;

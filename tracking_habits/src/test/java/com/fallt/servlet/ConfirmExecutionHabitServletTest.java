@@ -5,8 +5,8 @@ import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.service.HabitService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.HabitServiceImpl;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -38,7 +38,7 @@ class ConfirmExecutionHabitServletTest {
     private ConfirmExecutionHabitServlet confirmExecutionHabitServlet;
 
     @Mock
-    private HabitService habitService;
+    private HabitServiceImpl habitService;
 
     @Mock
     private ServletConfig servletConfig;

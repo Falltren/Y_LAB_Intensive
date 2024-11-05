@@ -1,15 +1,12 @@
 package com.fallt.service;
 
 import com.fallt.entity.AuditLog;
-import com.fallt.repository.AuditDao;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class AuditService {
+public interface AuditService {
 
-    private final AuditDao auditDao;
-
-    public void save(AuditLog auditLog) {
-        auditDao.save(auditLog);
-    }
+    /**
+     * Сохраняет действие пользователя
+     * @param auditLog Действие пользователя, включающее вызываемый метод, время
+     */
+    void save(AuditLog auditLog);
 }

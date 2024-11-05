@@ -5,7 +5,7 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.service.UserService;
+import com.fallt.service.impl.UserServiceImpl;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -34,7 +34,7 @@ class UserServletTest {
     private UserServlet userServlet;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private ServletConfig servletConfig;

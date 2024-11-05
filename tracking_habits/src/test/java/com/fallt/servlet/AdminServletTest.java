@@ -4,7 +4,7 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.service.UserService;
+import com.fallt.service.impl.UserServiceImpl;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletOutputStream;
 import com.fallt.util.SessionUtils;
@@ -34,7 +34,7 @@ class AdminServletTest {
     private AdminServlet adminServlet;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private ServletConfig servletConfig;

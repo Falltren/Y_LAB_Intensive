@@ -6,8 +6,8 @@ import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.service.AuthService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.AuthServiceImpl;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -36,7 +36,7 @@ class AuthServletTest {
     private AuthServlet authServlet;
 
     @Mock
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Mock
     private ValidationService validationService;

@@ -4,8 +4,8 @@ import com.fallt.dto.request.ReportRequest;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.service.StatisticService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.StatisticServiceImpl;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.Constant;
 import com.fallt.util.DelegatingServletInputStream;
 import com.fallt.util.DelegatingServletOutputStream;
@@ -37,7 +37,7 @@ class StatisticServletTest {
     private StatisticServlet statisticServlet;
 
     @Mock
-    private StatisticService statisticService;
+    private StatisticServiceImpl statisticService;
 
     @Mock
     private ServletConfig servletConfig;
