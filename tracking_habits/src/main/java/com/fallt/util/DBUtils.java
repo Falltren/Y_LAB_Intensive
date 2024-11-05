@@ -5,14 +5,12 @@ import com.fallt.exception.DBException;
 import java.sql.*;
 
 /**
- * Утилитарный класс для получения соединения с базой данных, с указанными в файле конфигурации настройками
+ * Утилитный класс для получения соединения с базой данных, с указанными в файле конфигурации настройками
  */
 public class DBUtils {
 
     private static String url;
-
     private static String user;
-
     private static String password;
 
     private DBUtils() {
@@ -31,9 +29,12 @@ public class DBUtils {
      */
     public static Connection getConnection() {
         try {
+            Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Не найден драйвер postgresql");
         }
     }
 

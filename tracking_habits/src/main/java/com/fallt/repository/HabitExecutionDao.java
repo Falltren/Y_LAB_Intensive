@@ -11,5 +11,5 @@ public interface HabitExecutionDao {
      *
      * @param execution Объект класса HabitExecution
      */
-    void save(HabitExecution execution);
+    HabitExecution save(HabitExecution execution);
 }

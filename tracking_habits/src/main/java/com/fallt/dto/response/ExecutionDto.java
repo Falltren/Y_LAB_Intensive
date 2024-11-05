@@ -1,4 +1,4 @@
-package com.fallt.dto;
+package com.fallt.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,13 +12,6 @@ import java.time.LocalDate;
 public class ExecutionDto {
 
     private LocalDate startPeriod;
-
     private LocalDate endPeriod;
-
     private boolean executed;
-
-    @Override
-    public String toString(){
-        return "Период: " + startPeriod + " - " + endPeriod + " результат: " + (executed?"выполнено":"невыполнено");
-    }
 }

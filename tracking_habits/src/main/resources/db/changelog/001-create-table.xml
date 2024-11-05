@@ -64,6 +64,25 @@
             <column name="date" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата выполнения привычки"/>
             <column name="habit_id" type="BIGINT" remarks="Внешний ключ, связывающий привычки с их выполнением"/>
         </createTable>
+
+        <createSequence schemaName="my_schema"
+                        sequenceName="audit_id_seq"
+                        startValue="1"
+                        incrementBy="1"
+                        cacheSize="1"/>
+
+        <createTable schemaName="my_schema"
+                     tableName="audit"
+                     remarks="Таблица аудита действий пользователя">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="audit_id_seq" remarks="Первичный ключ">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)" remarks="Электронный адрес пользователя"/>
+            <column name="action" type="VARCHAR(255)" remarks="Действие пользователя"/>
+            <column name="description" type="VARCHAR(255)" remarks="Описание действия"/>
+            <column name="date" type="TIMESTAMP(6) WITHOUT TIMEZONE" remarks="Дата и время выполнения действия"/>
+        </createTable>
+
         <addForeignKeyConstraint baseTableSchemaName="my_schema"
                                  baseTableName="habits"
                                  baseColumnNames="user_id"

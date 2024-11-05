@@ -15,14 +15,12 @@ import java.util.TreeSet;
 public class Habit {
 
     private Long id;
-
     private String title;
-
     private String text;
-
     private ExecutionRate executionRate;
 
-    private LocalDate createAt;
+    @Builder.Default
+    private LocalDate createAt = LocalDate.now();
 
     @ToString.Exclude
     private User user;

@@ -13,8 +13,6 @@ import java.time.LocalDate;
 public class HabitExecution {
 
     private Long id;
-
     private LocalDate date;
-
     private Habit habit;
 }

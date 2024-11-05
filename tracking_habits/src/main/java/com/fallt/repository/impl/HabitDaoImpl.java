@@ -5,7 +5,6 @@ import com.fallt.entity.Habit;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DBUtils;
-import com.fallt.util.Fetch;
 import com.fallt.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +43,7 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     @Override
-    public void update(Habit habit) {
+    public Habit update(Habit habit) {
         String sql = "UPDATE " + SCHEMA_NAME + "habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
         try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, habit.getTitle());
@@ -52,38 +51,13 @@ public class HabitDaoImpl implements HabitDao {
             preparedStatement.setString(3, habit.getExecutionRate().name());
             preparedStatement.setLong(4, habit.getId());
             preparedStatement.executeUpdate();
+            return habit;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
     }
 
-    @Override
-    public List<Habit> getAllUserHabits(Long userId, Fetch fetchType) {
-        if (fetchType.equals(Fetch.LAZY)) {
-            return getAllHabitsWithoutExecutions(userId);
-        } else {
-            return getAllHabitsWithExecutions(userId);
-        }
-    }
-
-    private List<Habit> getAllHabitsWithoutExecutions(Long userId) {
-        List<Habit> habits = new ArrayList<>();
-        String sql = "SELECT * FROM " + SCHEMA_NAME + "habits WHERE user_id = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Habit habit = instantiateHabit(resultSet);
-                habits.add(habit);
-            }
-            DBUtils.closeResultSet(resultSet);
-        } catch (SQLException e) {
-            throw new DBException(e.getMessage());
-        }
-        return habits;
-    }
-
-    private List<Habit> getAllHabitsWithExecutions(Long userId) {
+    public List<Habit> getAllUserHabits(Long userId) {
         String sql = "SELECT h.*, e.date FROM " + SCHEMA_NAME + "habits h LEFT JOIN " +
                 SCHEMA_NAME + "habit_execution e ON e.habit_id = h.id WHERE h.user_id = ?";
         Map<Long, Habit> userHabits = new HashMap<>();

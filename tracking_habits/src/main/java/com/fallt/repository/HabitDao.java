@@ -1,7 +1,6 @@
 package com.fallt.repository;
 
 import com.fallt.entity.Habit;
-import com.fallt.util.Fetch;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +22,15 @@ public interface HabitDao {
      *
      * @param habit Объект класса Habit
      */
-    void update(Habit habit);
+    Habit update(Habit habit);
 
     /**
      * Получение списка привычек пользователя
      *
-     * @param userId    Идентификатор пользователя
-     * @param fetchType Параметр, указывающий необходимость выгрузки данных по выполнению привычек вместе с привычками
+     * @param userId Идентификатор пользователя
      * @return Список привычек
      */
-    List<Habit> getAllUserHabits(Long userId, Fetch fetchType);
+    List<Habit> getAllUserHabits(Long userId);
 
     /**
      * Поиск привычки по названию

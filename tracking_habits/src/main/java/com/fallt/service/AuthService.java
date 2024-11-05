@@ -1,37 +1,22 @@
 package com.fallt.service;
 
-import com.fallt.entity.User;
-import com.fallt.out.ConsoleOutput;
-import com.fallt.util.Message;
-import lombok.RequiredArgsConstructor;
+import com.fallt.dto.request.LoginRequest;
+import com.fallt.dto.response.UserResponse;
+import com.fallt.security.AuthenticationContext;
 
 /**
- * Аутентификация пользователя
+ * Аутентификация пользователя в системе
  */
-@RequiredArgsConstructor
-public class AuthService {
-
-    private final UserService userService;
-
-    private final ConsoleOutput consoleOutput;
+public interface AuthService {
 
     /**
-     * Проверка наличия пользователя в базе данных
+     * Добавляет пользователя в контекст аутентификации
      *
-     * @param email    Электронный адрес пользователя
-     * @param password Пароль пользователя
-     * @return Возвращает объект класса User в случае успешной аутентификации или null если аутентификация завершилась неудачно
+     * @param request               Объект, содержащий электронную почту и пароль пользователя
+     * @param authenticationContext Контекст аутентификации, хранящий данные о пользователе, который вошел в систему
+     * @return Возвращает объект ответ, содержащий дынные, вошедшего в систему пользователя. Если пользователь не будет
+     * найден в системе, будет выброшено EntityNotFoundException, если пользователь был заблокирован,
+     * то будет выброшено AuthenticationException
      */
-    public User login(String email, String password) {
-        User user = userService.getUserByEmail(email);
-        if (user == null || !user.getPassword().equals(password)) {
-            consoleOutput.printMessage(Message.UNAUTHENTICATED_USER);
-            return null;
-        }
-        if (user.isBlocked()) {
-            consoleOutput.printMessage(Message.BLOCKED_USER);
-            return null;
-        }
-        return user;
-    }
+    UserResponse login(LoginRequest request, AuthenticationContext authenticationContext);
 }

@@ -1,4 +1,4 @@
-package com.fallt.dto;
+package com.fallt.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +12,6 @@ import java.util.List;
 public class HabitProgress {
 
     private String title;
-
     private int successRate;
-
     private List<ExecutionDto> execution;
 }
