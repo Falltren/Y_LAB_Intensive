@@ -1,28 +1,13 @@
 package com.fallt.service;
 
-import com.fallt.aop.audit.Auditable;
-import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.LoginRequest;
 import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.User;
-import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.AuthenticationException;
-import com.fallt.mapper.UserMapper;
 import com.fallt.security.AuthenticationContext;
-import com.fallt.security.UserDetails;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * Аутентификация пользователя
  */
-@RequiredArgsConstructor
-@Loggable
-@Auditable
-@Service
-public class AuthService {
-
-    private final UserService userService;
+public interface AuthService {
 
     /**
      * Проверка наличия пользователя в базе данных
@@ -32,15 +17,5 @@ public class AuthService {
      * @return Возвращает объект класса User в случае успешной аутентификации
      * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
      */
-    public UserResponse login(LoginRequest request, String sessionId, AuthenticationContext authenticationContext) {
-        User user = userService.getUserByEmail(request.getEmail());
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            throw new EntityNotFoundException("Проверьте электронную почту и пароль");
-        }
-        if (user.isBlocked()) {
-            throw new AuthenticationException("Ваша учетная запись заблокирована");
-        }
-        authenticationContext.authenticate(sessionId, UserDetails.createUserDetails(user));
-        return UserMapper.INSTANCE.toResponse(user);
-    }
+    UserResponse login(LoginRequest request, String sessionId, AuthenticationContext authenticationContext);
 }

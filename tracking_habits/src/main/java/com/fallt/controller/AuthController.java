@@ -5,7 +5,7 @@ import com.fallt.dto.response.UserResponse;
 import com.fallt.exception.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

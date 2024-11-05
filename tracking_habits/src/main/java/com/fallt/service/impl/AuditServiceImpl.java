@@ -4,8 +4,10 @@ import com.fallt.entity.AuditLog;
 import com.fallt.repository.AuditDao;
 import com.fallt.service.AuditService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
+@Service
 public class AuditServiceImpl implements AuditService {
 
     private final AuditDao auditDao;

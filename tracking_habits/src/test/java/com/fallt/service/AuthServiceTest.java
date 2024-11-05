@@ -6,6 +6,8 @@ import com.fallt.entity.User;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.security.AuthenticationContext;
+import com.fallt.service.impl.AuthServiceImpl;
+import com.fallt.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +23,10 @@ import static org.mockito.Mockito.when;
 class AuthServiceTest {
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private AuthenticationContext authenticationContext;

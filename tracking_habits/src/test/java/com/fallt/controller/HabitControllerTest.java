@@ -9,7 +9,7 @@ import com.fallt.exception.ExceptionHandlingController;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class HabitControllerTest {
+class HabitControllerTest {
 
     @InjectMocks
     private HabitController habitController;

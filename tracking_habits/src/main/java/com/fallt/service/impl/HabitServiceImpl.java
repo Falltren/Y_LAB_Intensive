@@ -18,12 +18,14 @@ import com.fallt.repository.HabitExecutionDao;
 import com.fallt.service.HabitService;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class HabitServiceImpl implements HabitService {
 
     private final HabitDao habitDao;
@@ -95,5 +97,4 @@ public class HabitServiceImpl implements HabitService {
     private boolean isExistedHabit(Long userId, String title) {
         return habitDao.findHabitByTitleAndUserId(userId, title).isPresent();
     }
-
 }

@@ -12,6 +12,7 @@ import com.fallt.service.HabitService;
 import com.fallt.service.StatisticService;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class StatisticServiceImpl implements StatisticService {
 
     private final HabitService habitService;

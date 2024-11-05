@@ -9,7 +9,7 @@ import com.fallt.exception.ExceptionHandlingController;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
-import com.fallt.service.ValidationService;
+import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -182,7 +182,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Попытка блокировки пользователя пользователем без роли ADMIN")
-    void whenUserWithoutRoleAdminBlockingUser_thenReturnForbidden() throws Exception{
+    void whenUserWithoutRoleAdminBlockingUser_thenReturnForbidden() throws Exception {
         String email = "user";
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         doThrow(AuthorizationException.class).when(authenticationContext).checkRole(SESSION_ID, Role.ROLE_ADMIN);

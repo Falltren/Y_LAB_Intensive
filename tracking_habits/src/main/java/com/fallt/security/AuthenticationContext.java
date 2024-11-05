@@ -55,11 +55,15 @@ public class AuthenticationContext {
         checkAuthentication(sessionId);
         Role currentUserRole = context.get(sessionId).getRole();
         if (!currentUserRole.equals(requiredRole)) {
-            throw new AuthorizationException("У вас недостаточно прав для выполнения данного действия"); // при использовании spring будет приводить к статусу 403 в ответе
+            throw new AuthorizationException("У вас недостаточно прав для выполнения данного действия");
         }
     }
 
     public String getEmailCurrentUser(String sessionId) {
         return context.get(sessionId).getEmail();
+    }
+
+    public UserDetails getCurrentUser() {
+        return context.values().stream().findFirst().orElse(null);
     }
 }

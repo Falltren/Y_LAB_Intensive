@@ -13,6 +13,7 @@ import com.fallt.mapper.UserMapper;
 import com.fallt.repository.UserDao;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
