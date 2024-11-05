@@ -30,11 +30,8 @@ import java.util.List;
 public class StatisticController {
 
     private final StatisticService statisticService;
-
     private final SessionUtils sessionUtils;
-
     private final ValidationService validationService;
-
     private final AuthenticationContext authenticationContext;
 
     @Operation(

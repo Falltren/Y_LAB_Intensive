@@ -1,6 +1,5 @@
 package com.fallt.dto.request;
 
-import com.fallt.entity.ExecutionRate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

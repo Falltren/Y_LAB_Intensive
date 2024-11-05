@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class AuditAspect {
 
     private final AuthenticationContext authenticationContext;
-
     private final AuditService auditService;
 
     @Before("@annotation(auditable) && execution(* *(..))")

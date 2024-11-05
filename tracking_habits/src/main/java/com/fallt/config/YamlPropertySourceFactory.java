@@ -11,6 +11,7 @@ import java.util.Properties;
 
 @Component
 public class YamlPropertySourceFactory implements PropertySourceFactory {
+
     @Override
     public PropertySource<?> createPropertySource(String name, EncodedResource resource) {
         YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();

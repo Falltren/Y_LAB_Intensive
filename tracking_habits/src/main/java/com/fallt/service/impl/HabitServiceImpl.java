@@ -29,9 +29,7 @@ import java.util.List;
 public class HabitServiceImpl implements HabitService {
 
     private final HabitDao habitDao;
-
     private final HabitExecutionDao executionDao;
-
     private final UserService userService;
 
     @Auditable(action = ActionType.CREATE)

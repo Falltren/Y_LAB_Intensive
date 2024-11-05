@@ -21,9 +21,7 @@ public class AuthAspect {
             "&& !execution(* com.fallt.controller.AuthController.login(..)) " +
             "&& !execution(* com.fallt.controller.UserController.createUser(..))")
     public void checkAuthentication() {
-        System.out.println("Проверка аутентификации");
         String sessionId = sessionUtils.getSessionIdFromContext();
         authenticationContext.checkAuthentication(sessionId);
     }
-
 }

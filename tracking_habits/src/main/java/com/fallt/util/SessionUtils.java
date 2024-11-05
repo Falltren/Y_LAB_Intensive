@@ -17,5 +17,4 @@ public class SessionUtils {
         }
         return attributes.getRequest().getSession().getId();
     }
-
 }

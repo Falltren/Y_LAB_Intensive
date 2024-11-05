@@ -24,7 +24,6 @@ import java.util.List;
 public class StatisticServiceImpl implements StatisticService {
 
     private final HabitService habitService;
-
     private final UserService userService;
 
     @Auditable(action = ActionType.GET)

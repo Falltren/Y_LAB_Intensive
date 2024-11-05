@@ -26,11 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-
     private final AuthenticationContext authenticationContext;
-
     private final ValidationService validationService;
-
     private final SessionUtils sessionUtils;
 
     @Operation(
