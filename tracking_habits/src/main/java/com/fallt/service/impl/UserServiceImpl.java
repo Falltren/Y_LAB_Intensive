@@ -40,8 +40,6 @@ public class UserServiceImpl implements UserService {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", request.getPassword()));
         }
         User user = UserMapper.INSTANCE.toEntity(request);
-        user.setRole(Role.ROLE_USER);
-        user.setBlocked(false);
         User savedUser = userDao.create(user);
         return UserMapper.INSTANCE.toResponse(savedUser);
     }

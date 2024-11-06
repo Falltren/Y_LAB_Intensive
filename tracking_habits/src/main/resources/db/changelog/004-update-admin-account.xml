@@ -4,10 +4,10 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
                    logicalFilePath="db/changelog/changelog-master.xml">
-
-    <include file="001-create-table.xml" relativeToChangelogFile="true"/>
-    <include file="002-insert-admin-account.xml" relativeToChangelogFile="true"/>
-    <include file="003-add-column-to-users.xml" relativeToChangelogFile="true"/>
-    <include file="004-update-admin-account.xml" relativeToChangelogFile="true"/>
-
+    <changeSet id="004-update-admin-account" author="fallt">
+        <update tableName="users">
+            <column name="is_active" value="true"/>
+            <where>id=1</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>
