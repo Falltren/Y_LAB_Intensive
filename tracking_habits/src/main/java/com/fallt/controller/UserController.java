@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,7 +38,6 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationContext authenticationContext;
     private final SessionUtils sessionUtils;
-    private final ValidationService validationService;
 
     @Operation(
             summary = "Получение всех аккаунтов",
@@ -56,32 +55,10 @@ public class UserController {
             })
     })
     @GetMapping
-    public List<UserResponse> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         String sessionId = sessionUtils.getSessionIdFromContext();
         authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
-        return userService.getAllUsers();
-    }
-
-    @Operation(
-            summary = "Создание аккаунта",
-            description = "Добавляет нового пользователя в систему"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Успешная регистрация пользователя", content = {
-                    @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Email/пароль уже используется другим пользователем", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse createUser(@RequestBody UpsertUserRequest request) {
-        validationService.checkUpsertUserRequest(request);
-        return userService.saveUser(request);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @Operation(
@@ -103,9 +80,9 @@ public class UserController {
             })
     })
     @PutMapping
-    public UserResponse updateUser(@RequestBody UpsertUserRequest request) {
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UpsertUserRequest request) {
         String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return userService.updateUser(email, request);
+        return ResponseEntity.ok(userService.updateUser(email, request));
     }
 
     @Operation(
@@ -122,10 +99,11 @@ public class UserController {
             })
     })
     @PutMapping("/block")
-    public void blockUser(@RequestParam("email") String email) {
+    public ResponseEntity<Void> blockUser(@RequestParam("email") String email) {
         String sessionId = sessionUtils.getSessionIdFromContext();
         authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
         userService.blockingUser(email);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Operation(
@@ -139,9 +117,9 @@ public class UserController {
             })
     })
     @DeleteMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser() {
+    public ResponseEntity<Void> deleteUser() {
         String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         userService.deleteUser(email);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

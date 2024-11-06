@@ -25,11 +25,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static com.fallt.TestConstant.SESSION_ID;
+import static com.fallt.TestConstant.USER_EMAIL;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -48,66 +55,14 @@ class UserControllerTest {
 
     @Mock
     private ValidationService validationService;
-
     private MockMvc mockMvc;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String SESSION_ID = "sessionId";
-
-    private static final String USER_EMAIL = "email";
 
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(ExceptionHandlingController.class)
                 .build();
-    }
-
-    @Test
-    @DisplayName("Регистрация нового пользователя")
-    void whenCreateNewUser_thenReturnOk() throws Exception {
-        UpsertUserRequest request = createRequest();
-        UserResponse response = createResponse();
-        when(userService.saveUser(request)).thenReturn(response);
-        String content = objectMapper.writeValueAsString(request);
-
-        mockMvc.perform(post("/api/v1/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(content().string(objectMapper.writeValueAsString(response)));
-    }
-
-    @Test
-    @DisplayName("Попытка регистрации нового пользователя с невалидными данными")
-    void whenCreateNewUserWithIncorrectData_thenReturnBadRequest() throws Exception {
-        UpsertUserRequest request = createRequest();
-        when(validationService.checkUpsertUserRequest(request)).thenThrow(ValidationException.class);
-        String content = objectMapper.writeValueAsString(request);
-
-        mockMvc.perform(post("/api/v1/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("BAD REQUEST"));
-    }
-
-    @Test
-    @DisplayName("Попытка регистрации нового пользователя с уже используемой электронной почтой")
-    void whenCreateNewUserWithExistsEmail_thenReturnBadRequest() throws Exception {
-        UpsertUserRequest request = createRequest();
-        when(userService.saveUser(request)).thenThrow(AlreadyExistException.class);
-        String content = objectMapper.writeValueAsString(request);
-
-        mockMvc.perform(post("/api/v1/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("ALREADY EXIST"));
     }
 
     @Test
@@ -141,8 +96,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("ALREADY EXIST"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

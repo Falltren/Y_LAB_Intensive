@@ -6,8 +6,6 @@ import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -22,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.fallt.util.Constant.DELETE_HABIT;
+import static com.fallt.util.Constant.FIND_ALL_HABITS_QUERY;
+import static com.fallt.util.Constant.FIND_HABIT_BY_TITLE_AND_USER;
+import static com.fallt.util.Constant.INSERT_HABIT_QUERY;
+import static com.fallt.util.Constant.UPDATE_HABIT_QUERY;
 
 /**
  * Класс предназначен для взаимодействия с таблицей habits посредствам SQL запросов
@@ -32,14 +35,10 @@ public class HabitDaoImpl implements HabitDao {
 
     private final DbConnectionManager connectionManager;
 
-    @Setter
-    @Value("${spring.liquibase.default-schema}")
-    private String schema;
-
     @Override
     public Habit save(Habit habit) {
-        String sql = "INSERT INTO " + schema + ".habits (title, text, execution_rate, create_at, user_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HABIT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
@@ -60,8 +59,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Habit update(Habit habit) {
-        String sql = "UPDATE " + schema + ".habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_HABIT_QUERY)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
@@ -74,10 +73,9 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     public List<Habit> getAllUserHabits(Long userId) {
-        String sql = "SELECT h.*, e.date FROM " + schema + ".habits h LEFT JOIN " +
-                schema + ".habit_execution e ON e.habit_id = h.id WHERE h.user_id = ?";
         Map<Long, Habit> userHabits = new HashMap<>();
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_HABITS_QUERY)) {
             preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -100,9 +98,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Optional<Habit> findHabitByTitleAndUserId(Long userId, String title) {
-        String sql = "SELECT * FROM " + schema + ".habits h LEFT JOIN " +
-                schema + ".habit_execution e ON e.habit_id = h.id WHERE h.user_id = ? AND h.title = ?";
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_TITLE_AND_USER)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -123,8 +120,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public void delete(Long userId, String title) {
-        String sql = "DELETE FROM " + schema + ".habits WHERE user_id = ? AND title = ?";
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_HABIT)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             preparedStatement.execute();

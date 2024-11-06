@@ -31,6 +31,7 @@ public class User {
     private LocalDateTime createAt = LocalDateTime.now();
     private LocalDateTime updateAt;
     private boolean isBlocked;
+    private boolean isActive;
 
     @Builder.Default
     private List<Habit> habits = new ArrayList<>();

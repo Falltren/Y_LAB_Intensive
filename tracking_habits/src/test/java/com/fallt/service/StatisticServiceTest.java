@@ -6,12 +6,9 @@ import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import com.fallt.entity.Role;
 import com.fallt.entity.User;
-import com.fallt.security.AuthenticationContext;
-import com.fallt.service.impl.AuditServiceImpl;
 import com.fallt.service.impl.HabitServiceImpl;
 import com.fallt.service.impl.StatisticServiceImpl;
 import com.fallt.service.impl.UserServiceImpl;
-import jakarta.servlet.ServletContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +31,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class StatisticServiceTest {
 
-//    private MockedStatic<InstanceCreator> mockedStatic;
-
     @InjectMocks
     private StatisticServiceImpl statisticService;
 
@@ -44,28 +39,6 @@ class StatisticServiceTest {
 
     @Mock
     private UserServiceImpl userService;
-
-    @Mock
-    private AuthenticationContext authenticationContext;
-
-    @Mock
-    private AuditServiceImpl auditService;
-
-    @Mock
-    private ServletContext servletContext;
-
-//    @BeforeEach
-//    void setup(){
-//        mockedStatic = mockStatic(InstanceCreator.class);
-//        mockedStatic.when(InstanceCreator::getServletContext).thenReturn(servletContext);
-//        when(servletContext.getAttribute(AUTH_CONTEXT)).thenReturn(authenticationContext);
-//        when(servletContext.getAttribute(AUDIT_SERVICE)).thenReturn(auditService);
-//    }
-//
-//    @AfterEach
-//    void tearDown(){
-//        mockedStatic.close();
-//    }
 
     @ParameterizedTest
     @MethodSource("dailyExecutionRate")

@@ -4,9 +4,11 @@ import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
 import com.fallt.entity.User;
 import com.fallt.repository.AbstractTest;
-import com.fallt.repository.HabitDao;
-import com.fallt.util.DbConnectionManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HabitDaoImplTest extends AbstractTest {
 
     private HabitDaoImpl habitDao;
-
     private User user;
 
     @BeforeAll
@@ -38,7 +39,6 @@ class HabitDaoImplTest extends AbstractTest {
     void setup() {
         habitDao = new HabitDaoImpl(connectionManager);
         user = addUserToDatabase();
-        habitDao.setSchema(SCHEMA);
     }
 
     @Test

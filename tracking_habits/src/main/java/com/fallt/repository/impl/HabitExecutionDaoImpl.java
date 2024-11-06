@@ -5,8 +5,6 @@ import com.fallt.exception.DBException;
 import com.fallt.repository.HabitExecutionDao;
 import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -14,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import static com.fallt.util.Constant.INSERT_HABIT_EXECUTION_QUERY;
 
 /**
  * Класс предназначен для взаимодействия с таблицей habit_execution посредствам SQL запросов
@@ -24,14 +24,10 @@ public class HabitExecutionDaoImpl implements HabitExecutionDao {
 
     private final DbConnectionManager connectionManager;
 
-    @Setter
-    @Value("${spring.liquibase.default-schema}")
-    private String schema;
-
     @Override
     public HabitExecution save(HabitExecution execution) {
-        String sql = "INSERT INTO " + schema + ".habit_execution (date, habit_id) VALUES (?, ?)";
-        try (Connection connection = connectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HABIT_EXECUTION_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, execution.getDate());
             preparedStatement.setLong(2, execution.getHabit().getId());
             preparedStatement.execute();

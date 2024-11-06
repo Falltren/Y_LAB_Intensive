@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,9 +58,9 @@ public class HabitController {
             })
     })
     @GetMapping
-    public List<HabitResponse> getAllHabits() {
+    public ResponseEntity<List<HabitResponse>> getAllHabits() {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return habitService.getAllHabits(userEmail);
+        return ResponseEntity.ok(habitService.getAllHabits(userEmail));
     }
 
     @Operation(
@@ -81,11 +82,11 @@ public class HabitController {
             })
     })
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public HabitResponse createHabit(@RequestBody UpsertHabitRequest request) {
+    public ResponseEntity<HabitResponse> createHabit(@RequestBody UpsertHabitRequest request) {
         validationService.checkUpsertHabitRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return habitService.saveHabit(userEmail, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(habitService.saveHabit(userEmail, request));
     }
 
     @Operation(
@@ -107,11 +108,11 @@ public class HabitController {
             })
     })
     @PostMapping("/confirm")
-    @ResponseStatus(HttpStatus.CREATED)
-    public HabitExecutionResponse confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
+    public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
         validationService.checkHabitConfirmRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return habitService.confirmHabit(userEmail, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(habitService.confirmHabit(userEmail, request));
     }
 
     @Operation(
@@ -136,9 +137,9 @@ public class HabitController {
             })
     })
     @PutMapping
-    public HabitResponse updateHabit(@RequestParam(name = "title") String title, @RequestBody UpsertHabitRequest request) {
+    public ResponseEntity<HabitResponse> updateHabit(@RequestParam(name = "title") String title, @RequestBody UpsertHabitRequest request) {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return habitService.updateHabit(userEmail, title, request);
+        return ResponseEntity.ok(habitService.updateHabit(userEmail, title, request));
     }
 
     @Operation(
@@ -152,9 +153,9 @@ public class HabitController {
             })
     })
     @DeleteMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteHabit(@RequestParam(name = "title") String title) {
+    public ResponseEntity<Void> deleteHabit(@RequestParam(name = "title") String title) {
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         habitService.deleteHabit(userEmail, title);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

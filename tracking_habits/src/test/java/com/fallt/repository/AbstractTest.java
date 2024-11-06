@@ -27,8 +27,6 @@ public abstract class AbstractTest {
 
     protected static final String DRIVER_NAME = "org.postgresql.Driver";
 
-    protected static final String SCHEMA = "my_schema";
-
     protected static PostgreSQLContainer postgreSQLContainer;
     protected static DbConnectionManager connectionManager = new DbConnectionManager();
 
@@ -44,7 +42,6 @@ public abstract class AbstractTest {
 
     protected User addUserToDatabase() {
         UserDaoImpl userDao = new UserDaoImpl(connectionManager);
-        userDao.setSchema(SCHEMA);
         User userForCreate = User.builder()
                 .name("user")
                 .email("user@u.u")
@@ -57,7 +54,6 @@ public abstract class AbstractTest {
 
     protected Habit addHabitToDatabase() {
         HabitDaoImpl habitDao = new HabitDaoImpl(connectionManager);
-        habitDao.setSchema(SCHEMA);
         User user = addUserToDatabase();
         Habit habit = Habit.builder()
                 .title("test habit")

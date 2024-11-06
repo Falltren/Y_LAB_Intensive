@@ -13,4 +13,6 @@ public class TestConstant {
     public static final String HABIT_TEXT = "text";
     public static final String DAILY_HABIT = "DAILY";
     public static final String WEEKLY_HABIT = "WEEKLY";
+    public static final String SESSION_ID = "sessionId";
+    public static final String USER_EMAIL = "email";
 }

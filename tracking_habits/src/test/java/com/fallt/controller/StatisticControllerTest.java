@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 
+import static com.fallt.TestConstant.SESSION_ID;
+import static com.fallt.TestConstant.USER_EMAIL;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,15 +48,8 @@ class StatisticControllerTest {
 
     @Mock
     private AuthenticationContext authenticationContext;
-
     private MockMvc mockMvc;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String SESSION_ID = "sessionId";
-
-    private static final String USER_EMAIL = "email";
-
     private static final String FULL_REPORT_URL = "/api/v1/reports/full";
     private static final String STREAK_REPORT_URL = "/api/v1/reports/streak";
 

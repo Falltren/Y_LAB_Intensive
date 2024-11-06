@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,10 +51,10 @@ public class StatisticController {
             })
     })
     @GetMapping("/full")
-    public HabitProgress getFullProgress(@RequestBody ReportRequest request) {
+    public ResponseEntity<HabitProgress> getFullProgress(@RequestBody ReportRequest request) {
         validationService.checkReportRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return statisticService.getHabitProgress(userEmail, request);
+        return ResponseEntity.ok(statisticService.getHabitProgress(userEmail, request));
     }
 
     @Operation(
@@ -72,9 +73,9 @@ public class StatisticController {
             })
     })
     @GetMapping("/streak")
-    public List<ExecutionDto> getStreak(@RequestBody ReportRequest request) {
+    public ResponseEntity<List<ExecutionDto>> getStreak(@RequestBody ReportRequest request) {
         validationService.checkReportRequest(request);
         String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return statisticService.getHabitStreak(userEmail, request);
+        return ResponseEntity.ok(statisticService.getHabitStreak(userEmail, request));
     }
 }

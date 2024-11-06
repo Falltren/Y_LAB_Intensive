@@ -3,10 +3,11 @@ package com.fallt.repository.impl;
 import com.fallt.entity.Habit;
 import com.fallt.entity.HabitExecution;
 import com.fallt.repository.AbstractTest;
-import com.fallt.repository.HabitDao;
-import com.fallt.repository.HabitExecutionDao;
-import com.fallt.util.DbConnectionManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HabitExecutionDaoImplTest extends AbstractTest {
 
     private HabitExecutionDaoImpl executionDao;
-
     private HabitDaoImpl habitDao;
 
     @BeforeAll
@@ -35,8 +35,6 @@ class HabitExecutionDaoImplTest extends AbstractTest {
     void setup() {
         executionDao = new HabitExecutionDaoImpl(connectionManager);
         habitDao = new HabitDaoImpl(connectionManager);
-        executionDao.setSchema(SCHEMA);
-        habitDao.setSchema(SCHEMA);
     }
 
     @Test
