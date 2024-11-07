@@ -6,6 +6,7 @@ import com.fallt.entity.User;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.security.AuthenticationContext;
+import com.fallt.security.PasswordEncoder;
 import com.fallt.service.impl.AuthServiceImpl;
 import com.fallt.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,9 @@ class AuthServiceTest {
     private UserServiceImpl userService;
 
     @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
     private AuthenticationContext authenticationContext;
 
     @Test
@@ -37,6 +41,7 @@ class AuthServiceTest {
         LoginRequest request = createRequest();
         User user = createUser();
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(passwordEncoder.checkPassword(request.getPassword(), user.getPassword())).thenReturn(true);
 
         UserResponse response = authService.login(request, user.getEmail(), authenticationContext);
 
@@ -51,6 +56,7 @@ class AuthServiceTest {
         request.setPassword("incorrectPassword");
         User user = createUser();
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(passwordEncoder.checkPassword(request.getPassword(), user.getPassword())).thenReturn(false);
 
         assertThrows(EntityNotFoundException.class, () -> authService.login(request, user.getEmail(), authenticationContext));
     }
@@ -62,6 +68,7 @@ class AuthServiceTest {
         User user = createUser();
         user.setBlocked(true);
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(passwordEncoder.checkPassword(request.getPassword(), user.getPassword())).thenReturn(true);
 
         assertThrows(AuthenticationException.class, () -> authService.login(request, user.getEmail(), authenticationContext));
     }

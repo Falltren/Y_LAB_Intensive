@@ -5,12 +5,12 @@ import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
 import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.Role;
 import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.repository.UserDao;
+import com.fallt.security.PasswordEncoder;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +25,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final PasswordEncoder passwordEncoder;
 
     @Auditable(action = ActionType.GET)
     public List<UserResponse> getAllUsers() {
@@ -33,13 +34,15 @@ public class UserServiceImpl implements UserService {
 
     @Auditable(action = ActionType.CREATE)
     public UserResponse saveUser(UpsertUserRequest request) {
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
         if (isExistsEmail(request.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", request.getEmail()));
         }
-        if (isExistsPassword(request.getPassword())) {
+        if (isExistsPassword(encodedPassword)) {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", request.getPassword()));
         }
         User user = UserMapper.INSTANCE.toEntity(request);
+        user.setPassword(encodedPassword);
         User savedUser = userDao.create(user);
         return UserMapper.INSTANCE.toResponse(savedUser);
     }

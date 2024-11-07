@@ -7,6 +7,7 @@ import com.fallt.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.repository.UserDao;
+import com.fallt.security.PasswordEncoder;
 import com.fallt.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserDao userDao;
@@ -100,8 +104,10 @@ class UserServiceTest {
     @Test
     @DisplayName("Попытка сохранения пользователя с существующим паролем")
     void testCreateUserWithDuplicatePassword() {
+        String encodedPassword = "encodedPwd";
         UpsertUserRequest request = createRequest("user1@user.user", "user");
-        when(userDao.getUserByPassword(request.getPassword())).thenReturn(Optional.of(new User()));
+        when(passwordEncoder.encode(request.getPassword())).thenReturn(encodedPassword);
+        when(userDao.getUserByPassword(encodedPassword)).thenReturn(Optional.of(new User()));
 
         assertThrows(AlreadyExistException.class, () -> userService.saveUser(request));
     }
