@@ -1,7 +1,7 @@
 package com.fallt.service;
 
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.User;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.security.AuthenticationContext;

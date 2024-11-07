@@ -1,16 +1,16 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.HabitExecutionResponse;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.entity.Habit;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.response.HabitExecutionResponse;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.User;
 
 import java.util.List;
 
 /**
- * Класс для работы с привычками
+ * Интерфейс, предназначенный для работы с привычками
  */
 public interface HabitService {
 

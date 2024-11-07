@@ -1,12 +1,11 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.Role;
-import com.fallt.exception.ExceptionResponse;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
-import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

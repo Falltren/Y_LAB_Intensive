@@ -1,7 +1,7 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.Habit;
-import com.fallt.entity.HabitExecution;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.HabitExecution;
 import com.fallt.repository.AbstractTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

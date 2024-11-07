@@ -1,9 +1,9 @@
 package com.fallt.repository;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.entity.User;
 import com.fallt.repository.impl.HabitDaoImpl;
 import com.fallt.repository.impl.UserDaoImpl;
 import com.fallt.util.DbConnectionManager;

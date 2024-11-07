@@ -1,6 +1,6 @@
 package com.fallt.service;
 
-import com.fallt.entity.AuditLog;
+import com.fallt.domain.entity.AuditLog;
 
 public interface AuditService {
 

@@ -1,5 +1,6 @@
-package com.fallt.entity;
+package com.fallt.domain.entity;
 
+import com.fallt.domain.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -3,7 +3,7 @@ package com.fallt.controller;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.ExceptionHandlingController;
+import com.fallt.controller.advice.ExceptionHandlingController;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;

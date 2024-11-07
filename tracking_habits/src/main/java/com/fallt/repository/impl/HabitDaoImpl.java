@@ -1,7 +1,7 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DbConnectionManager;

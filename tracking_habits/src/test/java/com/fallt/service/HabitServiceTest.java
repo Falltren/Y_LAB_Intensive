@@ -1,9 +1,9 @@
 package com.fallt.service;
 
-import com.fallt.dto.response.HabitExecutionResponse;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.entity.Habit;
-import com.fallt.entity.HabitExecution;
+import com.fallt.domain.dto.response.HabitExecutionResponse;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.HabitExecution;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.repository.HabitDao;

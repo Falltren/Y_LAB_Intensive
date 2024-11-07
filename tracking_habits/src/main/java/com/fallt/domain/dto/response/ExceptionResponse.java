@@ -1,4 +1,4 @@
-package com.fallt.dto.request;
+package com.fallt.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpsertUserRequest {
+public class ExceptionResponse {
 
-    private String name;
-    private String password;
-    private String email;
+    private String errorDescription;
+    private Long timestamp;
 }

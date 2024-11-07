@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.User;
+import com.fallt.domain.entity.User;
 
 import java.util.List;
 import java.util.Optional;

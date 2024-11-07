@@ -1,4 +1,4 @@
-package com.fallt.exception;
+package com.fallt.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ExceptionResponse {
+public class UserResponse {
 
-    private String errorDescription;
-    private Long timestamp;
+    private String name;
+    private String email;
 }

@@ -1,7 +1,7 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.response.UserResponse;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.security.AuthenticationContext;
 
 /**

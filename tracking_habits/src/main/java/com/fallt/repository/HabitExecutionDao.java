@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.HabitExecution;
+import com.fallt.domain.entity.HabitExecution;
 
 /**
  * Интерфейс для взаимодействия с таблицей выполнения привычек в базе данных

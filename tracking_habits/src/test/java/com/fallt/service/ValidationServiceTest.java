@@ -1,10 +1,10 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.impl.ValidationService;
 import org.junit.jupiter.api.DisplayName;

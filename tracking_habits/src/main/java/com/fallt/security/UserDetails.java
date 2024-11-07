@@ -1,7 +1,7 @@
 package com.fallt.security;
 
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

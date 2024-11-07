@@ -1,6 +1,6 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.AuditLog;
+import com.fallt.domain.entity.AuditLog;
 import com.fallt.exception.DBException;
 import com.fallt.repository.AuditDao;
 import com.fallt.util.DbConnectionManager;

@@ -1,7 +1,7 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.entity.User;
 import com.fallt.exception.DBException;
 import com.fallt.repository.UserDao;
 import com.fallt.util.DbConnectionManager;
@@ -26,9 +26,6 @@ import static com.fallt.util.Constant.FIND_USER_BY_PASSWORD_QUERY;
 import static com.fallt.util.Constant.INSERT_USER_QUERY;
 import static com.fallt.util.Constant.UPDATE_USER_QUERY;
 
-/**
- * Класс предназначен для взаимодействия с таблицей users посредствам SQL запросов
- */
 @RequiredArgsConstructor
 @Repository
 public class UserDaoImpl implements UserDao {

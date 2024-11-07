@@ -1,6 +1,6 @@
 package com.fallt.aop.audit;
 
-import com.fallt.entity.AuditLog;
+import com.fallt.domain.entity.AuditLog;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.security.UserDetails;
 import com.fallt.service.AuditService;

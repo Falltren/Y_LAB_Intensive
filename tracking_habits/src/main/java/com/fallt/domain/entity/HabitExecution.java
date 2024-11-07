@@ -1,4 +1,4 @@
-package com.fallt.entity;
+package com.fallt.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

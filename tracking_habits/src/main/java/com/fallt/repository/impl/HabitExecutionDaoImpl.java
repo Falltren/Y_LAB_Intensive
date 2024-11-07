@@ -1,6 +1,6 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.HabitExecution;
+import com.fallt.domain.entity.HabitExecution;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitExecutionDao;
 import com.fallt.util.DbConnectionManager;

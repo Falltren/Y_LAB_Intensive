@@ -1,6 +1,6 @@
 package com.fallt.security;
 
-import com.fallt.entity.Role;
+import com.fallt.domain.entity.enums.Role;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.AuthorizationException;
 import org.springframework.stereotype.Component;

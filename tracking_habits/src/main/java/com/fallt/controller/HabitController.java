@@ -1,10 +1,10 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.HabitExecutionResponse;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.exception.ExceptionResponse;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.response.HabitExecutionResponse;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.impl.ValidationService;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

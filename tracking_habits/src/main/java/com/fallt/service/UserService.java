@@ -1,13 +1,13 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.User;
 
 import java.util.List;
 
 /**
- * Класс для работы с пользователями
+ * Интерфейс, предназначенный для работы с пользователями
  */
 public interface UserService {
 

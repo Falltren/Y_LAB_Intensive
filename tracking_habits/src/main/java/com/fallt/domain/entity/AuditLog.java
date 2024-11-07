@@ -1,4 +1,4 @@
-package com.fallt.entity;
+package com.fallt.domain.entity;
 
 import com.fallt.aop.audit.ActionType;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.fallt.dto.response;
+package com.fallt.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,13 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitExecutionResponse {
+public class HabitResponse {
 
     private String title;
-    private LocalDate date;
+    private String text;
+    private List<LocalDate> successfulExecution;
 }

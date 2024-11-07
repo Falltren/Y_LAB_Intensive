@@ -1,4 +1,4 @@
-package com.fallt.dto.request;
+package com.fallt.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

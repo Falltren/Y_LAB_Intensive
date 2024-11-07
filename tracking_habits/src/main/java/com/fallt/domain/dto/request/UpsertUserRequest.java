@@ -1,4 +1,4 @@
-package com.fallt.dto.request;
+package com.fallt.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpsertHabitRequest {
+public class UpsertUserRequest {
 
-    private String title;
-    private String text;
-    private String rate;
+    private String name;
+    private String password;
+    private String email;
 }

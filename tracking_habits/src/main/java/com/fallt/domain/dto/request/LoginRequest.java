@@ -1,18 +1,16 @@
-package com.fallt.dto.request;
+package com.fallt.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitConfirmRequest {
+public class LoginRequest {
 
-    private String title;
-    private LocalDate date;
+    private String email;
+    private String password;
 }

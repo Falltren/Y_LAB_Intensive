@@ -1,9 +1,9 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.response.HabitProgress;
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.response.HabitProgress;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.service.impl.HabitServiceImpl;
 import com.fallt.service.impl.StatisticServiceImpl;
 import com.fallt.service.impl.UserServiceImpl;
@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 
 import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
 import static com.fallt.TestConstant.FIRST_USER_EMAIL;
-import static com.fallt.TestConstant.HABIT_FROM_DATABASE;
 import static com.fallt.TestConstant.HABIT_TEXT;
 import static com.fallt.TestConstant.USER_FROM_DATABASE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,7 +150,7 @@ class StatisticServiceTest {
         assertThat(rate).isEqualTo(3);
     }
 
-    private Habit createHabit(){
+    private Habit createHabit() {
         return Habit.builder()
                 .title(FIRST_HABIT_TITLE)
                 .text(HABIT_TEXT)

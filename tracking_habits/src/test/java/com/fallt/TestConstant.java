@@ -1,16 +1,15 @@
 package com.fallt;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.User;
+import com.fallt.domain.entity.enums.Role;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

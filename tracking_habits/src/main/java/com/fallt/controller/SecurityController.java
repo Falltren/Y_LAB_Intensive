@@ -1,9 +1,9 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.exception.ExceptionResponse;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.AuthService;
 import com.fallt.service.UserService;

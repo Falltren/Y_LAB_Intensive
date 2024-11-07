@@ -1,8 +1,8 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.User;
 import com.fallt.repository.AbstractTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

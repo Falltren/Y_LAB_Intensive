@@ -1,9 +1,9 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.response.ExecutionDto;
-import com.fallt.dto.response.HabitProgress;
-import com.fallt.exception.ExceptionResponse;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.response.ExecutionDto;
+import com.fallt.domain.dto.response.HabitProgress;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.StatisticService;
 import com.fallt.service.impl.ValidationService;
