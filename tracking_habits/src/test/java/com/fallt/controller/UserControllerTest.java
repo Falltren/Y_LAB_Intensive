@@ -1,15 +1,12 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.UpsertUserRequest;
 import com.fallt.dto.response.UserResponse;
 import com.fallt.entity.Role;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.AuthorizationException;
 import com.fallt.exception.ExceptionHandlingController;
-import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
-import com.fallt.service.impl.ValidationService;
 import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +22,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static com.fallt.TestConstant.FIRST_USER_EMAIL;
+import static com.fallt.TestConstant.FIRST_USER_NAME;
+import static com.fallt.TestConstant.SECOND_USER_EMAIL;
+import static com.fallt.TestConstant.SECOND_USER_NAME;
 import static com.fallt.TestConstant.SESSION_ID;
+import static com.fallt.TestConstant.USER_BLOCK_PATH;
+import static com.fallt.TestConstant.USER_CONTROLLER_PATH;
 import static com.fallt.TestConstant.USER_EMAIL;
+import static com.fallt.TestConstant.USER_REQUEST;
+import static com.fallt.TestConstant.USER_RESPONSE;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -52,9 +55,6 @@ class UserControllerTest {
 
     @Mock
     private SessionUtils sessionUtils;
-
-    @Mock
-    private ValidationService validationService;
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -68,31 +68,30 @@ class UserControllerTest {
     @Test
     @DisplayName("Обновление данных о пользователе")
     void whenUpdateUser_thenReturnOk() throws Exception {
-        UpsertUserRequest request = createRequest();
-        UserResponse response = createResponse();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(USER_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(userService.updateUser(USER_EMAIL, request)).thenReturn(response);
+        when(userService.updateUser(USER_EMAIL, USER_REQUEST)).thenReturn(USER_RESPONSE);
 
-        mockMvc.perform(put("/api/v1/users")
+        mockMvc.perform(put(USER_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(objectMapper.writeValueAsString(response)));
+                .andExpect(content().string(objectMapper.writeValueAsString(USER_RESPONSE)));
     }
 
     @Test
     @DisplayName("Попытка обновления данных о пользователе с указанием используемого email")
     void whenUpdateUserWithExistsEmail_thenReturnBadRequest() throws Exception {
-        UpsertUserRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(USER_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(userService.updateUser(USER_EMAIL, request)).thenThrow(AlreadyExistException.class);
+        when(userService.updateUser(USER_EMAIL, USER_REQUEST)).thenThrow(AlreadyExistException.class);
 
-        mockMvc.perform(put("/api/v1/users")
+        mockMvc.perform(put(USER_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -103,11 +102,13 @@ class UserControllerTest {
     @DisplayName("Получение данных о всех пользователях")
     void whenGetAllUsers_thenReturnListUsers() throws Exception {
         List<UserResponse> responseList = List.of(
-                createResponse("email1"), createResponse("email2")
+                UserResponse.builder().email(FIRST_USER_EMAIL).name(FIRST_USER_NAME).build(),
+                UserResponse.builder().email(SECOND_USER_EMAIL).name(SECOND_USER_NAME).build()
         );
+
         when(userService.getAllUsers()).thenReturn(responseList);
 
-        mockMvc.perform(get("/api/v1/users"))
+        mockMvc.perform(get(USER_CONTROLLER_PATH))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(objectMapper.writeValueAsString(responseList)));
@@ -119,7 +120,7 @@ class UserControllerTest {
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         doThrow(AuthorizationException.class).when(authenticationContext).checkRole(SESSION_ID, Role.ROLE_ADMIN);
 
-        mockMvc.perform(get("/api/v1/users"))
+        mockMvc.perform(get(USER_CONTROLLER_PATH))
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
@@ -127,9 +128,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Блокировка пользователя")
     void whenBlockingUser_thenReturnOk() throws Exception {
-        String email = "user";
-
-        mockMvc.perform(put("/api/v1/users/block?email=" + email))
+        mockMvc.perform(put(USER_BLOCK_PATH + FIRST_USER_EMAIL))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -137,11 +136,10 @@ class UserControllerTest {
     @Test
     @DisplayName("Попытка блокировки пользователя пользователем без роли ADMIN")
     void whenUserWithoutRoleAdminBlockingUser_thenReturnForbidden() throws Exception {
-        String email = "user";
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         doThrow(AuthorizationException.class).when(authenticationContext).checkRole(SESSION_ID, Role.ROLE_ADMIN);
 
-        mockMvc.perform(put("/api/v1/users/block?email=" + email))
+        mockMvc.perform(put(USER_BLOCK_PATH + FIRST_USER_EMAIL))
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
@@ -152,30 +150,8 @@ class UserControllerTest {
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(delete("/api/v1/users"))
+        mockMvc.perform(delete(USER_CONTROLLER_PATH))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-    }
-
-    private UpsertUserRequest createRequest() {
-        return UpsertUserRequest.builder()
-                .name("user")
-                .email("email")
-                .password("pwd")
-                .build();
-    }
-
-    private UserResponse createResponse() {
-        return UserResponse.builder()
-                .name("user")
-                .email("email")
-                .build();
-    }
-
-    private UserResponse createResponse(String email) {
-        return UserResponse.builder()
-                .name("user")
-                .email(email)
-                .build();
     }
 }

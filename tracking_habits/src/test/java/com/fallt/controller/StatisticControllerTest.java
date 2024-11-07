@@ -1,6 +1,5 @@
 package com.fallt.controller;
 
-import com.fallt.dto.request.ReportRequest;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.ExceptionHandlingController;
 import com.fallt.exception.ValidationException;
@@ -21,9 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDate;
-
+import static com.fallt.TestConstant.FULL_REPORT_PATH;
+import static com.fallt.TestConstant.REPORT_REQUEST;
 import static com.fallt.TestConstant.SESSION_ID;
+import static com.fallt.TestConstant.STREAK_REPORT_PATH;
 import static com.fallt.TestConstant.USER_EMAIL;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -50,8 +50,6 @@ class StatisticControllerTest {
     private AuthenticationContext authenticationContext;
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String FULL_REPORT_URL = "/api/v1/reports/full";
-    private static final String STREAK_REPORT_URL = "/api/v1/reports/streak";
 
     @BeforeEach
     void setup() {
@@ -64,12 +62,12 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Получение полной статистики")
     void whenGetFullStatistic_thenReturnOk() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(get(FULL_REPORT_URL)
+        mockMvc.perform(get(FULL_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -79,11 +77,11 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Попытка получения полной статистики с указанием некорректного названия")
     void whenGetFullStatisticByIncorrectTitle_thenReturnBadRequest() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
-        doThrow(ValidationException.class).when(validationService).checkReportRequest(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
 
-        mockMvc.perform(get(FULL_REPORT_URL)
+        doThrow(ValidationException.class).when(validationService).checkReportRequest(REPORT_REQUEST);
+
+        mockMvc.perform(get(FULL_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -93,13 +91,13 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Попытка получений полной статистики по отсутствующей привычки")
     void whenGetFullStatisticByNotExistHabit_thenReturnNotFound() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(statisticService.getHabitProgress(USER_EMAIL, request)).thenThrow(EntityNotFoundException.class);
+        when(statisticService.getHabitProgress(USER_EMAIL, REPORT_REQUEST)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get(FULL_REPORT_URL)
+        mockMvc.perform(get(FULL_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -109,12 +107,12 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Получение серии выполнения привычки")
     void whenGetStreak_thenReturnOk() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(get(STREAK_REPORT_URL)
+        mockMvc.perform(get(STREAK_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -124,11 +122,11 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Попытка получения серии выполнения привычки с указанием некорректного названия")
     void whenGetStrictByIncorrectTitle_thenReturnBadRequest() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
-        doThrow(ValidationException.class).when(validationService).checkReportRequest(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
 
-        mockMvc.perform(get(STREAK_REPORT_URL)
+        doThrow(ValidationException.class).when(validationService).checkReportRequest(REPORT_REQUEST);
+
+        mockMvc.perform(get(STREAK_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -138,24 +136,16 @@ class StatisticControllerTest {
     @Test
     @DisplayName("Попытка получения серии выполнения привычки с указанием отсутствующей привычки")
     void whenGetStreakByNotExistHabit_thenReturnNotFound() throws Exception {
-        ReportRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
+        String content = objectMapper.writeValueAsString(REPORT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(statisticService.getHabitStreak(USER_EMAIL, request)).thenThrow(EntityNotFoundException.class);
+        when(statisticService.getHabitStreak(USER_EMAIL, REPORT_REQUEST)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get(STREAK_REPORT_URL)
+        mockMvc.perform(get(STREAK_REPORT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
                 .andExpect(status().isNotFound());
-    }
-
-    private ReportRequest createRequest() {
-        return ReportRequest.builder()
-                .title("title")
-                .start(LocalDate.of(2024, 10, 1))
-                .end(LocalDate.of(2024, 10, 20))
-                .build();
     }
 }

@@ -1,8 +1,6 @@
 package com.fallt.controller;
 
 import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.HabitResponse;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.exception.ExceptionHandlingController;
@@ -25,8 +23,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
+import static com.fallt.TestConstant.CONFIRM_REQUEST;
+import static com.fallt.TestConstant.CREATE_HABIT_PATH;
+import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
+import static com.fallt.TestConstant.HABIT_BY_TITLE_PATH;
+import static com.fallt.TestConstant.HABIT_CONFIRM_PATH;
+import static com.fallt.TestConstant.HABIT_CONTROLLER_PATH;
+import static com.fallt.TestConstant.HABIT_REQUEST;
+import static com.fallt.TestConstant.HABIT_RESPONSE;
+import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
 import static com.fallt.TestConstant.SESSION_ID;
 import static com.fallt.TestConstant.USER_EMAIL;
 import static org.mockito.Mockito.doThrow;
@@ -70,29 +76,28 @@ class HabitControllerTest {
     @Test
     @DisplayName("Добавление привычки")
     void whenCreateHabit_thenReturnCreated() throws Exception {
-        UpsertHabitRequest request = createRequest();
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        String content = objectMapper.writeValueAsString(request);
-        HabitResponse response = createResponse();
-        when(habitService.saveHabit(USER_EMAIL, request)).thenReturn(response);
+        when(habitService.saveHabit(USER_EMAIL, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
 
-        mockMvc.perform(post("/api/v1/habits/create")
+        mockMvc.perform(post(CREATE_HABIT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().string(objectMapper.writeValueAsString(response)));
+                .andExpect(content().string(objectMapper.writeValueAsString(HABIT_RESPONSE)));
     }
 
     @Test
     @DisplayName("Попытка добавления привычки без указания названия")
     void whenCreateHabitWithMissedTitle_thenReturnBadRequest() throws Exception {
-        UpsertHabitRequest request = createRequest();
-        String content = objectMapper.writeValueAsString(request);
-        doThrow(ValidationException.class).when(validationService).checkUpsertHabitRequest(request);
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        mockMvc.perform(post("/api/v1/habits/create")
+        doThrow(ValidationException.class).when(validationService).checkUpsertHabitRequest(HABIT_REQUEST);
+
+        mockMvc.perform(post(CREATE_HABIT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -102,13 +107,13 @@ class HabitControllerTest {
     @Test
     @DisplayName("Попытка добавления уже имеющейся привычки")
     void whenCreateAlreadyExistsHabit_thenReturnBadRequest() throws Exception {
-        UpsertHabitRequest request = createRequest();
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        String content = objectMapper.writeValueAsString(request);
-        when(habitService.saveHabit(USER_EMAIL, request)).thenThrow(AlreadyExistException.class);
+        when(habitService.saveHabit(USER_EMAIL, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
 
-        mockMvc.perform(post("/api/v1/habits/create")
+        mockMvc.perform(post(CREATE_HABIT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -118,33 +123,31 @@ class HabitControllerTest {
     @Test
     @DisplayName("Обновление привычки")
     void whenUpdateHabit_thenReturnOk() throws Exception {
-        String title = "title";
-        UpsertHabitRequest request = createRequest();
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        String content = objectMapper.writeValueAsString(request);
-        HabitResponse response = createResponse();
-        when(habitService.updateHabit(USER_EMAIL, title, request)).thenReturn(response);
+        when(habitService.updateHabit(USER_EMAIL, FIRST_HABIT_TITLE, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
 
-        mockMvc.perform(put("/api/v1/habits?title=" + title)
+        mockMvc.perform(put(HABIT_BY_TITLE_PATH + FIRST_HABIT_TITLE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(objectMapper.writeValueAsString(response)));
+                .andExpect(content().string(objectMapper.writeValueAsString(HABIT_RESPONSE)));
     }
 
     @Test
     @DisplayName("Попытка обновления привычки по некорректному названию")
     void whenUpdateHabitByIncorrectTitle_thenReturnNotFound() throws Exception {
         String title = "incorrectTitle";
-        UpsertHabitRequest request = createRequest();
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        String content = objectMapper.writeValueAsString(request);
-        when(habitService.updateHabit(USER_EMAIL, title, request)).thenThrow(EntityNotFoundException.class);
+        when(habitService.updateHabit(USER_EMAIL, title, HABIT_REQUEST)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(put("/api/v1/habits?title=" + title)
+        mockMvc.perform(put(HABIT_BY_TITLE_PATH + title)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -154,14 +157,13 @@ class HabitControllerTest {
     @Test
     @DisplayName("Попытка обновления привычки с указанием уже имеющегося названия")
     void whenUpdateWithExistsTitle_thenReturnBadRequest() throws Exception {
-        String title = "title";
-        UpsertHabitRequest request = createRequest();
+        String content = objectMapper.writeValueAsString(HABIT_REQUEST);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        String content = objectMapper.writeValueAsString(request);
-        when(habitService.updateHabit(USER_EMAIL, title, request)).thenThrow(AlreadyExistException.class);
+        when(habitService.updateHabit(USER_EMAIL, SECOND_HABIT_TITLE, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
 
-        mockMvc.perform(put("/api/v1/habits?title=" + title)
+        mockMvc.perform(put(HABIT_BY_TITLE_PATH + SECOND_HABIT_TITLE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -174,7 +176,7 @@ class HabitControllerTest {
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(get("/api/v1/habits"))
+        mockMvc.perform(get(HABIT_CONTROLLER_PATH))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -182,11 +184,10 @@ class HabitControllerTest {
     @Test
     @DisplayName("Удаление привычки")
     void whenDeleteHabit_thenReturnNoContent() throws Exception {
-        String title = "title";
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(delete("/api/v1/habits?title=" + title))
+        mockMvc.perform(delete(HABIT_BY_TITLE_PATH + FIRST_HABIT_TITLE))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
@@ -194,15 +195,14 @@ class HabitControllerTest {
     @Test
     @DisplayName("Отметка выполнения привычки")
     void whenConfirmHabitExecution_thenReturnCreated() throws Exception {
-        HabitConfirmRequest request = HabitConfirmRequest.builder()
-                .title("title")
-                .date(LocalDate.now())
-                .build();
+        HabitConfirmRequest request = CONFIRM_REQUEST;
+        request.setDate(LocalDate.now());
         String content = objectMapper.writeValueAsString(request);
+
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
-        mockMvc.perform(post("/api/v1/habits/confirm")
+        mockMvc.perform(post(HABIT_CONFIRM_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
@@ -212,33 +212,14 @@ class HabitControllerTest {
     @Test
     @DisplayName("Попытка отметки привычки без указания даты выполнения")
     void whenConfirmHabitWithMissedDate_thenReturnBadRequest() throws Exception {
-        HabitConfirmRequest request = HabitConfirmRequest.builder()
-                .title("title")
-                .build();
-        String content = objectMapper.writeValueAsString(request);
-        when(validationService.checkHabitConfirmRequest(request)).thenThrow(ValidationException.class);
+        String content = objectMapper.writeValueAsString(CONFIRM_REQUEST);
 
-        mockMvc.perform(post("/api/v1/habits/confirm")
+        when(validationService.checkHabitConfirmRequest(CONFIRM_REQUEST)).thenThrow(ValidationException.class);
+
+        mockMvc.perform(post(HABIT_CONFIRM_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
-    }
-
-
-    private UpsertHabitRequest createRequest() {
-        return UpsertHabitRequest.builder()
-                .title("title")
-                .text("text")
-                .rate("WEEKLY")
-                .build();
-    }
-
-    private HabitResponse createResponse() {
-        return HabitResponse.builder()
-                .title("title")
-                .text("text")
-                .successfulExecution(new ArrayList<>())
-                .build();
     }
 }

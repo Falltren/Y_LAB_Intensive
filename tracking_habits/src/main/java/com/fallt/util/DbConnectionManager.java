@@ -2,6 +2,7 @@ package com.fallt.util;
 
 import com.fallt.config.YamlPropertySourceFactory;
 import com.fallt.exception.DBException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.sql.Statement;
  */
 @Component
 @PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
+@Slf4j
 public class DbConnectionManager {
 
     @Value("${spring.datasource.url}")
@@ -79,7 +81,7 @@ public class DbConnectionManager {
             try {
                 st.close();
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                log.error("Ошибка при закрытии Statement: ", e);
             }
         }
     }
@@ -94,7 +96,7 @@ public class DbConnectionManager {
             try {
                 rs.close();
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                log.error("Ошибка при закрытии ResultSet: ", e);
             }
         }
     }

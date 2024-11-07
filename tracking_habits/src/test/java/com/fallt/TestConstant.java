@@ -1,5 +1,20 @@
 package com.fallt;
 
+import com.fallt.dto.request.HabitConfirmRequest;
+import com.fallt.dto.request.LoginRequest;
+import com.fallt.dto.request.ReportRequest;
+import com.fallt.dto.request.UpsertHabitRequest;
+import com.fallt.dto.request.UpsertUserRequest;
+import com.fallt.dto.response.HabitResponse;
+import com.fallt.dto.response.UserResponse;
+import com.fallt.entity.ExecutionRate;
+import com.fallt.entity.Habit;
+import com.fallt.entity.Role;
+import com.fallt.entity.User;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+
 public class TestConstant {
 
     public static final String FIRST_USER_NAME = "user1";
@@ -15,4 +30,57 @@ public class TestConstant {
     public static final String WEEKLY_HABIT = "WEEKLY";
     public static final String SESSION_ID = "sessionId";
     public static final String USER_EMAIL = "email";
+    public static final UpsertUserRequest USER_REQUEST = UpsertUserRequest.builder()
+            .name(FIRST_USER_NAME)
+            .email(FIRST_USER_EMAIL)
+            .password(FIRST_USER_PASSWORD)
+            .build();
+    public static final UserResponse USER_RESPONSE = UserResponse.builder()
+            .name(FIRST_USER_NAME)
+            .email(FIRST_USER_EMAIL)
+            .build();
+    public static final UpsertHabitRequest HABIT_REQUEST = UpsertHabitRequest.builder()
+            .title(FIRST_HABIT_TITLE)
+            .text(HABIT_TEXT)
+            .rate(WEEKLY_HABIT)
+            .build();
+    public static final HabitResponse HABIT_RESPONSE = HabitResponse.builder()
+            .title(FIRST_HABIT_TITLE)
+            .text(HABIT_TEXT)
+            .successfulExecution(new ArrayList<>())
+            .build();
+    public static final HabitConfirmRequest CONFIRM_REQUEST = HabitConfirmRequest.builder()
+            .title(FIRST_HABIT_TITLE)
+            .date(LocalDate.now())
+            .build();
+    public static final ReportRequest REPORT_REQUEST = ReportRequest.builder()
+            .title(FIRST_HABIT_TITLE)
+            .start(LocalDate.of(2024, 10, 1))
+            .end(LocalDate.of(2024, 10, 20))
+            .build();
+    public static final LoginRequest LOGIN_REQUEST = LoginRequest.builder()
+            .email(FIRST_USER_EMAIL)
+            .password(FIRST_USER_PASSWORD)
+            .build();
+    public static final User USER_FROM_DATABASE = User.builder()
+            .id(1L)
+            .name(FIRST_USER_NAME)
+            .email(FIRST_USER_EMAIL)
+            .password(FIRST_USER_PASSWORD)
+            .role(Role.ROLE_USER)
+            .build();
+    public static final Habit HABIT_FROM_DATABASE = Habit.builder()
+            .title(FIRST_HABIT_TITLE)
+            .text(HABIT_TEXT)
+            .build();
+    public static final String USER_CONTROLLER_PATH = "/api/v1/users";
+    public static final String USER_BLOCK_PATH = "/api/v1/users/block?email=";
+    public static final String CREATE_HABIT_PATH = "/api/v1/habits/create";
+    public static final String HABIT_BY_TITLE_PATH = "/api/v1/habits?title=";
+    public static final String HABIT_CONFIRM_PATH = "/api/v1/habits/confirm";
+    public static final String HABIT_CONTROLLER_PATH = "/api/v1/habits";
+    public static final String REGISTER_PATH = "/api/v1/account/register";
+    public static final String LOGIN_PATH = "/api/v1/account/login";
+    public static final String FULL_REPORT_PATH = "/api/v1/reports/full";
+    public static final String STREAK_REPORT_PATH = "/api/v1/reports/streak";
 }

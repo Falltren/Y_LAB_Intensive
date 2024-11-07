@@ -4,8 +4,6 @@ import com.fallt.dto.request.ReportRequest;
 import com.fallt.dto.response.HabitProgress;
 import com.fallt.entity.ExecutionRate;
 import com.fallt.entity.Habit;
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
 import com.fallt.service.impl.HabitServiceImpl;
 import com.fallt.service.impl.StatisticServiceImpl;
 import com.fallt.service.impl.UserServiceImpl;
@@ -20,11 +18,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
+import static com.fallt.TestConstant.FIRST_USER_EMAIL;
+import static com.fallt.TestConstant.HABIT_FROM_DATABASE;
+import static com.fallt.TestConstant.HABIT_TEXT;
+import static com.fallt.TestConstant.USER_FROM_DATABASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -44,21 +46,18 @@ class StatisticServiceTest {
     @MethodSource("dailyExecutionRate")
     @DisplayName("Получение статистики по привычке c дневной частотой выполнения")
     void testGetHabitProgressWithDailyExecutionRate(List<LocalDate> successExecution, int expectedSuccessRate) {
-        String title = "title";
-        String email = "email";
         Habit habit = createHabit();
-        User user = createUser();
-        ReportRequest request = new ReportRequest("title",
+        habit.setExecutionRate(ExecutionRate.DAILY);
+        habit.setSuccessfulExecution(new TreeSet<>(successExecution));
+        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
                 LocalDate.of(2024, 9, 11),
                 LocalDate.of(2024, 9, 20));
-        when(userService.getUserByEmail(email)).thenReturn(user);
-        when(habitService.getHabitByTitle(user, title)).thenReturn(habit);
 
-        habit.setSuccessfulExecution(new TreeSet<>(successExecution));
+        when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
+        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(email, request);
-
-        assertThat(progress.getTitle()).isEqualTo("title");
+        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
+        assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
     }
 
@@ -76,21 +75,18 @@ class StatisticServiceTest {
     @MethodSource("weeklyExecutionRate")
     @DisplayName("Получение статистики по привычке с недельной частотой выполнения")
     void testGetHabitProgressWithWeeklyExecutionRate(List<LocalDate> successExecution, int expectedSuccessRate) {
-        String title = "title";
-        String email = "email";
         Habit habit = createHabit();
         habit.setExecutionRate(ExecutionRate.WEEKLY);
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        User user = createUser();
-        ReportRequest request = new ReportRequest("title",
+        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
                 LocalDate.of(2024, 9, 11),
                 LocalDate.of(2024, 10, 10));
-        when(userService.getUserByEmail(email)).thenReturn(user);
-        when(habitService.getHabitByTitle(user, title)).thenReturn(habit);
+        when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
+        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(email, request);
+        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
 
-        assertThat(progress.getTitle()).isEqualTo("title");
+        assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
     }
 
@@ -108,21 +104,18 @@ class StatisticServiceTest {
     @MethodSource("monthlyExecutionRate")
     @DisplayName("Получение статистики по привычке с месячной частотой выполнения")
     void testGetHabitProgressWithMonthlyExecutionRate(List<LocalDate> successExecution, int expectedSuccessRate) {
-        String title = "title";
-        String email = "email";
         Habit habit = createHabit();
         habit.setExecutionRate(ExecutionRate.MONTHLY);
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        User user = createUser();
-        ReportRequest request = new ReportRequest("title",
+        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
                 LocalDate.of(2024, 6, 11),
                 LocalDate.of(2024, 10, 5));
-        when(userService.getUserByEmail(email)).thenReturn(user);
-        when(habitService.getHabitByTitle(user, title)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(email, request);
+        when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
+        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        assertThat(progress.getTitle()).isEqualTo("title");
+        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
+        assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
     }
 
@@ -139,45 +132,29 @@ class StatisticServiceTest {
     @Test
     @DisplayName("Получение процента выполнения привычки")
     void testGetSuccessHabitRate() {
-        String title = "title";
-        String email = "email";
-        User user = createUser();
         Habit habit = createHabit();
+        habit.setExecutionRate(ExecutionRate.DAILY);
         List<LocalDate> successExecution = List.of(
                 LocalDate.of(2024, 9, 12),
                 LocalDate.of(2024, 9, 16),
                 LocalDate.of(2024, 9, 19)
         );
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        when(userService.getUserByEmail(email)).thenReturn(user);
-        when(habitService.getHabitByTitle(user, title)).thenReturn(habit);
-        ReportRequest request = new ReportRequest("title",
+        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
                 LocalDate.of(2024, 6, 11),
                 LocalDate.of(2024, 10, 5));
 
-        int rate = statisticService.getSuccessHabitRate(email, request);
+        when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
+        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
 
+        int rate = statisticService.getSuccessHabitRate(FIRST_USER_EMAIL, request);
         assertThat(rate).isEqualTo(3);
     }
 
-    private Habit createHabit() {
-        Habit habit = new Habit();
-        habit.setText("text");
-        habit.setTitle("title");
-        habit.setExecutionRate(ExecutionRate.DAILY);
-        habit.setCreateAt(LocalDate.of(2024, 6, 9));
-        return habit;
-    }
-
-    private User createUser() {
-        return User.builder()
-                .name("user")
-                .password("pwd")
-                .email("email")
-                .createAt(LocalDateTime.now())
-                .role(Role.ROLE_USER)
-                .isBlocked(false)
+    private Habit createHabit(){
+        return Habit.builder()
+                .title(FIRST_HABIT_TITLE)
+                .text(HABIT_TEXT)
                 .build();
     }
-
 }

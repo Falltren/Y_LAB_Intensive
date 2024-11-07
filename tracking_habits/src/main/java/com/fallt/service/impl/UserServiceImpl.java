@@ -61,10 +61,11 @@ public class UserServiceImpl implements UserService {
         if (updateUser.getEmail() != null && isExistsEmail(updateUser.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", updateUser.getEmail()));
         }
-
-        if (updateUser.getPassword() != null && isExistsPassword(updateUser.getPassword())) {
+        String encodedPassword = passwordEncoder.encode(updateUser.getPassword());
+        if (updateUser.getPassword() != null && isExistsPassword(encodedPassword)) {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", updateUser.getPassword()));
         }
+        updateUser.setPassword(encodedPassword);
         UserMapper.INSTANCE.updateUserFromDto(updateUser, user);
         user.setUpdateAt(LocalDateTime.now());
         return UserMapper.INSTANCE.toResponse(userDao.update(user));
