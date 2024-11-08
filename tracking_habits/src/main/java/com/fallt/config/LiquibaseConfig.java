@@ -4,7 +4,6 @@ import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
@@ -13,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @Configuration
-@PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
 public class LiquibaseConfig {
 
     @Value("${spring.datasource.url}")

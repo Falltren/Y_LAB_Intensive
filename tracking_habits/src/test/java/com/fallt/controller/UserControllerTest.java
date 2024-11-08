@@ -4,7 +4,7 @@ import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.enums.Role;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.AuthorizationException;
-import com.fallt.controller.advice.ExceptionHandlingController;
+import com.fallt.controller.advice.GlobalExceptionHandler;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
 import com.fallt.util.SessionUtils;
@@ -61,7 +61,7 @@ class UserControllerTest {
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
-                .setControllerAdvice(ExceptionHandlingController.class)
+                .setControllerAdvice(GlobalExceptionHandler.class)
                 .build();
     }
 

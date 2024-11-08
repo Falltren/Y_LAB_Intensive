@@ -1,7 +1,7 @@
 package com.fallt.controller;
 
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.controller.advice.ExceptionHandlingController;
+import com.fallt.controller.advice.GlobalExceptionHandler;
 import com.fallt.exception.ValidationException;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.StatisticService;
@@ -55,7 +55,7 @@ class StatisticControllerTest {
     void setup() {
         objectMapper.registerModule(new JavaTimeModule());
         mockMvc = MockMvcBuilders.standaloneSetup(statisticController)
-                .setControllerAdvice(ExceptionHandlingController.class)
+                .setControllerAdvice(GlobalExceptionHandler.class)
                 .build();
     }
 

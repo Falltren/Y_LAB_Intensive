@@ -1,10 +1,8 @@
 package com.fallt.util;
 
-import com.fallt.config.YamlPropertySourceFactory;
 import com.fallt.exception.DBException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -17,7 +15,6 @@ import java.sql.Statement;
  * Класс для получения соединения с базой данных, с указанными в файле конфигурации настройками
  */
 @Component
-@PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
 @Slf4j
 public class DbConnectionManager {
 

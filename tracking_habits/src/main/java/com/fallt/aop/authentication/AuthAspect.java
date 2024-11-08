@@ -18,8 +18,9 @@ public class AuthAspect {
     private SessionUtils sessionUtils;
 
     @Before("execution(* com.fallt.controller..*(..)) " +
-            "&& !execution(* com.fallt.controller.AuthController.login(..)) " +
-            "&& !execution(* com.fallt.controller.UserController.createUser(..))")
+            "&& !execution(* com.fallt.controller.SecurityController.login(..)) " +
+            "&& !execution(* com.fallt.controller.SecurityController.register(..)) " +
+            "&& !execution(* com.fallt.controller.advice..*(..))")
     public void checkAuthentication() {
         String sessionId = sessionUtils.getSessionIdFromContext();
         authenticationContext.checkAuthentication(sessionId);
