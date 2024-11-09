@@ -17,7 +17,7 @@ public final class Constant {
     public static final String DELETE_USER_QUERY = """
             UPDATE my_schema.users
             SET is_active = false
-            WHERE email = ?
+            WHERE id = ?
             """;
     public static final String FIND_ALL_USERS_QUERY = """
             SELECT * FROM my_schema.users
@@ -29,6 +29,10 @@ public final class Constant {
     public static final String FIND_USER_BY_PASSWORD_QUERY = """
             SELECT * FROM my_schema.users
             WHERE password = ?
+            """;
+    public static final String FIND_USER_BY_ID_QUERY = """
+            SELECT * FROM my_schema.users
+            WHERE id = ?
             """;
     public static final String DELETE_ALL_USERS_QUERY = """
             DELETE FROM my_schema.users
@@ -53,9 +57,15 @@ public final class Constant {
             ON e.habit_id = h.id
             WHERE h.user_id = ? AND h.title = ?
             """;
+    public static final String FIND_HABIT_BY_ID = """
+            SELECT * FROM my_schema.habits h
+            LEFT JOIN my_schema.habit_execution e
+            ON e.habit_id = h.id
+            WHERE h.id = ?
+            """;
     public static final String DELETE_HABIT = """
             DELETE FROM my_schema.habits
-            WHERE user_id = ? AND title = ?
+            WHERE id = ?
             """;
     public static final String INSERT_HABIT_EXECUTION_QUERY = """
             INSERT INTO my_schema.habit_execution (date, habit_id) VALUES (?, ?)

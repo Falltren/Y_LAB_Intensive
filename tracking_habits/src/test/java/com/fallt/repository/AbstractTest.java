@@ -13,10 +13,12 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ public abstract class AbstractTest {
 
     protected static PostgreSQLContainer postgreSQLContainer;
     protected static DbConnectionManager connectionManager = new DbConnectionManager();
+    protected static DataSource dataSource = new PGSimpleDataSource();
 
     static {
         DockerImageName postgres = DockerImageName.parse("postgres:15.4");
@@ -41,7 +44,7 @@ public abstract class AbstractTest {
 
 
     protected User addUserToDatabase() {
-        UserDaoImpl userDao = new UserDaoImpl(connectionManager);
+        UserDaoImpl userDao = new UserDaoImpl(dataSource);
         User userForCreate = User.builder()
                 .name("user")
                 .email("user@u.u")

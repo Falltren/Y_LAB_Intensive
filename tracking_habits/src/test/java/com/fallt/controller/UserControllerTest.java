@@ -72,7 +72,7 @@ class UserControllerTest {
 
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(userService.updateUser(USER_EMAIL, USER_REQUEST)).thenReturn(USER_RESPONSE);
+        when(userService.updateUser(1L, USER_REQUEST)).thenReturn(USER_RESPONSE);
 
         mockMvc.perform(put(USER_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +89,7 @@ class UserControllerTest {
 
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(userService.updateUser(USER_EMAIL, USER_REQUEST)).thenThrow(AlreadyExistException.class);
+        when(userService.updateUser(1L, USER_REQUEST)).thenThrow(AlreadyExistException.class);
 
         mockMvc.perform(put(USER_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)

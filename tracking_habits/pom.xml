@@ -22,6 +22,7 @@
         <postgres.version>42.6.2</postgres.version>
         <liquibase.version>4.26.0</liquibase.version>
         <jbcrypt.version>0.4</jbcrypt.version>
+        <jwt.version>4.4.0</jwt.version>
         <slf4j.version>2.0.16</slf4j.version>
         <log4j.version>2.21.1</log4j.version>
         <testcontainers.version>1.19.3</testcontainers.version>
@@ -30,6 +31,22 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fallt</groupId>
+            <artifactId>audit-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fallt</groupId>
+            <artifactId>logging-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -86,6 +103,11 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${jwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

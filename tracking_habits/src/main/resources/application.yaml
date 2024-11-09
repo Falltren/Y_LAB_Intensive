@@ -8,3 +8,8 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
     default-schema: my_schema
     liquibase-schema: service_schema
+
+jwt:
+  secretKey: some
+  lifeTime: 10000
+  issuer: habits

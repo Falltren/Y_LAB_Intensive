@@ -27,9 +27,9 @@ public interface UserDao {
     /**
      * Удаление пользователя из базы данных
      *
-     * @param email Электронная почта пользователя
+     * @param id Идентификатор пользователя
      */
-    void delete(String email);
+    void delete(Long id);
 
     /**
      * Получение списка пользователей из базы данных
@@ -55,6 +55,15 @@ public interface UserDao {
      * если пользователь не найден
      */
     Optional<User> getUserByPassword(String password);
+
+    /**
+     * Поиск пользователя по идентификатору
+     *
+     * @param id Идентификатор пользователя
+     * @return Объект Optional с найденным по указанному идентификатору пользователем или Optional.empty()
+     * если пользователь не найден
+     */
+    Optional<User> getUserById(Long id);
 
     /**
      * Удаление всех пользователей из базы данных

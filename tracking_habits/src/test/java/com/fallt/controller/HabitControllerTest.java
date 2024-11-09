@@ -127,7 +127,7 @@ class HabitControllerTest {
 
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(habitService.updateHabit(USER_EMAIL, FIRST_HABIT_TITLE, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
+        when(habitService.updateHabit(1L, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + FIRST_HABIT_TITLE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class HabitControllerTest {
 
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(habitService.updateHabit(USER_EMAIL, title, HABIT_REQUEST)).thenThrow(EntityNotFoundException.class);
+        when(habitService.updateHabit(1L, HABIT_REQUEST)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + title)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +161,7 @@ class HabitControllerTest {
 
         when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
         when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(habitService.updateHabit(USER_EMAIL, SECOND_HABIT_TITLE, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
+        when(habitService.updateHabit(1L, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + SECOND_HABIT_TITLE)
                         .contentType(MediaType.APPLICATION_JSON)

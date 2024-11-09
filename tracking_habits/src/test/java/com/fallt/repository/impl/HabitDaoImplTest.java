@@ -60,7 +60,7 @@ class HabitDaoImplTest extends AbstractTest {
         habit.setUser(user);
         habitDao.save(habit);
 
-        Optional<Habit> existedHabit = habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
+        Optional<Habit> existedHabit = habitDao.findByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
 
         assertThat(existedHabit).isPresent();
         assertThat(existedHabit.get().getTitle()).isEqualTo(SECOND_HABIT_TITLE);
@@ -92,7 +92,7 @@ class HabitDaoImplTest extends AbstractTest {
         existedHabit.setTitle(SECOND_HABIT_TITLE);
         habitDao.update(existedHabit);
 
-        Optional<Habit> optionalHabit = habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
+        Optional<Habit> optionalHabit = habitDao.findByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE);
 
         assertThat(optionalHabit).isPresent();
     }

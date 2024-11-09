@@ -1,4 +1,6 @@
-package com.fallt.aop.audit;
+package com.fallt.audit_starter.aop;
+
+import com.fallt.audit_starter.domain.entity.enums.ActionType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

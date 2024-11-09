@@ -1,13 +1,13 @@
 package com.fallt.service.impl;
 
-import com.fallt.aop.audit.ActionType;
-import com.fallt.aop.audit.Auditable;
-import com.fallt.aop.logging.Loggable;
+import com.fallt.audit_starter.aop.Auditable;
+import com.fallt.audit_starter.domain.entity.enums.ActionType;
 import com.fallt.domain.dto.request.LoginRequest;
 import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.User;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
+import com.fallt.logging.annotation.Loggable;
 import com.fallt.mapper.UserMapper;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.security.PasswordEncoder;

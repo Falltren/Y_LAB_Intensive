@@ -1,8 +1,8 @@
-package com.fallt.service.impl;
+package com.fallt.audit_starter.service.impl;
 
-import com.fallt.domain.entity.AuditLog;
-import com.fallt.repository.AuditDao;
-import com.fallt.service.AuditService;
+import com.fallt.audit_starter.domain.entity.AuditLog;
+import com.fallt.audit_starter.repository.AuditDao;
+import com.fallt.audit_starter.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

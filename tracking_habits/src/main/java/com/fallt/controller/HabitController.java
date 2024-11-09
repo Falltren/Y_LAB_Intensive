@@ -2,9 +2,9 @@ package com.fallt.controller;
 
 import com.fallt.domain.dto.request.HabitConfirmRequest;
 import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.HabitExecutionResponse;
 import com.fallt.domain.dto.response.HabitResponse;
-import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.impl.ValidationService;
@@ -21,11 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -135,10 +135,9 @@ public class HabitController {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
-    @PutMapping
-    public ResponseEntity<HabitResponse> updateHabit(@RequestParam(name = "title") String title, @RequestBody UpsertHabitRequest request) {
-        String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return ResponseEntity.ok(habitService.updateHabit(userEmail, title, request));
+    @PutMapping("/{id}")
+    public ResponseEntity<HabitResponse> updateHabit(@PathVariable Long id, @RequestBody UpsertHabitRequest request) {
+        return ResponseEntity.ok(habitService.updateHabit(id, request));
     }
 
     @Operation(
@@ -151,10 +150,9 @@ public class HabitController {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
-    @DeleteMapping
-    public ResponseEntity<Void> deleteHabit(@RequestParam(name = "title") String title) {
-        String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        habitService.deleteHabit(userEmail, title);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHabit(@PathVariable("id") Long id) {
+        habitService.deleteHabit(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

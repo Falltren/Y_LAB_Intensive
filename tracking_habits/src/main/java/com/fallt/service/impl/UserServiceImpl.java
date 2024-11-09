@@ -1,13 +1,13 @@
 package com.fallt.service.impl;
 
-import com.fallt.aop.audit.ActionType;
-import com.fallt.aop.audit.Auditable;
-import com.fallt.aop.logging.Loggable;
+import com.fallt.audit_starter.aop.Auditable;
+import com.fallt.audit_starter.domain.entity.enums.ActionType;
 import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
+import com.fallt.logging.annotation.Loggable;
 import com.fallt.mapper.UserMapper;
 import com.fallt.repository.UserDao;
 import com.fallt.security.PasswordEncoder;
@@ -48,16 +48,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Auditable(action = ActionType.UPDATE)
-    public void blockingUser(String email) {
-        User user = getUserByEmail(email);
+    public void blockingUser(Long id) {
+        User user = getUserById(id);
         user.setBlocked(true);
         user.setUpdateAt(LocalDateTime.now());
         userDao.update(user);
     }
 
     @Auditable(action = ActionType.UPDATE)
-    public UserResponse updateUser(String email, UpsertUserRequest updateUser) {
-        User user = getUserByEmail(email);
+    public UserResponse updateUser(Long id, UpsertUserRequest updateUser) {
+        User user = getUserById(id);
         if (updateUser.getEmail() != null && isExistsEmail(updateUser.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", updateUser.getEmail()));
         }
@@ -72,8 +72,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Auditable(action = ActionType.DELETE)
-    public void deleteUser(String email) {
-        userDao.delete(email);
+    public void deleteUser(Long id) {
+        userDao.delete(id);
+    }
+
+    public User getUserById(Long id){
+        return userDao.getUserById(id).orElseThrow(
+                () -> new EntityNotFoundException(MessageFormat.format("Пользователь с ID: {0} не найден", id)));
     }
 
     @Auditable(action = ActionType.GET)

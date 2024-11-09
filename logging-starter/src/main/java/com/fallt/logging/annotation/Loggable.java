@@ -1,4 +1,4 @@
-package com.fallt.aop.logging;
+package com.fallt.logging.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

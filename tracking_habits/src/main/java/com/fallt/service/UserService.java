@@ -39,22 +39,22 @@ public interface UserService {
      * Блокировка пользователя (выставление соответствующего флага в true). Заблокированный пользователь не сможет
      * войти в систему. Данное действие доступно только пользователям с ролью ROLE_ADMIN
      *
-     * @param email Почта пользователя
+     * @param id Идентификатор пользователя
      */
-    void blockingUser(String email);
+    void blockingUser(Long id);
 
     /**
      * Обновление пользователя
      *
-     * @param email      Электронный адрес обновляемого пользователя
+     * @param id         Идентификатор пользователя
      * @param updateUser Объект с обновляемыми данными пользователя
      */
-    UserResponse updateUser(String email, UpsertUserRequest updateUser);
+    UserResponse updateUser(Long id, UpsertUserRequest updateUser);
 
     /**
      * Удаление пользователя
      *
-     * @param email Электронная почта пользователя
+     * @param id Идентификатор пользователя
      */
-    void deleteUser(String email);
+    void deleteUser(Long id);
 }

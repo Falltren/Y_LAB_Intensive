@@ -40,14 +40,22 @@ public interface HabitDao {
      * @return Объект Optional с найденной по указанному названию привычкой или Optional.empty()
      * если привычка не найдена
      */
-    Optional<Habit> findHabitByTitleAndUserId(Long userId, String title);
+    Optional<Habit> findByTitleAndUserId(Long userId, String title);
 
     /**
-     * Удаление привычки пользователя по ее названию
+     * Поиск привычки по идентификатору
      *
-     * @param id    Идентификатор пользователя
-     * @param title Название привычки
+     * @param id Идентификатор привычки
+     * @return Объект Optional с найденной по указанному идентификатору привычкой или Optional.empty()
+     * если привычка не найдена
      */
-    void delete(Long id, String title);
+    Optional<Habit> findById(Long id);
+
+    /**
+     * Удаление привычки пользователя
+     *
+     * @param id Идентификатор привычки
+     */
+    void delete(Long id);
 
 }

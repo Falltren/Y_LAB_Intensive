@@ -26,7 +26,7 @@ class UserDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        userDao = new UserDaoImpl(connectionManager);
+        userDao = new UserDaoImpl(dataSource);
         clearDatabase(userDao);
     }
 
@@ -101,7 +101,7 @@ class UserDaoImplTest extends AbstractTest {
         User user2 = createUser(SECOND_USER_EMAIL);
         User existedUser = userDao.create(user1);
         userDao.create(user2);
-        userDao.delete(existedUser.getEmail());
+        userDao.delete(1L);
 
         User user = userDao.getUserByEmail(existedUser.getEmail()).orElseThrow();
 

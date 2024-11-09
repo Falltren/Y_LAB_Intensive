@@ -1,9 +1,9 @@
 package com.fallt.controller;
 
 import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.enums.Role;
-import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
 import com.fallt.util.SessionUtils;
@@ -19,11 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
 
@@ -77,10 +78,10 @@ public class UserController {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
-    @PutMapping
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UpsertUserRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("id") Long id, @RequestBody UpsertUserRequest request) {
         String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return ResponseEntity.ok(userService.updateUser(email, request));
+        return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
     @Operation(
@@ -96,11 +97,11 @@ public class UserController {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
-    @PutMapping("/block")
-    public ResponseEntity<Void> blockUser(@RequestParam("email") String email) {
+    @PutMapping("/block/{id}")
+    public ResponseEntity<Void> blockUser(@PathVariable("id") Long id) {
         String sessionId = sessionUtils.getSessionIdFromContext();
         authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
-        userService.blockingUser(email);
+        userService.blockingUser(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -114,10 +115,10 @@ public class UserController {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
             })
     })
-    @DeleteMapping
-    public ResponseEntity<Void> deleteUser() {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        userService.deleteUser(email);
+        userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

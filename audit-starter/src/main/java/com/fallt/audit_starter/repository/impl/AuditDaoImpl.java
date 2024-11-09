@@ -1,28 +1,30 @@
-package com.fallt.repository.impl;
+package com.fallt.audit_starter.repository.impl;
 
-import com.fallt.domain.entity.AuditLog;
-import com.fallt.exception.DBException;
-import com.fallt.repository.AuditDao;
-import com.fallt.util.DbConnectionManager;
+
+import com.fallt.audit_starter.domain.entity.AuditLog;
+import com.fallt.audit_starter.repository.AuditDao;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static com.fallt.util.Constant.INSERT_AUDIT_QUERY;
+import static com.fallt.audit_starter.repository.Constant.INSERT_AUDIT_QUERY;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AuditDaoImpl implements AuditDao {
 
-    private final DbConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Override
     public void save(AuditLog auditLog) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_AUDIT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, auditLog.getUserEmail());
             preparedStatement.setString(2, auditLog.getAction().name());
@@ -30,7 +32,7 @@ public class AuditDaoImpl implements AuditDao {
             preparedStatement.setObject(4, auditLog.getDate());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            log.error("Ошибка при выполнении запроса {}", e.getMessage());
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.fallt.repository.impl;
 
-import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
 import com.fallt.util.DbConnectionManager;
@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static com.fallt.util.Constant.DELETE_HABIT;
 import static com.fallt.util.Constant.FIND_ALL_HABITS_QUERY;
+import static com.fallt.util.Constant.FIND_HABIT_BY_ID;
 import static com.fallt.util.Constant.FIND_HABIT_BY_TITLE_AND_USER;
 import static com.fallt.util.Constant.INSERT_HABIT_QUERY;
 import static com.fallt.util.Constant.UPDATE_HABIT_QUERY;
@@ -97,7 +98,7 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     @Override
-    public Optional<Habit> findHabitByTitleAndUserId(Long userId, String title) {
+    public Optional<Habit> findByTitleAndUserId(Long userId, String title) {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_TITLE_AND_USER)) {
             preparedStatement.setLong(1, userId);
@@ -119,11 +120,31 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     @Override
-    public void delete(Long userId, String title) {
+    public Optional<Habit> findById(Long id) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_ID)) {
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Habit habit = null;
+            while (resultSet.next()) {
+                if (habit == null) {
+                    habit = instantiateHabit(resultSet);
+                } else {
+                    setExistsExecutionDate(habit, resultSet);
+                }
+            }
+            connectionManager.closeResultSet(resultSet);
+            return Optional.ofNullable(habit);
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_HABIT)) {
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setString(2, title);
+            preparedStatement.setLong(1, id);
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

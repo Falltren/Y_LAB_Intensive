@@ -124,7 +124,7 @@ class UserServiceTest {
         when(userDao.getUserByPassword(FIRST_USER_PASSWORD)).thenReturn(Optional.empty());
         when(userDao.update(any(User.class))).thenReturn(user);
 
-        UserResponse response = userService.updateUser(SECOND_USER_EMAIL, USER_REQUEST);
+        UserResponse response = userService.updateUser(1L, USER_REQUEST);
 
         verify(userDao, times(1)).update(user);
         assertThat(response).isEqualTo(USER_RESPONSE);
@@ -142,7 +142,7 @@ class UserServiceTest {
         when(userDao.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(Optional.of(USER_FROM_DATABASE));
         when(userDao.getUserByPassword(FIRST_USER_PASSWORD)).thenReturn(Optional.of(USER_FROM_DATABASE));
 
-        assertThrows(AlreadyExistException.class, () -> userService.updateUser(FIRST_USER_EMAIL, request));
+        assertThrows(AlreadyExistException.class, () -> userService.updateUser(1L, request));
     }
 
     @Test
@@ -155,15 +155,15 @@ class UserServiceTest {
 
         when(userDao.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(Optional.of(USER_FROM_DATABASE));
 
-        assertThrows(AlreadyExistException.class, () -> userService.updateUser(FIRST_USER_EMAIL, request));
+        assertThrows(AlreadyExistException.class, () -> userService.updateUser(1L, request));
     }
 
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUser() {
-        userService.deleteUser(FIRST_USER_EMAIL);
+        userService.deleteUser(1L);
 
-        verify(userDao, times(1)).delete(FIRST_USER_EMAIL);
+        verify(userDao, times(1)).delete(1L);
     }
 
     @Test
@@ -175,7 +175,7 @@ class UserServiceTest {
                 .build();
         when(userDao.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(Optional.of(user));
 
-        userService.blockingUser(user.getEmail());
+        userService.blockingUser(user.getId());
 
         assertThat(user.isBlocked()).isTrue();
         verify(userDao, times(1)).update(user);

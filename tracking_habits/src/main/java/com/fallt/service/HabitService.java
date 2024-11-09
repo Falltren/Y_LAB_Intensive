@@ -25,20 +25,17 @@ public interface HabitService {
     /**
      * Обновление привычки
      *
-     * @param userEmail Электронная почта пользователя
-     * @param title     Название привычки. Если будет передано название привычки, отсутствующее у пользователя
-     *                  в консоль будет выведено соответствующее сообщение
-     * @param request   Объект с данными по редактируемой привычке
+     * @param id      Идентификатор привычки
+     * @param request Объект с данными по редактируемой привычке
      */
-    HabitResponse updateHabit(String userEmail, String title, UpsertHabitRequest request);
+    HabitResponse updateHabit(Long id, UpsertHabitRequest request);
 
     /**
      * Удаление привычки
      *
-     * @param email Электронная почта пользователя
-     * @param title Название привычки
+     * @param id Идентификатор привычки
      */
-    void deleteHabit(String email, String title);
+    void deleteHabit(Long id);
 
     /**
      * Получение всех привычек пользователя
@@ -62,8 +59,17 @@ public interface HabitService {
      * @param user  Пользователь
      * @param title Название привычки
      * @return Объект класса Habit, если соответствующая привычка найдена в базе данных.
-     * Если привычка отсутствует, будет выброшено EntityNotFoundException
+     * Если привычка отсутствует, будет выброшено исключение EntityNotFoundException
      */
     Habit getHabitByTitle(User user, String title);
+
+    /**
+     * Получение привычки по идентификатору
+     *
+     * @param id Идентификатор привычки
+     * @return Объект класса Habit, если соответствующая привычка найдена в базе данных.
+     * Если привычка отсутствует, будет выброшено исключение EntityNotFoundException
+     */
+    Habit getHabitById(Long id);
 
 }

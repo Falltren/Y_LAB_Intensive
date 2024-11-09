@@ -55,7 +55,7 @@ class HabitServiceTest {
     @DisplayName("Успешное добавление привычки")
     void createHabit() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.empty());
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.empty());
         when(habitDao.save(any(Habit.class))).thenReturn(HABIT_FROM_DATABASE);
 
         HabitResponse response = habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST);
@@ -67,7 +67,7 @@ class HabitServiceTest {
     @DisplayName("Попытка добавления привычки с дублирующимся названием")
     void createHabitWithDuplicateTitle() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.of(new Habit()));
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.of(new Habit()));
 
         assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST));
     }
@@ -75,7 +75,7 @@ class HabitServiceTest {
     @Test
     @DisplayName("Получение привычки по названию")
     void testGetHabitByTitle() {
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
 
         Habit existedHabit = habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE);
         assertThat(existedHabit.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
@@ -84,7 +84,7 @@ class HabitServiceTest {
     @Test
     @DisplayName("Попытка получения привычки по отсутствующему названию")
     void testGetHabitByIncorrectTitle() {
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByTitle(USER_FROM_DATABASE, SECOND_HABIT_TITLE));
     }
@@ -94,8 +94,8 @@ class HabitServiceTest {
     void testDeleteHabit() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
 
-        habitService.deleteHabit(USER_FROM_DATABASE.getEmail(), FIRST_HABIT_TITLE);
-        verify(habitDao, times(1)).delete(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE);
+        habitService.deleteHabit(2L);
+        verify(habitDao, times(1)).delete(2L);
     }
 
     @Test
@@ -105,10 +105,10 @@ class HabitServiceTest {
         habitFromDb.setTitle(SECOND_HABIT_TITLE);
 
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.of(habitFromDb));
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.of(habitFromDb));
         when(habitDao.update(any(Habit.class))).thenReturn(HABIT_FROM_DATABASE);
 
-        HabitResponse response = habitService.updateHabit(USER_FROM_DATABASE.getEmail(), HABIT_FROM_DATABASE.getTitle(), HABIT_REQUEST);
+        HabitResponse response = habitService.updateHabit(1L, HABIT_REQUEST);
         verify(habitDao, times(1)).update(HABIT_FROM_DATABASE);
         assertThat(response).isEqualTo(HABIT_RESPONSE);
     }
@@ -117,9 +117,9 @@ class HabitServiceTest {
     @DisplayName("Попытка обновления привычки по некорректному названию")
     void testUpdateHabitByIncorrectTitle() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.updateHabit(USER_FROM_DATABASE.getEmail(), SECOND_HABIT_TITLE, HABIT_REQUEST));
+        assertThrows(EntityNotFoundException.class, () -> habitService.updateHabit(1L, HABIT_REQUEST));
 
     }
 
@@ -127,9 +127,9 @@ class HabitServiceTest {
     @DisplayName("Попытка обновления привычки с использованием названия уже имеющейся привычки")
     void testUpdateHabitWithExistsTitle() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
 
-        assertThrows(AlreadyExistException.class, () -> habitService.updateHabit(USER_FROM_DATABASE.getEmail(), FIRST_HABIT_TITLE, HABIT_REQUEST));
+        assertThrows(AlreadyExistException.class, () -> habitService.updateHabit(1L, HABIT_REQUEST));
     }
 
     @Test
@@ -140,7 +140,7 @@ class HabitServiceTest {
         HabitExecutionResponse expected = new HabitExecutionResponse(FIRST_HABIT_TITLE, execution);
 
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
         when(executionDao.save(any(HabitExecution.class))).thenReturn(habitExecution);
 
         HabitExecutionResponse response = habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST);
@@ -151,7 +151,7 @@ class HabitServiceTest {
     @DisplayName("Попытка отметки выполнения несуществующей привычки")
     void testConformHabitWithIncorrectTitle() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
-        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.empty());
+        when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST));
     }

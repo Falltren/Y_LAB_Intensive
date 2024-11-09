@@ -1,13 +1,13 @@
 package com.fallt.repository.impl;
 
-import com.fallt.domain.entity.enums.Role;
 import com.fallt.domain.entity.User;
+import com.fallt.domain.entity.enums.Role;
 import com.fallt.exception.DBException;
 import com.fallt.repository.UserDao;
-import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,6 +22,7 @@ import static com.fallt.util.Constant.DELETE_ALL_USERS_QUERY;
 import static com.fallt.util.Constant.DELETE_USER_QUERY;
 import static com.fallt.util.Constant.FIND_ALL_USERS_QUERY;
 import static com.fallt.util.Constant.FIND_USER_BY_EMAIL_QUERY;
+import static com.fallt.util.Constant.FIND_USER_BY_ID_QUERY;
 import static com.fallt.util.Constant.FIND_USER_BY_PASSWORD_QUERY;
 import static com.fallt.util.Constant.INSERT_USER_QUERY;
 import static com.fallt.util.Constant.UPDATE_USER_QUERY;
@@ -30,11 +31,11 @@ import static com.fallt.util.Constant.UPDATE_USER_QUERY;
 @Repository
 public class UserDaoImpl implements UserDao {
 
-    private final DbConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Override
     public User create(User user) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
@@ -45,12 +46,12 @@ public class UserDaoImpl implements UserDao {
             preparedStatement.setBoolean(7, user.isBlocked());
             preparedStatement.setBoolean(8, user.isActive());
             preparedStatement.executeUpdate();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                long userId = generatedKeys.getLong(1);
-                user.setId(userId);
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    long userId = generatedKeys.getLong(1);
+                    user.setId(userId);
+                }
             }
-            connectionManager.closeResultSet(generatedKeys);
             return user;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -59,7 +60,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USER_QUERY)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
@@ -77,10 +78,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void delete(String email) {
-        try (Connection connection = connectionManager.getConnection();
+    public void delete(Long id) {
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_USER_QUERY)) {
-            preparedStatement.setString(1, email);
+            preparedStatement.setLong(1, id);
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -90,14 +91,13 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        try (Connection connection = connectionManager.getConnection();
-             Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS_QUERY);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS_QUERY)) {
             while (resultSet.next()) {
                 User user = instantiateUser(resultSet);
                 users.add(user);
             }
-            connectionManager.closeResultSet(resultSet);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
@@ -106,15 +106,15 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_EMAIL_QUERY)) {
             preparedStatement.setString(1, email);
-            ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
-            while (resultSet.next()) {
-                user = instantiateUser(resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    user = instantiateUser(resultSet);
+                }
             }
-            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -123,15 +123,32 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByPassword(String password) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_PASSWORD_QUERY)) {
             preparedStatement.setString(1, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
-            while (resultSet.next()) {
-                user = instantiateUser(resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    user = instantiateUser(resultSet);
+                }
             }
-            connectionManager.closeResultSet(resultSet);
+            return Optional.ofNullable(user);
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<User> getUserById(Long id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_ID_QUERY)) {
+            preparedStatement.setLong(1, id);
+            User user = null;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    user = instantiateUser(resultSet);
+                }
+            }
             return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -140,7 +157,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL_USERS_QUERY)) {
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -161,4 +178,5 @@ public class UserDaoImpl implements UserDao {
                 .isActive(resultSet.getBoolean("is_active"))
                 .build();
     }
+
 }

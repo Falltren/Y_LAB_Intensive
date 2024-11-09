@@ -1,37 +1,36 @@
-package com.fallt.aop.audit;
+package com.fallt.audit_starter.aop;
 
-import com.fallt.domain.entity.AuditLog;
-import com.fallt.security.AuthenticationContext;
-import com.fallt.security.UserDetails;
-import com.fallt.service.AuditService;
+import com.fallt.audit_starter.condition.EnableAuditCondition;
+import com.fallt.audit_starter.domain.entity.AuditLog;
+import com.fallt.audit_starter.domain.entity.enums.ActionType;
+import com.fallt.audit_starter.security.UserDetails;
+import com.fallt.audit_starter.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Conditional(EnableAuditCondition.class)
 @RequiredArgsConstructor
 public class AuditAspect {
 
-    private final AuthenticationContext authenticationContext;
     private final AuditService auditService;
+    private final UserDetails userDetails;
 
     @Before("@annotation(auditable) && execution(* *(..))")
     public void auditing(JoinPoint joinPoint, Auditable auditable) {
         String methodName = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
         ActionType action = auditable.action();
-        UserDetails userDetails = authenticationContext.getCurrentUser();
         AuditLog audit = AuditLog.builder()
                 .action(action)
-                .userEmail(getUserEmail(userDetails))
+                .userEmail(userDetails.getUserName())
                 .description("User called method: " + methodName)
                 .build();
         auditService.save(audit);
     }
 
-    private String getUserEmail(UserDetails userDetails) {
-        return userDetails == null ? "anonymous" : userDetails.getEmail();
-    }
 }
