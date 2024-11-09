@@ -1,10 +1,9 @@
-package com.fallt.service;
+package com.fallt.unit.service;
 
-import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.dto.response.LoginResponse;
 import com.fallt.domain.entity.User;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.security.AuthenticationContext;
 import com.fallt.security.PasswordEncoder;
 import com.fallt.service.impl.AuthServiceImpl;
 import com.fallt.service.impl.UserServiceImpl;
@@ -35,18 +34,14 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private AuthenticationContext authenticationContext;
-
     @Test
     @DisplayName("Успешная аутентификация пользователя")
     void testLogin() {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
         when(passwordEncoder.checkPassword(LOGIN_REQUEST.getPassword(), USER_FROM_DATABASE.getPassword())).thenReturn(true);
 
-        UserResponse response = authService.login(LOGIN_REQUEST, USER_FROM_DATABASE.getEmail(), authenticationContext);
+        LoginResponse response = authService.login(LOGIN_REQUEST);
 
-        assertThat(response.getEmail()).isEqualTo(USER_FROM_DATABASE.getEmail());
         assertThat(response.getName()).isEqualTo(USER_FROM_DATABASE.getName());
     }
 
@@ -56,7 +51,7 @@ class AuthServiceTest {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
         when(passwordEncoder.checkPassword(LOGIN_REQUEST.getPassword(), USER_FROM_DATABASE.getPassword())).thenReturn(false);
 
-        assertThrows(EntityNotFoundException.class, () -> authService.login(LOGIN_REQUEST, USER_FROM_DATABASE.getEmail(), authenticationContext));
+        assertThrows(EntityNotFoundException.class, () -> authService.login(LOGIN_REQUEST));
     }
 
     @Test
@@ -70,6 +65,6 @@ class AuthServiceTest {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
         when(passwordEncoder.checkPassword(LOGIN_REQUEST.getPassword(), user.getPassword())).thenReturn(true);
 
-        assertThrows(AuthenticationException.class, () -> authService.login(LOGIN_REQUEST, user.getEmail(), authenticationContext));
+        assertThrows(AuthenticationException.class, () -> authService.login(LOGIN_REQUEST));
     }
 }

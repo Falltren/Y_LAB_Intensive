@@ -5,17 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitResponse {
+public class LoginResponse {
 
-    private String title;
-    private String text;
-    private List<LocalDate> successfulExecution;
+    private String name;
+    private String token;
 
 }

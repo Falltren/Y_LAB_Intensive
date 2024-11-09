@@ -1,9 +1,10 @@
-package com.fallt.repository.impl;
+package com.fallt.unit.repository.impl;
 
-import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.domain.entity.Habit;
 import com.fallt.domain.entity.User;
-import com.fallt.repository.AbstractTest;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.repository.impl.HabitDaoImpl;
+import com.fallt.unit.repository.AbstractTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class HabitDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        habitDao = new HabitDaoImpl(connectionManager);
+        habitDao = new HabitDaoImpl(dataSource);
         user = addUserToDatabase();
     }
 

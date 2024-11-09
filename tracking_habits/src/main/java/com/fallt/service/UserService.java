@@ -23,9 +23,17 @@ public interface UserService {
      *
      * @param email Электронная почта
      * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой
-     * или null, если пользователь не найден
+     * Если пользователь не найден, будет выброшено исключение EntityNotFoundException
      */
     User getUserByEmail(String email);
+
+    /**
+     *
+     * @param id Идентификатор пользователя
+     * @return Объект класса User, если в базе данных присутствует пользователь с указанным идентификатором
+     * Если пользователь не найден, будет выброшено исключение EntityNotFoundException
+     */
+    User getUserById(Long id);
 
     /**
      * Сохранение нового пользователя в базу данных
@@ -57,4 +65,5 @@ public interface UserService {
      * @param id Идентификатор пользователя
      */
     void deleteUser(Long id);
+
 }

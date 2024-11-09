@@ -1,14 +1,13 @@
-package com.fallt.controller;
+package com.fallt.unit.controller;
 
+import com.fallt.controller.HabitController;
+import com.fallt.controller.advice.GlobalExceptionHandler;
 import com.fallt.domain.dto.request.HabitConfirmRequest;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.controller.advice.GlobalExceptionHandler;
 import com.fallt.exception.ValidationException;
-import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.impl.ValidationService;
-import com.fallt.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +32,6 @@ import static com.fallt.TestConstant.HABIT_CONTROLLER_PATH;
 import static com.fallt.TestConstant.HABIT_REQUEST;
 import static com.fallt.TestConstant.HABIT_RESPONSE;
 import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
-import static com.fallt.TestConstant.SESSION_ID;
-import static com.fallt.TestConstant.USER_EMAIL;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -54,14 +51,9 @@ class HabitControllerTest {
     @Mock
     private HabitService habitService;
 
-    @Mock
-    private AuthenticationContext authenticationContext;
 
     @Mock
     private ValidationService validationService;
-
-    @Mock
-    private SessionUtils sessionUtils;
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -78,9 +70,7 @@ class HabitControllerTest {
     void whenCreateHabit_thenReturnCreated() throws Exception {
         String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(habitService.saveHabit(USER_EMAIL, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
+        when(habitService.saveHabit(HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
 
         mockMvc.perform(post(CREATE_HABIT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,9 +99,7 @@ class HabitControllerTest {
     void whenCreateAlreadyExistsHabit_thenReturnBadRequest() throws Exception {
         String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-        when(habitService.saveHabit(USER_EMAIL, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
+        when(habitService.saveHabit(HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
 
         mockMvc.perform(post(CREATE_HABIT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,8 +113,6 @@ class HabitControllerTest {
     void whenUpdateHabit_thenReturnOk() throws Exception {
         String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
         when(habitService.updateHabit(1L, HABIT_REQUEST)).thenReturn(HABIT_RESPONSE);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + FIRST_HABIT_TITLE)
@@ -143,8 +129,6 @@ class HabitControllerTest {
         String title = "incorrectTitle";
         String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
         when(habitService.updateHabit(1L, HABIT_REQUEST)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + title)
@@ -159,8 +143,6 @@ class HabitControllerTest {
     void whenUpdateWithExistsTitle_thenReturnBadRequest() throws Exception {
         String content = objectMapper.writeValueAsString(HABIT_REQUEST);
 
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
         when(habitService.updateHabit(1L, HABIT_REQUEST)).thenThrow(AlreadyExistException.class);
 
         mockMvc.perform(put(HABIT_BY_TITLE_PATH + SECOND_HABIT_TITLE)
@@ -173,9 +155,6 @@ class HabitControllerTest {
     @Test
     @DisplayName("Получение всех привычек")
     void whenGetAllHabits_thenReturnOk() throws Exception {
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-
         mockMvc.perform(get(HABIT_CONTROLLER_PATH))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -184,9 +163,6 @@ class HabitControllerTest {
     @Test
     @DisplayName("Удаление привычки")
     void whenDeleteHabit_thenReturnNoContent() throws Exception {
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
-
         mockMvc.perform(delete(HABIT_BY_TITLE_PATH + FIRST_HABIT_TITLE))
                 .andDo(print())
                 .andExpect(status().isNoContent());
@@ -198,9 +174,6 @@ class HabitControllerTest {
         HabitConfirmRequest request = CONFIRM_REQUEST;
         request.setDate(LocalDate.now());
         String content = objectMapper.writeValueAsString(request);
-
-        when(sessionUtils.getSessionIdFromContext()).thenReturn(SESSION_ID);
-        when(authenticationContext.getEmailCurrentUser(SESSION_ID)).thenReturn(USER_EMAIL);
 
         mockMvc.perform(post(HABIT_CONFIRM_PATH)
                         .contentType(MediaType.APPLICATION_JSON)

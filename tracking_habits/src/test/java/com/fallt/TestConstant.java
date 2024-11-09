@@ -6,6 +6,7 @@ import com.fallt.domain.dto.request.ReportRequest;
 import com.fallt.domain.dto.request.UpsertHabitRequest;
 import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.dto.response.LoginResponse;
 import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.Habit;
 import com.fallt.domain.entity.User;
@@ -29,6 +30,7 @@ public class TestConstant {
     public static final String WEEKLY_HABIT = "WEEKLY";
     public static final String SESSION_ID = "sessionId";
     public static final String USER_EMAIL = "email";
+    public static final String TOKEN = "token";
     public static final UpsertUserRequest USER_REQUEST = UpsertUserRequest.builder()
             .name(FIRST_USER_NAME)
             .email(FIRST_USER_EMAIL)
@@ -49,17 +51,21 @@ public class TestConstant {
             .successfulExecution(new ArrayList<>())
             .build();
     public static final HabitConfirmRequest CONFIRM_REQUEST = HabitConfirmRequest.builder()
-            .title(FIRST_HABIT_TITLE)
+            .habitId(1L)
             .date(LocalDate.now())
             .build();
     public static final ReportRequest REPORT_REQUEST = ReportRequest.builder()
-            .title(FIRST_HABIT_TITLE)
+            .habitId(1L)
             .start(LocalDate.of(2024, 10, 1))
             .end(LocalDate.of(2024, 10, 20))
             .build();
     public static final LoginRequest LOGIN_REQUEST = LoginRequest.builder()
             .email(FIRST_USER_EMAIL)
             .password(FIRST_USER_PASSWORD)
+            .build();
+    public static final LoginResponse LOGIN_RESPONSE = LoginResponse.builder()
+            .name(FIRST_USER_NAME)
+            .token(TOKEN)
             .build();
     public static final User USER_FROM_DATABASE = User.builder()
             .id(1L)
@@ -82,4 +88,5 @@ public class TestConstant {
     public static final String LOGIN_PATH = "/api/v1/account/login";
     public static final String FULL_REPORT_PATH = "/api/v1/reports/full";
     public static final String STREAK_REPORT_PATH = "/api/v1/reports/streak";
+
 }

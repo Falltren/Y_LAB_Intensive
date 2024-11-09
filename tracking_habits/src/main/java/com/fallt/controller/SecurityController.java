@@ -2,13 +2,12 @@ package com.fallt.controller;
 
 import com.fallt.domain.dto.request.LoginRequest;
 import com.fallt.domain.dto.request.UpsertUserRequest;
-import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.dto.response.ExceptionResponse;
-import com.fallt.security.AuthenticationContext;
+import com.fallt.domain.dto.response.LoginResponse;
+import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.service.AuthService;
 import com.fallt.service.UserService;
 import com.fallt.service.impl.ValidationService;
-import com.fallt.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,9 +30,7 @@ public class SecurityController {
 
     private final AuthService authService;
     private final UserService userService;
-    private final AuthenticationContext authenticationContext;
     private final ValidationService validationService;
-    private final SessionUtils sessionUtils;
 
     @Operation(
             summary = "Создание аккаунта",
@@ -63,7 +60,7 @@ public class SecurityController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешный вход в систему", content = {
-                    @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
+                    @Content(schema = @Schema(implementation = LoginResponse.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
                     @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
@@ -76,9 +73,9 @@ public class SecurityController {
             })
     })
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         validationService.checkLoginRequest(request);
-        String sessionId = sessionUtils.getSessionIdFromContext();
-        return ResponseEntity.ok(authService.login(request, sessionId, authenticationContext));
+        return ResponseEntity.ok(authService.login(request));
     }
+
 }

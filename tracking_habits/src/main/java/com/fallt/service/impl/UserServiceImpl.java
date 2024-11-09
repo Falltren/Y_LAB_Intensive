@@ -43,8 +43,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = UserMapper.INSTANCE.toEntity(request);
         user.setPassword(encodedPassword);
-        User savedUser = userDao.create(user);
-        return UserMapper.INSTANCE.toResponse(savedUser);
+        return UserMapper.INSTANCE.toResponse(userDao.create(user));
     }
 
     @Auditable(action = ActionType.UPDATE)
@@ -65,8 +64,10 @@ public class UserServiceImpl implements UserService {
         if (updateUser.getPassword() != null && isExistsPassword(encodedPassword)) {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", updateUser.getPassword()));
         }
-        updateUser.setPassword(encodedPassword);
         UserMapper.INSTANCE.updateUserFromDto(updateUser, user);
+        if (updateUser.getPassword() != null) {
+            user.setPassword(encodedPassword);
+        }
         user.setUpdateAt(LocalDateTime.now());
         return UserMapper.INSTANCE.toResponse(userDao.update(user));
     }
@@ -76,7 +77,8 @@ public class UserServiceImpl implements UserService {
         userDao.delete(id);
     }
 
-    public User getUserById(Long id){
+    @Auditable(action = ActionType.GET)
+    public User getUserById(Long id) {
         return userDao.getUserById(id).orElseThrow(
                 () -> new EntityNotFoundException(MessageFormat.format("Пользователь с ID: {0} не найден", id)));
     }
@@ -94,4 +96,5 @@ public class UserServiceImpl implements UserService {
     private boolean isExistsPassword(String password) {
         return userDao.getUserByPassword(password).isPresent();
     }
+
 }

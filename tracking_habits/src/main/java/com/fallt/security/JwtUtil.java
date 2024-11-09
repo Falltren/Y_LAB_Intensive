@@ -32,9 +32,10 @@ public class JwtUtil {
         this.algorithm = Algorithm.HMAC256(secretKey);
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(Long id, String email, String role) {
         return JWT.create()
                 .withIssuer(issuer)
+                .withClaim("id", id)
                 .withClaim("email", email)
                 .withClaim("role", role)
                 .withExpiresAt(new Date(System.currentTimeMillis() + tokenLifetime))
@@ -50,12 +51,9 @@ public class JwtUtil {
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(issuer)
                     .build();
-            DecodedJWT decodedJWT = verifier.verify(token);
-            if (decodedJWT.getExpiresAt().before(new Date(System.currentTimeMillis()))) {
-                throw new AuthenticationException("Время действия токена истекло");
-            }
+            verifier.verify(token);
         } catch (JWTVerificationException ex) {
-            throw new AuthenticationException("Токен не найден");
+            throw new AuthenticationException(ex.getMessage());
         }
     }
 
@@ -67,21 +65,23 @@ public class JwtUtil {
     }
 
     public String getUserEmail(String authHeader) {
-        String token = authHeader.replace(START_HEADER, "");
-        JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer(issuer)
-                .build();
-        DecodedJWT decodedJWT = verifier.verify(token);
-        return decodedJWT.getClaim("email").asString();
+        return getDecodedJwt(authHeader).getClaim("email").asString();
     }
 
-    private String getUserRole(String authHeader) {
+    public Long getUserId(String authHeader) {
+        return getDecodedJwt(authHeader).getClaim("id").asLong();
+    }
+
+    public String getUserRole(String authHeader) {
+        return getDecodedJwt(authHeader).getClaim("role").asString();
+    }
+
+    private DecodedJWT getDecodedJwt(String authHeader) {
         String token = authHeader.replace(START_HEADER, "");
         JWTVerifier verifier = JWT.require(algorithm)
                 .withIssuer(issuer)
                 .build();
-        DecodedJWT decodedJWT = verifier.verify(token);
-        return decodedJWT.getClaim("role").asString();
+        return verifier.verify(token);
     }
 
 }

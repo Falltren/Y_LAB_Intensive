@@ -1,4 +1,4 @@
-package com.fallt.service;
+package com.fallt.unit.service;
 
 import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.domain.dto.response.UserResponse;

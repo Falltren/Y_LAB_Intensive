@@ -3,10 +3,7 @@ package com.fallt.controller;
 import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.UserResponse;
-import com.fallt.domain.entity.enums.Role;
-import com.fallt.security.AuthenticationContext;
 import com.fallt.service.UserService;
-import com.fallt.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
 
@@ -35,8 +31,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final AuthenticationContext authenticationContext;
-    private final SessionUtils sessionUtils;
 
     @Operation(
             summary = "Получение всех аккаунтов",
@@ -55,8 +49,6 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        String sessionId = sessionUtils.getSessionIdFromContext();
-        authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -79,8 +71,7 @@ public class UserController {
             })
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable("id") Long id, @RequestBody UpsertUserRequest request) {
-        String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpsertUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
@@ -98,9 +89,7 @@ public class UserController {
             })
     })
     @PutMapping("/block/{id}")
-    public ResponseEntity<Void> blockUser(@PathVariable("id") Long id) {
-        String sessionId = sessionUtils.getSessionIdFromContext();
-        authenticationContext.checkRole(sessionId, Role.ROLE_ADMIN);
+    public ResponseEntity<Void> blockUser(@PathVariable Long id) {
         userService.blockingUser(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -116,9 +105,9 @@ public class UserController {
             })
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-        String email = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 }

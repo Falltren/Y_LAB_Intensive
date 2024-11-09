@@ -1,4 +1,4 @@
-package com.fallt.service;
+package com.fallt.unit.service;
 
 import com.fallt.domain.dto.request.ReportRequest;
 import com.fallt.domain.dto.response.HabitProgress;
@@ -48,14 +48,14 @@ class StatisticServiceTest {
         Habit habit = createHabit();
         habit.setExecutionRate(ExecutionRate.DAILY);
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
+        ReportRequest request = new ReportRequest(1L,
                 LocalDate.of(2024, 9, 11),
                 LocalDate.of(2024, 9, 20));
 
         when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
-        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
+        when(habitService.getHabitByUserIdAndTitle(1L, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
+        HabitProgress progress = statisticService.getHabitProgress(request);
         assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
     }
@@ -77,13 +77,13 @@ class StatisticServiceTest {
         Habit habit = createHabit();
         habit.setExecutionRate(ExecutionRate.WEEKLY);
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
+        ReportRequest request = new ReportRequest(1L,
                 LocalDate.of(2024, 9, 11),
                 LocalDate.of(2024, 10, 10));
         when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
-        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
+        when(habitService.getHabitByUserIdAndTitle(1L, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
+        HabitProgress progress = statisticService.getHabitProgress(request);
 
         assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
@@ -106,14 +106,14 @@ class StatisticServiceTest {
         Habit habit = createHabit();
         habit.setExecutionRate(ExecutionRate.MONTHLY);
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
+        ReportRequest request = new ReportRequest(1L,
                 LocalDate.of(2024, 6, 11),
                 LocalDate.of(2024, 10, 5));
 
         when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
-        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
+        when(habitService.getHabitByUserIdAndTitle(1L, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        HabitProgress progress = statisticService.getHabitProgress(FIRST_USER_EMAIL, request);
+        HabitProgress progress = statisticService.getHabitProgress(request);
         assertThat(progress.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
         assertThat(progress.getSuccessRate()).isEqualTo(expectedSuccessRate);
     }
@@ -139,14 +139,14 @@ class StatisticServiceTest {
                 LocalDate.of(2024, 9, 19)
         );
         habit.setSuccessfulExecution(new TreeSet<>(successExecution));
-        ReportRequest request = new ReportRequest(FIRST_HABIT_TITLE,
+        ReportRequest request = new ReportRequest(1L,
                 LocalDate.of(2024, 6, 11),
                 LocalDate.of(2024, 10, 5));
 
         when(userService.getUserByEmail(FIRST_USER_EMAIL)).thenReturn(USER_FROM_DATABASE);
-        when(habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE)).thenReturn(habit);
+        when(habitService.getHabitByUserIdAndTitle(1L, FIRST_HABIT_TITLE)).thenReturn(habit);
 
-        int rate = statisticService.getSuccessHabitRate(FIRST_USER_EMAIL, request);
+        int rate = statisticService.getSuccessHabitRate(request);
         assertThat(rate).isEqualTo(3);
     }
 

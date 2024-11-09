@@ -13,4 +13,5 @@ public class ExceptionResponse {
 
     private String errorDescription;
     private Long timestamp;
+
 }

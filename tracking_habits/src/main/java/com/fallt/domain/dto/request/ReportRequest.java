@@ -13,7 +13,8 @@ import java.time.LocalDate;
 @Builder
 public class ReportRequest {
 
-    private String title;
+    private Long habitId;
     private LocalDate start;
     private LocalDate end;
+
 }

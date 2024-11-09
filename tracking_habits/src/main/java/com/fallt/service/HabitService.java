@@ -15,18 +15,16 @@ import java.util.List;
 public interface HabitService {
 
     /**
-     * Метод создания привычки
-     *
-     * @param userEmail Электронная почта пользователя
-     * @param request   Объект с данными по новой привычке
+     * @param request Объект, содержащий информацию о добавляемой привычке
+     * @return Данные о созданной пользователем привычке
      */
-    HabitResponse saveHabit(String userEmail, UpsertHabitRequest request);
+    HabitResponse saveHabit(UpsertHabitRequest request);
 
     /**
      * Обновление привычки
      *
      * @param id      Идентификатор привычки
-     * @param request Объект с данными по редактируемой привычке
+     * @param request Объект с данными по измененной привычке
      */
     HabitResponse updateHabit(Long id, UpsertHabitRequest request);
 
@@ -40,28 +38,26 @@ public interface HabitService {
     /**
      * Получение всех привычек пользователя
      *
-     * @param email Электронный адрес пользователя
      * @return Список привычек
      */
-    List<HabitResponse> getAllHabits(String email);
+    List<HabitResponse> getAllHabits();
 
     /**
      * Добавление данных о выполнении привычки
      *
-     * @param email   Электронная почта пользователь
      * @param request Объект, содержащий информацию о названии привычки и дате выполнения
      */
-    HabitExecutionResponse confirmHabit(String email, HabitConfirmRequest request);
+    HabitExecutionResponse confirmHabit(HabitConfirmRequest request);
 
     /**
      * Получение привычки пользователя по названию
      *
-     * @param user  Пользователь
+     * @param userId  Идентификатор пользователя
      * @param title Название привычки
      * @return Объект класса Habit, если соответствующая привычка найдена в базе данных.
      * Если привычка отсутствует, будет выброшено исключение EntityNotFoundException
      */
-    Habit getHabitByTitle(User user, String title);
+    Habit getHabitByUserIdAndTitle(Long userId, String title);
 
     /**
      * Получение привычки по идентификатору

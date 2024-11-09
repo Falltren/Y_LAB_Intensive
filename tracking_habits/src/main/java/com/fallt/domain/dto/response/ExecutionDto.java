@@ -14,4 +14,5 @@ public class ExecutionDto {
     private LocalDate startPeriod;
     private LocalDate endPeriod;
     private boolean executed;
+
 }

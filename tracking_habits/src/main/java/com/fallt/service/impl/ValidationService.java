@@ -58,16 +58,10 @@ public class ValidationService {
         if (request.getDate() == null) {
             throw new ValidationException("Дата выполнения привычки должны быть указана");
         }
-        if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {
-            throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
-        }
         return true;
     }
 
     public boolean checkReportRequest(ReportRequest request) {
-        if (request.getTitle() == null || request.getTitle().length() < 3 || request.getTitle().length() > 30) {
-            throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
-        }
         if (request.getStart() == null || request.getEnd() == null) {
             throw new ValidationException("Дата начала и окончания отчетного периода должны быть указаны");
         }

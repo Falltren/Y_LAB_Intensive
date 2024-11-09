@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
                 .body(body);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationException(Exception e) {
+    @ExceptionHandler({ValidationException.class, AlreadyExistException.class})
+    public ResponseEntity<ExceptionResponse> handleValidationAndAlreadyExistsException(Exception e) {
         ExceptionResponse body = ExceptionResponse.builder()
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
@@ -55,16 +55,6 @@ public class GlobalExceptionHandler {
                 .body(body);
     }
 
-    @ExceptionHandler(AlreadyExistException.class)
-    public ResponseEntity<ExceptionResponse> handleAlreadyExistException(Exception e) {
-        ExceptionResponse body = ExceptionResponse.builder()
-                .timestamp(System.currentTimeMillis())
-                .errorDescription(e.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(body);
-    }
-
     @ExceptionHandler(DBException.class)
     public ResponseEntity<ExceptionResponse> handleDbException(Exception e) {
         ExceptionResponse body = ExceptionResponse.builder()
@@ -74,4 +64,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(body);
     }
+
 }

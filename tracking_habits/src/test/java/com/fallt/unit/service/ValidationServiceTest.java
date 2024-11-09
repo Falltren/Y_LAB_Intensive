@@ -1,4 +1,4 @@
-package com.fallt.service;
+package com.fallt.unit.service;
 
 import com.fallt.domain.dto.request.HabitConfirmRequest;
 import com.fallt.domain.dto.request.LoginRequest;
@@ -139,7 +139,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка HabitConfirmRequest")
     void testCheckHabitConfirmRequest() {
-        HabitConfirmRequest request = new HabitConfirmRequest(FIRST_HABIT_TITLE, LocalDate.now());
+        HabitConfirmRequest request = new HabitConfirmRequest(1L, LocalDate.now());
 
         boolean result = validationService.checkHabitConfirmRequest(request);
 
@@ -147,17 +147,9 @@ class ValidationServiceTest {
     }
 
     @Test
-    @DisplayName("Проверка HabitConfirmRequest с некорректным названием привычки")
-    void testCheckHabitConfirmRequestWithIncorrectTitle() {
-        HabitConfirmRequest request = new HabitConfirmRequest("t", LocalDate.now());
-
-        assertThrows(ValidationException.class, () -> validationService.checkHabitConfirmRequest(request));
-    }
-
-    @Test
     @DisplayName("Проверка HabitConfirmRequest с отсутствием даты выполнения")
     void testCheckHabitConfirmRequestWithIncorrectDate() {
-        HabitConfirmRequest request = new HabitConfirmRequest(FIRST_HABIT_TITLE, null);
+        HabitConfirmRequest request = new HabitConfirmRequest(1L, null);
 
         assertThrows(ValidationException.class, () -> validationService.checkHabitConfirmRequest(request));
     }
@@ -165,7 +157,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Успешная проверка ReportRequest")
     void testCheckReportRequest() {
-        ReportRequest request = new ReportRequest(SECOND_HABIT_TITLE,
+        ReportRequest request = new ReportRequest(2L,
                 LocalDate.of(2024, 10, 1),
                 LocalDate.of(2024, 10, 10));
 
@@ -175,19 +167,9 @@ class ValidationServiceTest {
     }
 
     @Test
-    @DisplayName("Проверка ReportRequest с некорректным название привычки")
-    void testCheckReportRequestWithIncorrectTitle() {
-        ReportRequest request = new ReportRequest("",
-                LocalDate.of(2024, 10, 1),
-                LocalDate.of(2024, 10, 10));
-
-        assertThrows(ValidationException.class, () -> validationService.checkReportRequest(request));
-    }
-
-    @Test
     @DisplayName("Проверка ReportRequest с отсутствующей датой начала периода")
     void testCheckReportRequestWithMissingStartDate() {
-        ReportRequest request = new ReportRequest("",
+        ReportRequest request = new ReportRequest(1L,
                 null,
                 LocalDate.of(2024, 10, 10));
 
@@ -197,7 +179,7 @@ class ValidationServiceTest {
     @Test
     @DisplayName("Проверка ReportRequest с датой окончания предшествующей дате начала периода")
     void testCheckReportRequestWhenStartDateIsAfterEndDate() {
-        ReportRequest request = new ReportRequest("",
+        ReportRequest request = new ReportRequest(1L,
                 LocalDate.of(2024, 10, 10),
                 LocalDate.of(2024, 10, 1));
 

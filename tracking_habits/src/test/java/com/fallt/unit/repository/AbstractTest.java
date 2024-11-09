@@ -1,4 +1,4 @@
-package com.fallt.repository;
+package com.fallt.unit.repository;
 
 import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.domain.entity.Habit;
@@ -56,7 +56,7 @@ public abstract class AbstractTest {
     }
 
     protected Habit addHabitToDatabase() {
-        HabitDaoImpl habitDao = new HabitDaoImpl(connectionManager);
+        HabitDaoImpl habitDao = new HabitDaoImpl(dataSource);
         User user = addUserToDatabase();
         Habit habit = Habit.builder()
                 .title("test habit")

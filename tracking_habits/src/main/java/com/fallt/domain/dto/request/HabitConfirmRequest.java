@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 public class HabitConfirmRequest {
 
-    private String title;
+    private Long habitId;
     private LocalDate date;
+
 }

@@ -1,4 +1,4 @@
-package com.fallt.service;
+package com.fallt.unit.service;
 
 import com.fallt.domain.dto.response.HabitExecutionResponse;
 import com.fallt.domain.dto.response.HabitResponse;
@@ -8,6 +8,7 @@ import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
+import com.fallt.service.UserService;
 import com.fallt.service.impl.HabitServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class HabitServiceTest {
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.empty());
         when(habitDao.save(any(Habit.class))).thenReturn(HABIT_FROM_DATABASE);
 
-        HabitResponse response = habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST);
+        HabitResponse response = habitService.saveHabit(HABIT_REQUEST);
 
         assertThat(response).isEqualTo(HABIT_RESPONSE);
     }
@@ -69,7 +70,7 @@ class HabitServiceTest {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.of(new Habit()));
 
-        assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST));
+        assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(HABIT_REQUEST));
     }
 
     @Test
@@ -77,7 +78,7 @@ class HabitServiceTest {
     void testGetHabitByTitle() {
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
 
-        Habit existedHabit = habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE);
+        Habit existedHabit = habitService.getHabitByUserIdAndTitle(1L, FIRST_HABIT_TITLE);
         assertThat(existedHabit.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
     }
 
@@ -86,7 +87,7 @@ class HabitServiceTest {
     void testGetHabitByIncorrectTitle() {
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByTitle(USER_FROM_DATABASE, SECOND_HABIT_TITLE));
+        assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByUserIdAndTitle(1L, SECOND_HABIT_TITLE));
     }
 
     @Test
@@ -143,7 +144,7 @@ class HabitServiceTest {
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
         when(executionDao.save(any(HabitExecution.class))).thenReturn(habitExecution);
 
-        HabitExecutionResponse response = habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST);
+        HabitExecutionResponse response = habitService.confirmHabit(CONFIRM_REQUEST);
         assertThat(response).isEqualTo(expected);
     }
 
@@ -153,7 +154,7 @@ class HabitServiceTest {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
         when(habitDao.findByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST));
+        assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(CONFIRM_REQUEST));
     }
 
     @Test
@@ -171,7 +172,7 @@ class HabitServiceTest {
         when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
         when(habitDao.getAllUserHabits(USER_FROM_DATABASE.getId())).thenReturn(habits);
 
-        List<HabitResponse> response = habitService.getAllHabits(USER_FROM_DATABASE.getEmail());
+        List<HabitResponse> response = habitService.getAllHabits();
         assertThat(response).isEqualTo(expected);
     }
 }

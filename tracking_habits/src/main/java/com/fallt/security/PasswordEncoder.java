@@ -13,4 +13,5 @@ public class PasswordEncoder {
     public boolean checkPassword(String rowPassword, String encodedPassword) {
         return BCrypt.checkpw(rowPassword, encodedPassword);
     }
+
 }

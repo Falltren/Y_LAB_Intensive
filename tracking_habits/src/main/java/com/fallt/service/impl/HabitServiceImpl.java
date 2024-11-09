@@ -15,7 +15,6 @@ import com.fallt.logging.annotation.Loggable;
 import com.fallt.mapper.HabitMapper;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.security.AuthenticationContext;
 import com.fallt.security.JwtUtil;
 import com.fallt.service.HabitService;
 import com.fallt.service.UserService;
@@ -34,13 +33,13 @@ public class HabitServiceImpl implements HabitService {
     private final HabitDao habitDao;
     private final HabitExecutionDao executionDao;
     private final UserService userService;
-    private final AuthenticationContext authenticationContext;
     private final CommonUtil commonUtil;
     private final JwtUtil jwtUtil;
 
     @Auditable(action = ActionType.CREATE)
-    public HabitResponse saveHabit(String userEmail, UpsertHabitRequest request) {
-        User user = userService.getUserByEmail(userEmail);
+    public HabitResponse saveHabit(UpsertHabitRequest request) {
+        Long userId = jwtUtil.getUserId(commonUtil.getAuthHeader());
+        User user = userService.getUserById(userId);
         if (isExistedHabit(user.getId(), request.getTitle())) {
             throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
@@ -52,12 +51,11 @@ public class HabitServiceImpl implements HabitService {
     @Auditable(action = ActionType.UPDATE)
     public HabitResponse updateHabit(Long id, UpsertHabitRequest request) {
         Habit habit = getHabitById(id);
-        String email = jwtUtil.getUserEmail(commonUtil.getAuthHeader());
-        User user = userService.getUserByEmail(email);
+        Long userId = jwtUtil.getUserId(commonUtil.getAuthHeader());
+        User user = userService.getUserById(userId);
         if (request.getTitle() != null && isExistedHabit(user.getId(), request.getTitle())) {
             throw new AlreadyExistException("Привычка с указанным названием уже существует");
         }
-
         HabitMapper.INSTANCE.updateHabitFromDto(request, habit);
         return HabitMapper.INSTANCE.toResponse(habitDao.update(habit));
     }
@@ -68,30 +66,27 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Auditable(action = ActionType.GET)
-    public List<HabitResponse> getAllHabits(String email) {
-        User user = userService.getUserByEmail(email);
+    public List<HabitResponse> getAllHabits() {
+        Long userId = jwtUtil.getUserId(commonUtil.getAuthHeader());
+        User user = userService.getUserById(userId);
         return HabitMapper.INSTANCE.toResponseList(habitDao.getAllUserHabits(user.getId()));
     }
 
     @Auditable(action = ActionType.CREATE)
-    public HabitExecutionResponse confirmHabit(String email, HabitConfirmRequest request) {
-        User user = userService.getUserByEmail(email);
-        if (!isExistedHabit(user.getId(), request.getTitle())) {
-            throw new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", request.getTitle()));
-        }
-        Habit habit = getHabitByTitle(user, request.getTitle());
+    public HabitExecutionResponse confirmHabit(HabitConfirmRequest request) {
+        Habit habit = getHabitById(request.getHabitId());
         HabitExecution habitExecution = HabitExecution.builder()
                 .habit(habit)
                 .date(request.getDate())
                 .build();
         HabitExecutionResponse response = HabitMapper.INSTANCE.toExecutionResponse(executionDao.save(habitExecution));
-        response.setTitle(request.getTitle());
+        response.setTitle(habit.getTitle());
         return response;
     }
 
     @Auditable(action = ActionType.GET)
-    public Habit getHabitByTitle(User user, String title) {
-        return habitDao.findByTitleAndUserId(user.getId(), title).orElseThrow(
+    public Habit getHabitByUserIdAndTitle(Long userId, String title) {
+        return habitDao.findByTitleAndUserId(userId, title).orElseThrow(
                 () -> new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title))
         );
     }

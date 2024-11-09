@@ -1,8 +1,9 @@
-package com.fallt.repository.impl;
+package com.fallt.unit.repository.impl;
 
 import com.fallt.domain.entity.enums.Role;
 import com.fallt.domain.entity.User;
-import com.fallt.repository.AbstractTest;
+import com.fallt.unit.repository.AbstractTest;
+import com.fallt.repository.impl.UserDaoImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

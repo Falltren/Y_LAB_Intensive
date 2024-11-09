@@ -4,10 +4,10 @@ import com.fallt.domain.entity.Habit;
 import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
-import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,11 +34,11 @@ import static com.fallt.util.Constant.UPDATE_HABIT_QUERY;
 @Repository
 public class HabitDaoImpl implements HabitDao {
 
-    private final DbConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Override
     public Habit save(Habit habit) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HABIT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
@@ -46,12 +46,13 @@ public class HabitDaoImpl implements HabitDao {
             preparedStatement.setObject(4, habit.getCreateAt());
             preparedStatement.setLong(5, habit.getUser().getId());
             preparedStatement.executeUpdate();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                long habitId = generatedKeys.getLong(1);
-                habit.setId(habitId);
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    long habitId = generatedKeys.getLong(1);
+                    habit.setId(habitId);
+                }
+
             }
-            connectionManager.closeResultSet(generatedKeys);
             return habit;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -60,7 +61,7 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Habit update(Habit habit) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_HABIT_QUERY)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
@@ -75,22 +76,22 @@ public class HabitDaoImpl implements HabitDao {
 
     public List<Habit> getAllUserHabits(Long userId) {
         Map<Long, Habit> userHabits = new HashMap<>();
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_HABITS_QUERY)) {
             preparedStatement.setLong(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
-                if (userHabits.containsKey(id)) {
-                    Habit habit = userHabits.get(id);
-                    setExistsExecutionDate(habit, resultSet);
-                } else {
-                    Habit habit = instantiateHabit(resultSet);
-                    setExistsExecutionDate(habit, resultSet);
-                    userHabits.put(id, habit);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Long id = resultSet.getLong("id");
+                    if (userHabits.containsKey(id)) {
+                        Habit habit = userHabits.get(id);
+                        setExistsExecutionDate(habit, resultSet);
+                    } else {
+                        Habit habit = instantiateHabit(resultSet);
+                        setExistsExecutionDate(habit, resultSet);
+                        userHabits.put(id, habit);
+                    }
                 }
             }
-            connectionManager.closeResultSet(resultSet);
             return new ArrayList<>(userHabits.values());
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -99,20 +100,20 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Optional<Habit> findByTitleAndUserId(Long userId, String title) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_TITLE_AND_USER)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
-            ResultSet resultSet = preparedStatement.executeQuery();
             Habit habit = null;
-            while (resultSet.next()) {
-                if (habit == null) {
-                    habit = instantiateHabit(resultSet);
-                } else {
-                    setExistsExecutionDate(habit, resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    if (habit == null) {
+                        habit = instantiateHabit(resultSet);
+                    } else {
+                        setExistsExecutionDate(habit, resultSet);
+                    }
                 }
             }
-            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(habit);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -121,19 +122,19 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Optional<Habit> findById(Long id) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_ID)) {
             preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
             Habit habit = null;
-            while (resultSet.next()) {
-                if (habit == null) {
-                    habit = instantiateHabit(resultSet);
-                } else {
-                    setExistsExecutionDate(habit, resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    if (habit == null) {
+                        habit = instantiateHabit(resultSet);
+                    } else {
+                        setExistsExecutionDate(habit, resultSet);
+                    }
                 }
             }
-            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(habit);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -142,7 +143,7 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public void delete(Long id) {
-        try (Connection connection = connectionManager.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_HABIT)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
@@ -167,4 +168,5 @@ public class HabitDaoImpl implements HabitDao {
             habit.getSuccessfulExecution().add(date);
         }
     }
+
 }

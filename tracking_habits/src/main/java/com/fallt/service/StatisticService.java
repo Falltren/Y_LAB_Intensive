@@ -15,28 +15,25 @@ public interface StatisticService {
      * Получение общей статистики по выполнению привычки пользователем, включая название привычки,
      * % успешного выполнения и серии выполнения
      *
-     * @param userEmail Электронный адрес пользователя
-     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
+     * @param request   Объект, содержащий данные об идентификаторе привычки, а также дате начала и окончания отчетного периода
      * @return Прогресс выполнения пользователем привычки
      */
-    HabitProgress getHabitProgress(String userEmail, ReportRequest request);
+    HabitProgress getHabitProgress(ReportRequest request);
 
     /**
      * Расчет % успешного выполнения привычки за указанный период
      *
-     * @param userEmail Электронный адрес пользователя
-     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
+     * @param request   Объект, содержащий данные об идентификаторе привычки, а также дате начала и окончания отчетного периода
      * @return % успешного выполнения привычки
      */
-    int getSuccessHabitRate(String userEmail, ReportRequest request);
+    int getSuccessHabitRate(ReportRequest request);
 
     /**
      * Расчет серии выполнения привычки
      *
-     * @param userEmail Электронный адрес пользователя
-     * @param request   Объект, содержащий данные о названии привычки, а также дате начала и окончания отчетного периода
-     * @return Список с данными по выполнению привычки за указанны период
+     * @param request   Объект, содержащий данные об идентификаторе привычки, а также дате начала и окончания отчетного периода
+     * @return Список с данными по выполнению привычки за указанный период
      */
-    List<ExecutionDto> getHabitStreak(String userEmail, ReportRequest request);
+    List<ExecutionDto> getHabitStreak(ReportRequest request);
 
 }

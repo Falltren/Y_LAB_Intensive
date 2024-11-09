@@ -1,8 +1,7 @@
 package com.fallt.service;
 
 import com.fallt.domain.dto.request.LoginRequest;
-import com.fallt.domain.dto.response.UserResponse;
-import com.fallt.security.AuthenticationContext;
+import com.fallt.domain.dto.response.LoginResponse;
 
 /**
  * Аутентификация пользователя
@@ -10,12 +9,12 @@ import com.fallt.security.AuthenticationContext;
 public interface AuthService {
 
     /**
-     * Проверка наличия пользователя в базе данных
+     * Аутентификация пользователя в системе
      *
-     * @param request               Дто, содержащий электронную почту и пароль пользователя
-     * @param authenticationContext Контекст аутентификации, хранящий данные о пользователе, который вошел в приложение
-     * @return Возвращает объект класса User в случае успешной аутентификации
-     * или выбрасывается исключение AuthenticationException, если аутентификация завершилась неудачно
+     * @param request Объект, содержащий данные необходимые для идентификации пользователя
+     * @return После проверки предоставленных данных возвращается ответ, содержащий токен доступа.
+     * Если аутентификация завершилась неудачно, будет выброшено исключение AuthenticationException
      */
-    UserResponse login(LoginRequest request, String sessionId, AuthenticationContext authenticationContext);
+    LoginResponse login(LoginRequest request);
+
 }

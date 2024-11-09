@@ -5,10 +5,8 @@ import com.fallt.domain.dto.request.UpsertHabitRequest;
 import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.HabitExecutionResponse;
 import com.fallt.domain.dto.response.HabitResponse;
-import com.fallt.security.AuthenticationContext;
 import com.fallt.service.HabitService;
 import com.fallt.service.impl.ValidationService;
-import com.fallt.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,8 +35,6 @@ import java.util.List;
 public class HabitController {
 
     private final HabitService habitService;
-    private final AuthenticationContext authenticationContext;
-    private final SessionUtils sessionUtils;
     private final ValidationService validationService;
 
     @Operation(
@@ -58,8 +54,7 @@ public class HabitController {
     })
     @GetMapping
     public ResponseEntity<List<HabitResponse>> getAllHabits() {
-        String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
-        return ResponseEntity.ok(habitService.getAllHabits(userEmail));
+        return ResponseEntity.ok(habitService.getAllHabits());
     }
 
     @Operation(
@@ -83,9 +78,8 @@ public class HabitController {
     @PostMapping("/create")
     public ResponseEntity<HabitResponse> createHabit(@RequestBody UpsertHabitRequest request) {
         validationService.checkUpsertHabitRequest(request);
-        String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(habitService.saveHabit(userEmail, request));
+                .body(habitService.saveHabit(request));
     }
 
     @Operation(
@@ -109,9 +103,8 @@ public class HabitController {
     @PostMapping("/confirm")
     public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
         validationService.checkHabitConfirmRequest(request);
-        String userEmail = authenticationContext.getEmailCurrentUser(sessionUtils.getSessionIdFromContext());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(habitService.confirmHabit(userEmail, request));
+                .body(habitService.confirmHabit(request));
     }
 
     @Operation(
@@ -151,8 +144,9 @@ public class HabitController {
             })
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteHabit(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteHabit(@PathVariable Long id) {
         habitService.deleteHabit(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 }
