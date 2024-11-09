@@ -106,7 +106,7 @@ class HabitDaoImplTest extends AbstractTest {
         habit2.setUser(user);
         habitDao.save(habit1);
         habitDao.save(habit2);
-        habitDao.delete(user.getId(), FIRST_HABIT_TITLE);
+        habitDao.delete(user.getId());
 
         List<Habit> habits = habitDao.getAllUserHabits(user.getId());
 
