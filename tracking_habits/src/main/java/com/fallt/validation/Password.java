@@ -16,8 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface Password {
     String message() default "";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
+
 }

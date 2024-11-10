@@ -73,7 +73,6 @@ public class UserDaoImpl implements UserDao {
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
-
     }
 
     @Override

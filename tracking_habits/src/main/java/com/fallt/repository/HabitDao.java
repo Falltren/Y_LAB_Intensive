@@ -28,7 +28,7 @@ public interface HabitDao {
      * Получение списка привычек пользователя
      *
      * @param userId Идентификатор пользователя
-     * @return Список привычек
+     * @return Список привычек пользователя
      */
     List<Habit> getAllUserHabits(Long userId);
 
@@ -37,8 +37,8 @@ public interface HabitDao {
      *
      * @param userId Идентификатор пользователя
      * @param title  Название привычки
-     * @return Объект Optional с найденной по указанному названию привычкой или Optional.empty()
-     * если привычка не найдена
+     * @return Объект {@link Optional} с найденной по указанному названию привычкой
+     * или {@link Optional#empty()} если привычка не найдена
      */
     Optional<Habit> findByTitleAndUserId(Long userId, String title);
 
@@ -46,8 +46,8 @@ public interface HabitDao {
      * Поиск привычки по идентификатору
      *
      * @param id Идентификатор привычки
-     * @return Объект Optional с найденной по указанному идентификатору привычкой или Optional.empty()
-     * если привычка не найдена
+     * @return Объект {@link Optional} с найденной по указанному идентификатору привычкой
+     * или {@link Optional#empty()} если привычка не найдена
      */
     Optional<Habit> findById(Long id);
 

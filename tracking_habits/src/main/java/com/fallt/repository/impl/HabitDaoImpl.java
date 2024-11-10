@@ -27,9 +27,6 @@ import static com.fallt.util.Constant.FIND_HABIT_BY_TITLE_AND_USER;
 import static com.fallt.util.Constant.INSERT_HABIT_QUERY;
 import static com.fallt.util.Constant.UPDATE_HABIT_QUERY;
 
-/**
- * Класс предназначен для взаимодействия с таблицей habits посредствам SQL запросов
- */
 @RequiredArgsConstructor
 @Repository
 public class HabitDaoImpl implements HabitDao {
@@ -51,7 +48,6 @@ public class HabitDaoImpl implements HabitDao {
                     long habitId = generatedKeys.getLong(1);
                     habit.setId(habitId);
                 }
-
             }
             return habit;
         } catch (SQLException e) {

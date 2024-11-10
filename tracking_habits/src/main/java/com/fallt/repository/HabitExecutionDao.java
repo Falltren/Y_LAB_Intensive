@@ -10,7 +10,7 @@ public interface HabitExecutionDao {
     /**
      * Сохранение выполнения привычки в базу данных
      *
-     * @param execution Объект класса HabitExecution
+     * @param execution Объект класса HabitExecution, содержащий дату выполнения привычки
      */
     HabitExecution save(HabitExecution execution);
 

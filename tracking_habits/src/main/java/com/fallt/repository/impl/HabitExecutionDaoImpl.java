@@ -15,9 +15,6 @@ import java.sql.Statement;
 
 import static com.fallt.util.Constant.INSERT_HABIT_EXECUTION_QUERY;
 
-/**
- * Класс предназначен для взаимодействия с таблицей habit_execution посредствам SQL запросов
- */
 @RequiredArgsConstructor
 @Repository
 public class HabitExecutionDaoImpl implements HabitExecutionDao {

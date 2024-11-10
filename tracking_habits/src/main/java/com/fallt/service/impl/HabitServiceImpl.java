@@ -84,13 +84,6 @@ public class HabitServiceImpl implements HabitService {
         return response;
     }
 
-    @Auditable(action = ActionType.GET)
-    public Habit getHabitByUserIdAndTitle(Long userId, String title) {
-        return habitDao.findByTitleAndUserId(userId, title).orElseThrow(
-                () -> new EntityNotFoundException(MessageFormat.format("У вас отсутствует привычка с указанным названием: {0}", title))
-        );
-    }
-
     @Override
     public Habit getHabitById(Long id) {
         return habitDao.findById(id).orElseThrow(

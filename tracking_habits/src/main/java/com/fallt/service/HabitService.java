@@ -5,7 +5,6 @@ import com.fallt.domain.dto.request.UpsertHabitRequest;
 import com.fallt.domain.dto.response.HabitExecutionResponse;
 import com.fallt.domain.dto.response.HabitResponse;
 import com.fallt.domain.entity.Habit;
-import com.fallt.domain.entity.User;
 
 import java.util.List;
 
@@ -15,7 +14,8 @@ import java.util.List;
 public interface HabitService {
 
     /**
-     * @param request Объект, содержащий информацию о добавляемой привычке
+     * @param request Объект, содержащий информацию о добавляемой привычке. Если у пользователя
+     *                уже присутствует привычка с указанным названием, будет выброшено исключение AlreadyExistException
      * @return Данные о созданной пользователем привычке
      */
     HabitResponse saveHabit(UpsertHabitRequest request);
@@ -24,7 +24,8 @@ public interface HabitService {
      * Обновление привычки
      *
      * @param id      Идентификатор привычки
-     * @param request Объект с данными по измененной привычке
+     * @param request Объект с данными по измененной привычке. Если у пользователя
+     *                уже присутствует привычка с указанным названием, будет выброшено исключение AlreadyExistException
      */
     HabitResponse updateHabit(Long id, UpsertHabitRequest request);
 
@@ -48,16 +49,6 @@ public interface HabitService {
      * @param request Объект, содержащий информацию о названии привычки и дате выполнения
      */
     HabitExecutionResponse confirmHabit(HabitConfirmRequest request);
-
-    /**
-     * Получение привычки пользователя по названию
-     *
-     * @param userId  Идентификатор пользователя
-     * @param title Название привычки
-     * @return Объект класса Habit, если соответствующая привычка найдена в базе данных.
-     * Если привычка отсутствует, будет выброшено исключение EntityNotFoundException
-     */
-    Habit getHabitByUserIdAndTitle(Long userId, String title);
 
     /**
      * Получение привычки по идентификатору

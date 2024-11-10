@@ -42,8 +42,8 @@ public interface UserDao {
      * Метод поиска пользователя в базе данных по email
      *
      * @param email Электронная почта пользователя
-     * @return Объект Optional с найденным по указанному электронному адресу пользователем или Optional.empty()
-     * если пользователь не найден
+     * @return Объект {@link Optional} с найденным по указанному электронному адресу пользователем или
+     * {@link Optional#empty()} если пользователь не найден
      */
     Optional<User> getUserByEmail(String email);
 
@@ -51,8 +51,8 @@ public interface UserDao {
      * Метод поиска пользователя в базе данных по паролю
      *
      * @param password Пароль пользователя
-     * @return Объект Optional с найденным по указанному паролю пользователем или Optional.empty()
-     * если пользователь не найден
+     * @return Объект {@link Optional} с найденным по указанному паролю пользователем
+     * или {@link Optional#empty()} если пользователь не найден
      */
     Optional<User> getUserByPassword(String password);
 
@@ -60,8 +60,8 @@ public interface UserDao {
      * Поиск пользователя по идентификатору
      *
      * @param id Идентификатор пользователя
-     * @return Объект Optional с найденным по указанному идентификатору пользователем или Optional.empty()
-     * если пользователь не найден
+     * @return Объект {@link Optional} с найденным по указанному идентификатору пользователем
+     * или {@link Optional#empty()} если пользователь не найден
      */
     Optional<User> getUserById(Long id);
 
