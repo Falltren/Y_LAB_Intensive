@@ -9,4 +9,5 @@ import com.fallt.audit_starter.aop.Auditable;
  */
 public enum ActionType {
     CREATE, UPDATE, DELETE, LOGIN, GET
+
 }
