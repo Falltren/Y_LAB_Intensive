@@ -36,110 +36,53 @@ public class HabitController {
 
     private final HabitService habitService;
 
-    @Operation(
-            summary = "Получение списка привычек",
-            description = "Возвращает список привычек пользователя"
-    )
+    @Operation(summary = "Получение списка привычек")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Получение списка привычек", content = {
-                    @Content(array = @ArraySchema(schema = @Schema(implementation = HabitResponse.class)), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = HabitResponse.class)))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @GetMapping
     public ResponseEntity<List<HabitResponse>> getAllHabits() {
         return ResponseEntity.ok(habitService.getAllHabits());
     }
 
-    @Operation(
-            summary = "Добавление новой привычки",
-            description = "Добавляет новую привычку пользователю"
-    )
+    @Operation(summary = "Добавление новой привычки")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Добавление привычки", content = {
-                    @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "201", content = {@Content(schema = @Schema(implementation = HabitResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PostMapping("/create")
     public ResponseEntity<HabitResponse> createHabit(@RequestBody @Valid UpsertHabitRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(habitService.saveHabit(request));
     }
 
-    @Operation(
-            summary = "Подтверждение выполнения привычки",
-            description = "Отмечает выполнение привычки в определенную дату"
-    )
+    @Operation(summary = "Подтверждение выполнения привычки")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Подтверждение выполнения привычки", content = {
-                    @Content(schema = @Schema(implementation = HabitExecutionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "201", content = {@Content(schema = @Schema(implementation = HabitExecutionResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PostMapping("/confirm")
     public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody @Valid HabitConfirmRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(habitService.confirmHabit(request));
     }
 
-    @Operation(
-            summary = "Обновление привычки",
-            description = "Обновляет данные о привычке"
-    )
+    @Operation(summary = "Обновление привычки")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Обновление привычки", content = {
-                    @Content(schema = @Schema(implementation = HabitResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание title уже имеющейся привычки", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "404", description = "Указание отсутствующей для обновления привычки", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = HabitResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PutMapping("/{id}")
     public ResponseEntity<HabitResponse> updateHabit(@PathVariable Long id, @RequestBody UpsertHabitRequest request) {
         return ResponseEntity.ok(habitService.updateHabit(id, request));
     }
 
-    @Operation(
-            summary = "Удаление привычки",
-            description = "Удаление привычки"
-    )
+    @Operation(summary = "Удаление привычки")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Удаление привычки"),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHabit(@PathVariable Long id) {
         habitService.deleteHabit(id);

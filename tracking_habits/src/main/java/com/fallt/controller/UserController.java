@@ -34,62 +34,32 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(
-            summary = "Получение всех аккаунтов",
-            description = "Предоставляет данные по всем пользователям"
-    )
+    @Operation(summary = "Получение всех аккаунтов")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Получение списка пользователей", content = {
-                    @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class)), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "403", description = "Запрос от пользователя, не имеющего роль ROLE_ADMIN", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class)))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "403", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @GetMapping
     @HasRole(mustBe = Role.ROLE_ADMIN)
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @Operation(
-            summary = "Обновление данных о пользователе",
-            description = "Обновление данных о пользователе"
-    )
+    @Operation(summary = "Обновление данных о пользователе")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Обновление аккаунта", content = {
-                    @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Email/пароль уже используется другим пользователем", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = UserResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpsertUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
-    @Operation(
-            summary = "Блокировка пользователя",
-            description = "Запрещает пользователю вход в систему"
-    )
+    @Operation(summary = "Блокировка пользователя")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Блокировка пользователя"),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "403", description = "Запрос от пользователя, не имеющего роль ROLE_ADMIN", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "403", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})
     })
     @PutMapping("/block/{id}")
     @HasRole(mustBe = Role.ROLE_ADMIN)
@@ -98,16 +68,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Operation(
-            summary = "Удаление пользователя",
-            description = "Удаление пользователя"
-    )
+    @Operation(summary = "Удаление пользователя")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Удаление аккаунта"),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

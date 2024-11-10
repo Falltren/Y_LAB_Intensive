@@ -31,40 +31,24 @@ public class StatisticController {
     private final StatisticService statisticService;
 
     @Operation(
-            summary = "Получение полного отчета",
-            description = "Предоставляет отчет содержащий различные метрики по привычкам"
+            summary = "Получение полного отчета"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Получение полного отчета", content = {
-                    @Content(schema = @Schema(implementation = HabitProgress.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = HabitProgress.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @GetMapping("/full")
     public ResponseEntity<HabitProgress> getFullProgress(@RequestBody @Valid ReportRequest request) {
         return ResponseEntity.ok(statisticService.getHabitProgress(request));
     }
 
     @Operation(
-            summary = "Получение серии выполнения привычки",
-            description = "Предоставляет отчет, содержащий данные по выполнению привычки"
+            summary = "Получение серии выполнения привычки"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Получение отчета", content = {
-                    @Content(array = @ArraySchema(schema = @Schema(implementation = ExecutionDto.class)), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Запрос от неаутентифицированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = ExecutionDto.class)))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @GetMapping("/streak")
     public ResponseEntity<List<ExecutionDto>> getStreak(@RequestBody @Valid ReportRequest request) {
         return ResponseEntity.ok(statisticService.getHabitStreak(request));

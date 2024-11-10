@@ -31,45 +31,23 @@ public class SecurityController {
     private final AuthService authService;
     private final UserService userService;
 
-    @Operation(
-            summary = "Создание аккаунта",
-            description = "Добавляет нового пользователя в систему"
-    )
+    @Operation(summary = "Регистрация аккаунта")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Успешная регистрация пользователя", content = {
-                    @Content(schema = @Schema(implementation = UserResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Email/пароль уже используется другим пользователем", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "201", content = {@Content(schema = @Schema(implementation = UserResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UpsertUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveUser(request));
     }
 
-    @Operation(
-            summary = "Аутентификация пользователя",
-            description = "Добавляет пользователя в контекст аутентификации"
-    )
+    @Operation(summary = "Аутентификация пользователя")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешный вход в систему", content = {
-                    @Content(schema = @Schema(implementation = LoginResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Указание невалидных данных", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "401", description = "Вход заблокированного пользователя", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "404", description = "Пользователь отсутствует в системе", content = {
-                    @Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")
-            })
-    })
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = LoginResponse.class))}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))}),
+            @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class))})})
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));

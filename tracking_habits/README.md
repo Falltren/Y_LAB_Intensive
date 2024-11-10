@@ -9,16 +9,17 @@
 * Получение статистики по привычкам.
 
 #### Используемые технологии, фреймворки, библиотеки:
-Java 17, Testcontainers, Liquibase, Junit, Mockito, AspectJ, Mapstruct, Swagger, Spring
+* Java 17, Testcontainers, Liquibase, Junit, Mockito, AspectJ, Mapstruct, Swagger, Spring, Spring Boot, Hibernate Validation
+* Дополнительно были разработаны 2 spring-boot-starter, предназначенных для осуществления логирования работы приложения и аудита действий пользователей
 
 ## Настройки для запуска
 - Предварительно необходимо развернуть базу данных, для чего необходимо запустить файл `docker-compose.yml`, расположенный в директории docker. Настройки для подключения к базе данных
 указаны в файле конфигурации `application.yaml`
-- Подготовить сервер Tomcat
-- Выполнить команду `mvn clean package`, далее скопировать сформированный war файл в директорию `webapps` подготовленного сервера Tomcat
-
+- Установить JDK не менее 17 версии
+- Для активации аудита действий пользователя необходимо использовать аннотацию `EnableAudit` из `com.fallt.audit_starter.aop`
+- Выполнить команду `mvn clean package`, далее скопировать сформированный jar файл на сервер
 
 ## Запуск программы
-Запустить сервер Tomcat c с помощью файла `startup`, расположенного в директории `bin`
+При локальном запуске приложения необходимо воспользоваться средствами IDE или командой java -jar tracking_habits.jar
 После запуска, взаимодействие с приложением осуществляется с помощью отправки соответствующих http запросов
-Документация API доступна по адресу: url приложения/swagger-ui/index.html (например, localhost:8080/tracking_habits/swagger-ui/index.html)
+Документация API доступна по адресу: url/swagger-ui/index.html (например, localhost:8080/swagger-ui/index.html)
