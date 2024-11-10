@@ -23,4 +23,5 @@ public class AuditLog {
 
     @Builder.Default
     private LocalDateTime date = LocalDateTime.now();
+
 }

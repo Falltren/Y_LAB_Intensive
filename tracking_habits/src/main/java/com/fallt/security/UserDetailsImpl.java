@@ -17,4 +17,5 @@ public class UserDetailsImpl implements UserDetails {
         String authHeader = commonUtil.getAuthHeader();
         return authHeader != null ? jwtUtil.getUserEmail(commonUtil.getAuthHeader()) : "anonymous";
     }
+
 }

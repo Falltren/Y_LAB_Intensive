@@ -7,4 +7,5 @@ public final class Constant {
     public static final String INSERT_AUDIT_QUERY = """
             INSERT INTO my_schema.audit (email, action, description, date) VALUES (?, ?, ?, ?)
             """;
+
 }

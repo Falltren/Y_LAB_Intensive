@@ -64,4 +64,5 @@ public class LiquibaseConfig {
             throw new RuntimeException(e);
         }
     }
+
 }

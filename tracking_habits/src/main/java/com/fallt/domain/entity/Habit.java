@@ -33,4 +33,5 @@ public class Habit {
 
     @Builder.Default
     private Set<LocalDate> successfulExecution = new TreeSet<>();
+
 }

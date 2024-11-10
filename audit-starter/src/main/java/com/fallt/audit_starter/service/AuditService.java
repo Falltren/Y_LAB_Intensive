@@ -7,7 +7,8 @@ public interface AuditService {
     /**
      * Сохраняет действие пользователя
      *
-     * @param auditLog Действие пользователя, включающее вызываемый метод, время
+     * @param auditLog Объект, описывающий действие пользователя
      */
     void save(AuditLog auditLog);
+
 }

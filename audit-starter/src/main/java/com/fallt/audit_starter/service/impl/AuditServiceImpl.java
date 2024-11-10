@@ -4,10 +4,8 @@ import com.fallt.audit_starter.domain.entity.AuditLog;
 import com.fallt.audit_starter.repository.AuditDao;
 import com.fallt.audit_starter.service.AuditService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Service
 public class AuditServiceImpl implements AuditService {
 
     private final AuditDao auditDao;
@@ -15,4 +13,5 @@ public class AuditServiceImpl implements AuditService {
     public void save(AuditLog auditLog) {
         auditDao.save(auditLog);
     }
+
 }

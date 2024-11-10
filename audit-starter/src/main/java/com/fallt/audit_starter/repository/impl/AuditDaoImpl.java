@@ -1,11 +1,9 @@
 package com.fallt.audit_starter.repository.impl;
 
-
 import com.fallt.audit_starter.domain.entity.AuditLog;
 import com.fallt.audit_starter.repository.AuditDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -15,7 +13,6 @@ import java.sql.Statement;
 
 import static com.fallt.audit_starter.repository.Constant.INSERT_AUDIT_QUERY;
 
-@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class AuditDaoImpl implements AuditDao {
@@ -35,4 +32,5 @@ public class AuditDaoImpl implements AuditDao {
             log.error("Ошибка при выполнении запроса {}", e.getMessage());
         }
     }
+
 }

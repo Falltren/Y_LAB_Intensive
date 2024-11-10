@@ -1,6 +1,5 @@
 package com.fallt.audit_starter.aop;
 
-import com.fallt.audit_starter.condition.EnableAuditCondition;
 import com.fallt.audit_starter.domain.entity.AuditLog;
 import com.fallt.audit_starter.domain.entity.enums.ActionType;
 import com.fallt.audit_starter.security.UserDetails;
@@ -9,12 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 
 @Aspect
-@Component
-@Conditional(EnableAuditCondition.class)
 @RequiredArgsConstructor
 public class AuditAspect {
 
