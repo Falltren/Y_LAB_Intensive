@@ -99,6 +99,10 @@ public class StatisticServiceImpl implements StatisticService {
         List<ExecutionDto> result = new ArrayList<>();
         LocalDate startOfMonth = start;
         LocalDate endOfMonth = start.withDayOfMonth(start.getMonth().length(start.isLeapYear()));
+        if (end.isBefore(endOfMonth) && !executed.isEmpty()) {
+            result.add(new ExecutionDto(start, end, true));
+            return result;
+        }
         while (!endOfMonth.isAfter(end)) {
             if (executed.isEmpty()) {
                 result.add(new ExecutionDto(startOfMonth, endOfMonth, false));

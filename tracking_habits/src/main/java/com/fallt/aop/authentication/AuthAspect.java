@@ -29,7 +29,7 @@ public class AuthAspect {
         Method method = signature.getMethod();
         HasRole hasRole = method.getAnnotation(HasRole.class);
         if (hasRole != null) {
-            jwtUtil.verifyAdminTokenFromHeader(authHeader, hasRole.mustBe());
+            jwtUtil.verifyUserRole(authHeader, hasRole.mustBe());
         } else {
             jwtUtil.verifyTokenFromHeader(authHeader);
         }

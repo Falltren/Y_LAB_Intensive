@@ -153,13 +153,15 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     private Habit instantiateHabit(ResultSet resultSet) throws SQLException {
-        return Habit.builder()
+        Habit habit = Habit.builder()
                 .id(resultSet.getLong("id"))
                 .title(resultSet.getString("title"))
                 .text(resultSet.getString("text"))
                 .executionRate(ExecutionRate.valueOf(resultSet.getString("execution_rate")))
                 .createAt(resultSet.getObject("create_at", LocalDate.class))
                 .build();
+        setExistsExecutionDate(habit, resultSet);
+        return habit;
     }
 
     private void setExistsExecutionDate(Habit habit, ResultSet resultSet) throws SQLException {

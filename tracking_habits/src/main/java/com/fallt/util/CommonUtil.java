@@ -14,4 +14,5 @@ public class CommonUtil {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         return request.getHeader("Authorization");
     }
+
 }

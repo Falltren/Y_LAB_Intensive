@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.fallt.util.Constant.PASSWORD_FORMAT_MESSAGE;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +19,7 @@ public class LoginRequest {
     @Email(regexp = "^[A-z0-9._%+-]+@[A-z0-9.-]+\\.[A-z]{2,6}$", message = Constant.INCORRECT_EMAIL_FORMAT_MESSAGE)
     private String email;
 
-    @Password(message = Constant.PASSWORD_FORMAT_MASSAGE)
+    @Password(message = PASSWORD_FORMAT_MESSAGE)
     private String password;
 
 }

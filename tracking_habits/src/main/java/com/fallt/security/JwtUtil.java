@@ -58,7 +58,7 @@ public class JwtUtil {
         }
     }
 
-    public void verifyAdminTokenFromHeader(String authHeader, Role role) {
+    public void verifyUserRole(String authHeader, Role role) {
         verifyTokenFromHeader(authHeader);
         if (!getUserRole(authHeader).equals(role.name())) {
             throw new AuthorizationException("У вас нет прав на данное действие");

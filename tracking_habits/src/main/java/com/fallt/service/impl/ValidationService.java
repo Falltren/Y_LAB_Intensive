@@ -45,7 +45,7 @@ public class ValidationService {
             throw new ValidationException("Название привычки должно содержать от 3 до 30 символов");
         }
         if (request.getText() == null || request.getText().length() < 3 || request.getText().length() > 100) {
-            throw new ValidationException("Описание привычки должно содержать от 3 до 100 символов");
+            throw new ValidationException("Описание привычки должно содержать не более 100 символов");
         }
         if (request.getRate() == null) {
             throw new ValidationException("Частота выполнения привычки должна быть указана");

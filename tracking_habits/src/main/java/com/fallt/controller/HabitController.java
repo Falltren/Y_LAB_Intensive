@@ -6,7 +6,6 @@ import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.HabitExecutionResponse;
 import com.fallt.domain.dto.response.HabitResponse;
 import com.fallt.service.HabitService;
-import com.fallt.service.impl.ValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,6 @@ import java.util.List;
 public class HabitController {
 
     private final HabitService habitService;
-    private final ValidationService validationService;
 
     @Operation(
             summary = "Получение списка привычек",
@@ -76,8 +75,7 @@ public class HabitController {
             })
     })
     @PostMapping("/create")
-    public ResponseEntity<HabitResponse> createHabit(@RequestBody UpsertHabitRequest request) {
-        validationService.checkUpsertHabitRequest(request);
+    public ResponseEntity<HabitResponse> createHabit(@RequestBody @Valid UpsertHabitRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(habitService.saveHabit(request));
     }
@@ -102,7 +100,6 @@ public class HabitController {
     })
     @PostMapping("/confirm")
     public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
-        validationService.checkHabitConfirmRequest(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(habitService.confirmHabit(request));
     }

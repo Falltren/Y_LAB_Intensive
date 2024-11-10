@@ -5,7 +5,6 @@ import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.ExecutionDto;
 import com.fallt.domain.dto.response.HabitProgress;
 import com.fallt.service.StatisticService;
-import com.fallt.service.impl.ValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,6 @@ import java.util.List;
 public class StatisticController {
 
     private final StatisticService statisticService;
-    private final ValidationService validationService;
 
     @Operation(
             summary = "Получение полного отчета",
@@ -47,8 +46,7 @@ public class StatisticController {
             })
     })
     @GetMapping("/full")
-    public ResponseEntity<HabitProgress> getFullProgress(@RequestBody ReportRequest request) {
-        validationService.checkReportRequest(request);
+    public ResponseEntity<HabitProgress> getFullProgress(@RequestBody @Valid ReportRequest request) {
         return ResponseEntity.ok(statisticService.getHabitProgress(request));
     }
 
@@ -68,8 +66,7 @@ public class StatisticController {
             })
     })
     @GetMapping("/streak")
-    public ResponseEntity<List<ExecutionDto>> getStreak(@RequestBody ReportRequest request) {
-        validationService.checkReportRequest(request);
+    public ResponseEntity<List<ExecutionDto>> getStreak(@RequestBody @Valid ReportRequest request) {
         return ResponseEntity.ok(statisticService.getHabitStreak(request));
     }
 
