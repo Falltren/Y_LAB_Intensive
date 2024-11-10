@@ -70,7 +70,11 @@ public final class Constant {
     public static final String INSERT_HABIT_EXECUTION_QUERY = """
             INSERT INTO my_schema.habit_execution (date, habit_id) VALUES (?, ?)
             """;
-    public static final String INSERT_AUDIT_QUERY = """
-            INSERT INTO my_schema.audit (email, action, description, date) VALUES (?, ?, ?, ?)
-            """;
+    public static final String INCORRECT_EMAIL_MESSAGE = "Электронная почта должна быть указана";
+    public static final String NAME_LENGTH_MASSAGE = "Имя должно содержать от 3 до 30 символов";
+    public static final String PASSWORD_FORMAT_MASSAGE = "Неверный формат пароля. Пароль должен состоять из букв, цифр и символов. Обязательно содержать заглавную латинскую букву, цифру и иметь длину не менее 8 символов";
+    public static final String NOT_BLANK_MESSAGE = "Поле должно быть заполнено";
+    public static final String INCORRECT_EMAIL_FORMAT_MESSAGE = "Неверный формат email";
+    public static final String MAX_EMAIL_LENGTH_MESSAGE = "Длина email должна быть не более 30 символов";
+
 }

@@ -1,8 +1,10 @@
 package com.fallt.controller;
 
+import com.fallt.aop.authentication.HasRole;
 import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.domain.dto.response.ExceptionResponse;
 import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.enums.Role;
 import com.fallt.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -48,6 +50,7 @@ public class UserController {
             })
     })
     @GetMapping
+    @HasRole(mustBe = Role.ROLE_ADMIN)
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -89,6 +92,7 @@ public class UserController {
             })
     })
     @PutMapping("/block/{id}")
+    @HasRole(mustBe = Role.ROLE_ADMIN)
     public ResponseEntity<Void> blockUser(@PathVariable Long id) {
         userService.blockingUser(id);
         return ResponseEntity.status(HttpStatus.OK).build();

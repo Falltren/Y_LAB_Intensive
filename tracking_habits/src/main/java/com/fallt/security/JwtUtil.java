@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.fallt.domain.entity.enums.Role;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.AuthorizationException;
 import jakarta.annotation.PostConstruct;
@@ -57,9 +58,9 @@ public class JwtUtil {
         }
     }
 
-    public void verifyAdminTokenFromHeader(String authHeader) {
+    public void verifyAdminTokenFromHeader(String authHeader, Role role) {
         verifyTokenFromHeader(authHeader);
-        if (!getUserRole(authHeader).equals("ROLE_ADMIN")) {
+        if (!getUserRole(authHeader).equals(role.name())) {
             throw new AuthorizationException("У вас нет прав на данное действие");
         }
     }

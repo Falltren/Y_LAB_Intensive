@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.fallt.util.Constant.INCORRECT_EMAIL_MESSAGE;
+
 @Service
 public class ValidationService {
 
@@ -23,14 +25,14 @@ public class ValidationService {
             throw new ValidationException("Пароль должен содержать от 3 до 20 символов");
         }
         if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new ValidationException("Значение электронной почты должно быть указано");
+            throw new ValidationException(INCORRECT_EMAIL_MESSAGE);
         }
         return true;
     }
 
     public boolean checkLoginRequest(LoginRequest request) {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new ValidationException("Электронная почта должна быть указана");
+            throw new ValidationException(INCORRECT_EMAIL_MESSAGE);
         }
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new ValidationException("Пароль должен быть указан");

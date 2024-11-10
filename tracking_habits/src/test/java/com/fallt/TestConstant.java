@@ -17,12 +17,16 @@ import java.util.ArrayList;
 
 public class TestConstant {
 
+    public static final Long ADMIN_ID = 100L;
+    public static final Long FIRST_USER_ID = 101L;
+    public static final Long SECOND_USER_ID = 102L;
+    public static final String USER_ROLE = Role.ROLE_USER.name();
     public static final String FIRST_USER_NAME = "user1";
     public static final String SECOND_USER_NAME = "user2";
-    public static final String FIRST_USER_EMAIL = "email1";
-    public static final String SECOND_USER_EMAIL = "email2";
-    public static final String FIRST_USER_PASSWORD = "pwd1";
-    public static final String SECOND_USER_PASSWORD = "pwd2";
+    public static final String FIRST_USER_EMAIL = "email1@user.com";
+    public static final String SECOND_USER_EMAIL = "email2@user.com";
+    public static final String FIRST_USER_PASSWORD = "user1Pass";
+    public static final String SECOND_USER_PASSWORD = "user2Pass";
     public static final String FIRST_HABIT_TITLE = "title1";
     public static final String SECOND_HABIT_TITLE = "title2";
     public static final String HABIT_TEXT = "text";

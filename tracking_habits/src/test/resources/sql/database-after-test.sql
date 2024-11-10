@@ -1,0 +1,1 @@
+TRUNCATE TABLE my_schema.users cascade;

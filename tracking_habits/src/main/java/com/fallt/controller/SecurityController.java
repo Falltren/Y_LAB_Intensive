@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,6 @@ public class SecurityController {
 
     private final AuthService authService;
     private final UserService userService;
-    private final ValidationService validationService;
 
     @Operation(
             summary = "Создание аккаунта",
@@ -48,8 +48,7 @@ public class SecurityController {
             })
     })
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UpsertUserRequest request) {
-        validationService.checkUpsertUserRequest(request);
+    public ResponseEntity<UserResponse> register(@RequestBody @Valid UpsertUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveUser(request));
     }
@@ -73,8 +72,7 @@ public class SecurityController {
             })
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        validationService.checkLoginRequest(request);
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
