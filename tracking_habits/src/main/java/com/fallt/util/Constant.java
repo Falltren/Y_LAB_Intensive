@@ -34,9 +34,6 @@ public final class Constant {
             SELECT * FROM my_schema.users
             WHERE id = ?
             """;
-    public static final String DELETE_ALL_USERS_QUERY = """
-            DELETE FROM my_schema.users
-            """;
     public static final String INSERT_HABIT_QUERY = """
             INSERT INTO my_schema.habits (title, text, execution_rate, create_at, user_id)
             VALUES (?, ?, ?, ?, ?)
@@ -74,6 +71,7 @@ public final class Constant {
     public static final String NAME_LENGTH_MESSAGE = "Имя должно содержать от 3 до 30 символов";
     public static final String PASSWORD_FORMAT_MESSAGE = "Неверный формат пароля. Пароль должен состоять из букв, цифр и символов. Обязательно содержать заглавную латинскую букву, цифру и иметь длину не менее 8 символов";
     public static final String NOT_BLANK_MESSAGE = "Поле должно быть заполнено";
+    public static final String NOT_NULL_MESSAGE = "Поле не может быть пустым";
     public static final String INCORRECT_EMAIL_FORMAT_MESSAGE = "Неверный формат email";
     public static final String MAX_EMAIL_LENGTH_MESSAGE = "Длина email должна быть не более 30 символов";
     public static final String REPORT_PERIOD_MESSAGE = "Дата окончания не может предшествовать дате начала периода";

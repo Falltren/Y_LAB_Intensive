@@ -99,7 +99,7 @@ public class HabitController {
             })
     })
     @PostMapping("/confirm")
-    public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody HabitConfirmRequest request) {
+    public ResponseEntity<HabitExecutionResponse> confirmHabitExecution(@RequestBody @Valid HabitConfirmRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(habitService.confirmHabit(request));
     }

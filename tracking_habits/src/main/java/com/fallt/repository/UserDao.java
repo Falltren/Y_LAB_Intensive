@@ -65,9 +65,4 @@ public interface UserDao {
      */
     Optional<User> getUserById(Long id);
 
-    /**
-     * Удаление всех пользователей из базы данных
-     */
-    void deleteAll();
-
 }

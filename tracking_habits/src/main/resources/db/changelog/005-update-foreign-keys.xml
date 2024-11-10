@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
+                   logicalFilePath="db/changelog/changelog-master.xml">
+    <changeSet id="005-update-foreign-keys" author="fallt">
+
+        <dropForeignKeyConstraint
+                baseTableSchemaName="my_schema"
+                baseTableName="habits"
+                constraintName="fk_habit_user"/>
+
+        <dropForeignKeyConstraint
+                baseTableSchemaName="my_schema"
+                baseTableName="habit_execution"
+                constraintName="fk_execution_habit"/>
+
+        <addForeignKeyConstraint baseTableSchemaName="my_schema"
+                                 baseTableName="habits"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_habit_user"
+                                 referencedTableSchemaName="my_schema"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableSchemaName="my_schema"
+                                 baseTableName="habit_execution"
+                                 baseColumnNames="habit_id"
+                                 constraintName="fk_execution_habit"
+                                 referencedTableSchemaName="my_schema"
+                                 referencedTableName="habits"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

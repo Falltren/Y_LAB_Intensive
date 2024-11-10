@@ -7,7 +7,6 @@ import com.fallt.domain.dto.response.LoginResponse;
 import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.service.AuthService;
 import com.fallt.service.UserService;
-import com.fallt.service.impl.ValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

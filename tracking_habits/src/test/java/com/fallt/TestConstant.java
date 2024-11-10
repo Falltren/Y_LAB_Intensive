@@ -1,16 +1,13 @@
-package com.fallt.controller;
+package com.fallt;
 
 import com.fallt.domain.dto.request.HabitConfirmRequest;
 import com.fallt.domain.dto.request.LoginRequest;
 import com.fallt.domain.dto.request.ReportRequest;
 import com.fallt.domain.dto.request.UpsertHabitRequest;
 import com.fallt.domain.dto.request.UpsertUserRequest;
-import com.fallt.domain.dto.response.HabitResponse;
-import com.fallt.domain.dto.response.UserResponse;
 import com.fallt.domain.entity.enums.Role;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class TestConstant {
 
@@ -20,6 +17,7 @@ public class TestConstant {
     public static final Long WEEKLY_HABIT_ID = 100L;
     public static final Long MONTHLY_HABIT_ID = 101L;
     public static final Long DAILY_HABIT_ID = 102L;
+    public static final Long NOT_EXIST_ID = 1000L;
     public static final String ROLE_USER = Role.ROLE_USER.name();
     public static final String ROLE_ADMIN = Role.ROLE_ADMIN.name();
     public static final String ADMIN_NAME = "admin";
@@ -45,22 +43,18 @@ public class TestConstant {
             .email(FIRST_USER_EMAIL)
             .password(FIRST_USER_PASSWORD)
             .build();
-    public static final UserResponse USER_RESPONSE = UserResponse.builder()
-            .name(FIRST_USER_NAME)
-            .email(FIRST_USER_EMAIL)
-            .build();
-    public static final UpsertHabitRequest HABIT_REQUEST = UpsertHabitRequest.builder()
+    public static final UpsertHabitRequest NEW_HABIT_REQUEST = UpsertHabitRequest.builder()
             .title(NEW_HABIT_TITLE)
             .text(HABIT_TEXT)
             .rate(WEEKLY_HABIT)
             .build();
-    public static final HabitResponse HABIT_RESPONSE = HabitResponse.builder()
+    public static final UpsertHabitRequest EXIST_HABIT_REQUEST = UpsertHabitRequest.builder()
             .title(FIRST_HABIT_TITLE)
             .text(HABIT_TEXT)
-            .successfulExecution(new ArrayList<>())
+            .rate(DAILY_HABIT)
             .build();
     public static final HabitConfirmRequest CONFIRM_REQUEST = HabitConfirmRequest.builder()
-            .habitId(1L)
+            .habitId(WEEKLY_HABIT_ID)
             .date(LocalDate.now())
             .build();
     public static final ReportRequest REPORT_REQUEST = ReportRequest.builder()
@@ -73,6 +67,7 @@ public class TestConstant {
             .password(FIRST_USER_PASSWORD)
             .build();
     public static final String USER_CONTROLLER_PATH = "/api/v1/users";
+    public static final String USER_BY_ID = "/api/v1/users/{id}";
     public static final String USER_BLOCK_PATH = "/api/v1/users/block/{id}";
     public static final String CREATE_HABIT_PATH = "/api/v1/habits/create";
     public static final String HABIT_BY_ID_PATH = "/api/v1/habits/{id}";

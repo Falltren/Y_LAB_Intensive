@@ -1,6 +1,3 @@
-TRUNCATE TABLE my_schema.users cascade;
-TRUNCATE TABLE my_schema.habits cascade;
-TRUNCATE TABLE my_schema.habit_execution cascade;
 
 INSERT INTO my_schema.users (id, name, email, password, role, create_at, update_at, is_blocked, is_active)
 VALUES (100, 'admin', 'admin@admin.com', '$2a$10$o64Ue.UXV/CxRdXis.7Sle.IeMfoAKbsHVSSEPoLcrwUDDdAcOYlK', 'ROLE_ADMIN', '2024-09-01 12:00:00.000000', null, false, true),

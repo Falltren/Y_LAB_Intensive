@@ -6,7 +6,6 @@ import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.AuthorizationException;
 import com.fallt.exception.DBException;
 import com.fallt.exception.EntityNotFoundException;
-import com.fallt.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,7 +38,7 @@ public class GlobalExceptionHandler {
                 .body(body);
     }
 
-    @ExceptionHandler({ValidationException.class, AlreadyExistException.class})
+    @ExceptionHandler(AlreadyExistException.class)
     public ResponseEntity<ExceptionResponse> handleValidationAndAlreadyExistsException(Exception e) {
         ExceptionResponse body = ExceptionResponse.builder()
                 .timestamp(System.currentTimeMillis())

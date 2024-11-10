@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.fallt.util.Constant.DELETE_ALL_USERS_QUERY;
 import static com.fallt.util.Constant.DELETE_USER_QUERY;
 import static com.fallt.util.Constant.FIND_ALL_USERS_QUERY;
 import static com.fallt.util.Constant.FIND_USER_BY_EMAIL_QUERY;
@@ -150,16 +149,6 @@ public class UserDaoImpl implements UserDao {
                 }
             }
             return Optional.ofNullable(user);
-        } catch (SQLException e) {
-            throw new DBException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteAll() {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL_USERS_QUERY)) {
-            preparedStatement.execute();
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
