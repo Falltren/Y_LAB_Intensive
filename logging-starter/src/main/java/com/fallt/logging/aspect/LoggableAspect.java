@@ -26,4 +26,5 @@ public class LoggableAspect {
         log.info("Execution of method {} finished. Execution time is: {} ms.", methodName, time);
         return result;
     }
+
 }
