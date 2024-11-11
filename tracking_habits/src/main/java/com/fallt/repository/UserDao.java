@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.User;
+import com.fallt.domain.entity.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +27,9 @@ public interface UserDao {
     /**
      * Удаление пользователя из базы данных
      *
-     * @param email Электронная почта пользователя
+     * @param id Идентификатор пользователя
      */
-    void delete(String email);
+    void delete(Long id);
 
     /**
      * Получение списка пользователей из базы данных
@@ -42,8 +42,8 @@ public interface UserDao {
      * Метод поиска пользователя в базе данных по email
      *
      * @param email Электронная почта пользователя
-     * @return Объект Optional с найденным по указанному электронному адресу пользователем или Optional.empty()
-     * если пользователь не найден
+     * @return Объект {@link Optional} с найденным по указанному электронному адресу пользователем или
+     * {@link Optional#empty()} если пользователь не найден
      */
     Optional<User> getUserByEmail(String email);
 
@@ -51,14 +51,18 @@ public interface UserDao {
      * Метод поиска пользователя в базе данных по паролю
      *
      * @param password Пароль пользователя
-     * @return Объект Optional с найденным по указанному паролю пользователем или Optional.empty()
-     * если пользователь не найден
+     * @return Объект {@link Optional} с найденным по указанному паролю пользователем
+     * или {@link Optional#empty()} если пользователь не найден
      */
     Optional<User> getUserByPassword(String password);
 
     /**
-     * Удаление всех пользователей из базы данных
+     * Поиск пользователя по идентификатору
+     *
+     * @param id Идентификатор пользователя
+     * @return Объект {@link Optional} с найденным по указанному идентификатору пользователем
+     * или {@link Optional#empty()} если пользователь не найден
      */
-    void deleteAll();
+    Optional<User> getUserById(Long id);
 
 }

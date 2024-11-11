@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.Habit;
+import com.fallt.domain.entity.Habit;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public interface HabitDao {
      * Получение списка привычек пользователя
      *
      * @param userId Идентификатор пользователя
-     * @return Список привычек
+     * @return Список привычек пользователя
      */
     List<Habit> getAllUserHabits(Long userId);
 
@@ -37,17 +37,25 @@ public interface HabitDao {
      *
      * @param userId Идентификатор пользователя
      * @param title  Название привычки
-     * @return Объект Optional с найденной по указанному названию привычкой или Optional.empty()
-     * если привычка не найдена
+     * @return Объект {@link Optional} с найденной по указанному названию привычкой
+     * или {@link Optional#empty()} если привычка не найдена
      */
-    Optional<Habit> findHabitByTitleAndUserId(Long userId, String title);
+    Optional<Habit> findByTitleAndUserId(Long userId, String title);
 
     /**
-     * Удаление привычки пользователя по ее названию
+     * Поиск привычки по идентификатору
      *
-     * @param id    Идентификатор пользователя
-     * @param title Название привычки
+     * @param id Идентификатор привычки
+     * @return Объект {@link Optional} с найденной по указанному идентификатору привычкой
+     * или {@link Optional#empty()} если привычка не найдена
      */
-    void delete(Long id, String title);
+    Optional<Habit> findById(Long id);
+
+    /**
+     * Удаление привычки пользователя
+     *
+     * @param id Идентификатор привычки
+     */
+    void delete(Long id);
 
 }

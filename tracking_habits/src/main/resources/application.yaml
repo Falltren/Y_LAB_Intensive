@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/habit_db
+    username: y_lab_user
+    password: y_lab_password
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: my_schema
+    liquibase-schema: service_schema
+
+jwt:
+  secretKey: some
+  lifeTime: 1800000
+  issuer: habits

@@ -1,22 +1,20 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.LoginRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.security.AuthenticationContext;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.response.LoginResponse;
 
 /**
- * Аутентификация пользователя в системе
+ * Аутентификация пользователя
  */
 public interface AuthService {
 
     /**
-     * Добавляет пользователя в контекст аутентификации
+     * Аутентификация пользователя в системе
      *
-     * @param request               Объект, содержащий электронную почту и пароль пользователя
-     * @param authenticationContext Контекст аутентификации, хранящий данные о пользователе, который вошел в систему
-     * @return Возвращает объект ответ, содержащий дынные, вошедшего в систему пользователя. Если пользователь не будет
-     * найден в системе, будет выброшено EntityNotFoundException, если пользователь был заблокирован,
-     * то будет выброшено AuthenticationException
+     * @param request Объект, содержащий данные необходимые для идентификации пользователя
+     * @return После проверки предоставленных данных возвращается ответ, содержащий токен доступа.
+     * Если аутентификация завершилась неудачно, будет выброшено исключение AuthenticationException
      */
-    UserResponse login(LoginRequest request, AuthenticationContext authenticationContext);
+    LoginResponse login(LoginRequest request);
+
 }

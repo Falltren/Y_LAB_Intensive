@@ -1,17 +1,16 @@
 package com.fallt.service.impl;
 
-import com.fallt.aop.audit.ActionType;
-import com.fallt.aop.audit.Auditable;
-import com.fallt.aop.logging.Loggable;
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.response.ExecutionDto;
-import com.fallt.dto.response.HabitProgress;
-import com.fallt.entity.Habit;
-import com.fallt.entity.User;
+import com.fallt.audit_starter.aop.Auditable;
+import com.fallt.audit_starter.domain.entity.enums.ActionType;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.response.ExecutionDto;
+import com.fallt.domain.dto.response.HabitProgress;
+import com.fallt.domain.entity.Habit;
+import com.fallt.logging.annotation.Loggable;
 import com.fallt.service.HabitService;
 import com.fallt.service.StatisticService;
-import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,33 +18,30 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class StatisticServiceImpl implements StatisticService {
 
     private final HabitService habitService;
 
-    private final UserService userService;
-
     @Auditable(action = ActionType.GET)
-    public HabitProgress getHabitProgress(String userEmail, ReportRequest request) {
-        User user = userService.getUserByEmail(userEmail);
-        Habit habit = habitService.getHabitByTitle(user, request.getTitle());
+    public HabitProgress getHabitProgress(ReportRequest request) {
+        Habit habit = habitService.getHabitById(request.getHabitId());
         HabitProgress progress = new HabitProgress();
         progress.setTitle(habit.getTitle());
-        List<ExecutionDto> executions = getHabitStreak(userEmail, request);
+        List<ExecutionDto> executions = getHabitStreak(request);
         progress.setSuccessRate(calculateSuccessRate(executions));
         progress.setExecution(executions);
         return progress;
     }
 
-    public int getSuccessHabitRate(String userEmail, ReportRequest request) {
-        List<ExecutionDto> executions = getHabitStreak(userEmail, request);
+    public int getSuccessHabitRate(ReportRequest request) {
+        List<ExecutionDto> executions = getHabitStreak(request);
         return calculateSuccessRate(executions);
     }
 
     @Auditable(action = ActionType.GET)
-    public List<ExecutionDto> getHabitStreak(String userEmail, ReportRequest request) {
-        User user = userService.getUserByEmail(userEmail);
-        Habit habit = habitService.getHabitByTitle(user, request.getTitle());
+    public List<ExecutionDto> getHabitStreak(ReportRequest request) {
+        Habit habit = habitService.getHabitById(request.getHabitId());
         return switch (habit.getExecutionRate()) {
             case DAILY -> getDailyHabitStreak(habit, request.getStart(), request.getEnd());
             case WEEKLY -> getWeeklyHabitStreak(habit, request.getStart(), request.getEnd());
@@ -103,6 +99,10 @@ public class StatisticServiceImpl implements StatisticService {
         List<ExecutionDto> result = new ArrayList<>();
         LocalDate startOfMonth = start;
         LocalDate endOfMonth = start.withDayOfMonth(start.getMonth().length(start.isLeapYear()));
+        if (end.isBefore(endOfMonth) && !executed.isEmpty()) {
+            result.add(new ExecutionDto(start, end, true));
+            return result;
+        }
         while (!endOfMonth.isAfter(end)) {
             if (executed.isEmpty()) {
                 result.add(new ExecutionDto(startOfMonth, endOfMonth, false));
@@ -122,4 +122,5 @@ public class StatisticServiceImpl implements StatisticService {
         }
         return result;
     }
+
 }
