@@ -16,13 +16,10 @@ import static com.fallt.TestConstant.AUTHORIZATION_HEADER;
 import static com.fallt.TestConstant.DAILY_HABIT_ID;
 import static com.fallt.TestConstant.END_PERIOD;
 import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
-import static com.fallt.TestConstant.FIRST_USER_EMAIL;
-import static com.fallt.TestConstant.FIRST_USER_ID;
 import static com.fallt.TestConstant.FULL_REPORT_PATH;
 import static com.fallt.TestConstant.MONTHLY_HABIT_ID;
 import static com.fallt.TestConstant.NOT_EXIST_ID;
 import static com.fallt.TestConstant.REPORT_REQUEST;
-import static com.fallt.TestConstant.ROLE_USER;
 import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
 import static com.fallt.TestConstant.START_PERIOD;
 import static com.fallt.TestConstant.STREAK_REPORT_PATH;
@@ -38,7 +35,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Получение полной статистики привычки с недельной частотой выполнения")
     void whenGetFullStatisticWeeklyHabit_thenReturnReport() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         String content = objectMapper.writeValueAsString(REPORT_REQUEST);
         List<ExecutionDto> executionDtos = List.of(
                 new ExecutionDto(LocalDate.of(2024, 10, 1), LocalDate.of(2024, 10, 6), true),
@@ -63,7 +59,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Получение полной статистики привычки с месячной частотой выполнения")
     void whenGetFullStatisticMonthlyHabit_thenReturnReport() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         ReportRequest request = ReportRequest.builder()
                 .habitId(MONTHLY_HABIT_ID)
                 .start(START_PERIOD)
@@ -89,7 +84,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Получение полной статистики привычки с ежедневной частотой выполнения")
     void whenGetFullStatisticDailyHabit_thenReturnReport() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         ReportRequest request = ReportRequest.builder()
                 .habitId(DAILY_HABIT_ID)
                 .start(LocalDate.of(2024, 10, 21))
@@ -132,7 +126,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка получения полной статистики с указанием некорректного периода")
     void whenGetFullStatisticByIncorrectTitle_thenReturnBadRequest() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         LocalDate startPeriod = LocalDate.now();
         ReportRequest request = ReportRequest.builder()
                 .habitId(100L)
@@ -152,7 +145,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка получений полной статистики по отсутствующей привычки")
     void whenGetFullStatisticByNotExistHabit_thenReturnNotFound() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         ReportRequest request = ReportRequest.builder()
                 .habitId(NOT_EXIST_ID)
                 .start(LocalDate.now())
@@ -171,7 +163,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Получение серии выполнения привычки")
     void whenGetStreak_thenReturnOk() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         String content = objectMapper.writeValueAsString(REPORT_REQUEST);
 
         mockMvc.perform(get(STREAK_REPORT_PATH)
@@ -197,7 +188,6 @@ class StatisticControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка получения серии выполнения отсутствующей привычки")
     void whenGetStreakByNotExistHabit_thenReturnNotFound() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         ReportRequest request = ReportRequest.builder()
                 .habitId(NOT_EXIST_ID)
                 .start(LocalDate.now())

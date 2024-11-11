@@ -17,7 +17,6 @@ import static com.fallt.TestConstant.FIRST_USER_EMAIL;
 import static com.fallt.TestConstant.FIRST_USER_ID;
 import static com.fallt.TestConstant.FIRST_USER_NAME;
 import static com.fallt.TestConstant.ROLE_ADMIN;
-import static com.fallt.TestConstant.ROLE_USER;
 import static com.fallt.TestConstant.SECOND_USER_EMAIL;
 import static com.fallt.TestConstant.SECOND_USER_ID;
 import static com.fallt.TestConstant.SECOND_USER_NAME;
@@ -36,7 +35,6 @@ class UserControllerTest extends AbstractTest {
     @Test
     @DisplayName("Обновление данных о пользователе")
     void whenUpdateUser_thenReturnOk() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         UpsertUserRequest request = UpsertUserRequest.builder()
                 .email(SECOND_USER_EMAIL)
                 .name(SECOND_USER_NAME)
@@ -59,7 +57,6 @@ class UserControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка обновления данных о пользователе с указанием используемого email")
     void whenUpdateUserWithExistsEmail_thenReturnBadRequest() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
         UpsertUserRequest request = UpsertUserRequest.builder()
                 .email(ADMIN_EMAIL)
                 .name(SECOND_USER_NAME)
@@ -94,8 +91,6 @@ class UserControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка получения данных о всех пользователях пользователем без роли ADMIN")
     void whenUserWithoutRoleAdminGetAllUsers_thenReturnForbidden() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
-
         mockMvc.perform(get(USER_CONTROLLER_PATH)
                         .header(AUTHORIZATION_HEADER, token))
                 .andDo(print())
@@ -116,8 +111,6 @@ class UserControllerTest extends AbstractTest {
     @Test
     @DisplayName("Попытка блокировки пользователя пользователем без роли ADMIN")
     void whenUserWithoutRoleAdminBlockingUser_thenReturnForbidden() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
-
         mockMvc.perform(put(USER_BLOCK_PATH, SECOND_USER_ID)
                         .header(AUTHORIZATION_HEADER, token))
                 .andDo(print())
@@ -127,8 +120,6 @@ class UserControllerTest extends AbstractTest {
     @Test
     @DisplayName("Удаление пользователя")
     void whenDeleteUser_thenReturnNoContent() throws Exception {
-        String token = createJwtToken(FIRST_USER_ID, FIRST_USER_EMAIL, ROLE_USER);
-
         mockMvc.perform(delete(USER_BY_ID, FIRST_USER_ID)
                         .header(AUTHORIZATION_HEADER, token))
                 .andDo(print())
