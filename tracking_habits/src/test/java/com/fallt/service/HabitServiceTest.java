@@ -1,30 +1,19 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.HabitExecutionResponse;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.entity.Habit;
-import com.fallt.entity.HabitExecution;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.response.HabitExecutionResponse;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.HabitExecution;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.repository.HabitDao;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.security.AuthenticationContext;
-import com.fallt.service.impl.AuditServiceImpl;
 import com.fallt.service.impl.HabitServiceImpl;
-import com.fallt.service.impl.UserServiceImpl;
-import com.fallt.util.InstanceCreator;
-import jakarta.servlet.ServletContext;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -32,17 +21,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.fallt.TestConstant.*;
-import static com.fallt.util.Constant.AUDIT_SERVICE;
-import static com.fallt.util.Constant.AUTH_CONTEXT;
+import static com.fallt.TestConstant.CONFIRM_REQUEST;
+import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
+import static com.fallt.TestConstant.HABIT_FROM_DATABASE;
+import static com.fallt.TestConstant.HABIT_REQUEST;
+import static com.fallt.TestConstant.HABIT_RESPONSE;
+import static com.fallt.TestConstant.HABIT_TEXT;
+import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
+import static com.fallt.TestConstant.USER_FROM_DATABASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class HabitServiceTest {
-
-    private MockedStatic<InstanceCreator> mockedStatic;
 
     @InjectMocks
     private HabitServiceImpl habitService;
@@ -54,207 +49,129 @@ class HabitServiceTest {
     private HabitExecutionDao executionDao;
 
     @Mock
-    private UserServiceImpl userService;
-
-    @Mock
-    private AuthenticationContext authenticationContext;
-
-    @Mock
-    private AuditServiceImpl auditService;
-
-    @Mock
-    private ServletContext servletContext;
-
-    @BeforeEach
-    void setup(){
-        mockedStatic = mockStatic(InstanceCreator.class);
-        mockedStatic.when(InstanceCreator::getServletContext).thenReturn(servletContext);
-        when(servletContext.getAttribute(AUTH_CONTEXT)).thenReturn(authenticationContext);
-        when(servletContext.getAttribute(AUDIT_SERVICE)).thenReturn(auditService);
-    }
-
-    @AfterEach
-    void tearDown(){
-        mockedStatic.close();
-    }
+    private UserService userService;
 
     @Test
     @DisplayName("Успешное добавление привычки")
     void createHabit() {
-        User user = createUser();
-        Habit habit = createHabit(FIRST_HABIT_TITLE);
-        UpsertHabitRequest request = createHabitDto(FIRST_HABIT_TITLE);
-        HabitResponse expected = new HabitResponse(request.getTitle(), request.getText(), new ArrayList<>());
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.empty());
-        when(habitDao.save(any(Habit.class))).thenReturn(habit);
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.empty());
+        when(habitDao.save(any(Habit.class))).thenReturn(HABIT_FROM_DATABASE);
 
-        HabitResponse response = habitService.saveHabit(user.getEmail(), request);
+        HabitResponse response = habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST);
 
-        assertThat(response).isEqualTo(expected);
+        assertThat(response).isEqualTo(HABIT_RESPONSE);
     }
 
     @Test
     @DisplayName("Попытка добавления привычки с дублирующимся названием")
     void createHabitWithDuplicateTitle() {
-        User user = createUser();
-        UpsertHabitRequest upsertHabitRequest = createHabitDto(FIRST_HABIT_TITLE);
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), upsertHabitRequest.getTitle())).thenReturn(Optional.of(new Habit()));
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), HABIT_REQUEST.getTitle())).thenReturn(Optional.of(new Habit()));
 
-        assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(user.getEmail(), upsertHabitRequest));
+        assertThrows(AlreadyExistException.class, () -> habitService.saveHabit(USER_FROM_DATABASE.getEmail(), HABIT_REQUEST));
     }
 
     @Test
     @DisplayName("Получение привычки по названию")
     void testGetHabitByTitle() {
-        User user = createUser();
-        Habit habit = createHabit(SECOND_HABIT_TITLE);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.of(habit));
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
 
-        Habit existedHabit = habitService.getHabitByTitle(user, SECOND_HABIT_TITLE);
-
-        assertThat(existedHabit.getTitle()).isEqualTo(SECOND_HABIT_TITLE);
+        Habit existedHabit = habitService.getHabitByTitle(USER_FROM_DATABASE, FIRST_HABIT_TITLE);
+        assertThat(existedHabit.getTitle()).isEqualTo(FIRST_HABIT_TITLE);
     }
 
     @Test
     @DisplayName("Попытка получения привычки по отсутствующему названию")
     void testGetHabitByIncorrectTitle() {
-        User user = createUser();
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByTitle(user, SECOND_HABIT_TITLE));
+        assertThrows(EntityNotFoundException.class, () -> habitService.getHabitByTitle(USER_FROM_DATABASE, SECOND_HABIT_TITLE));
     }
 
     @Test
     @DisplayName("Удаление привычки")
     void testDeleteHabit() {
-        User user = createUser();
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
 
-        habitService.deleteHabit(user.getEmail(), SECOND_HABIT_TITLE);
-
-        verify(habitDao, times(1)).delete(user.getId(), SECOND_HABIT_TITLE);
+        habitService.deleteHabit(USER_FROM_DATABASE.getEmail(), FIRST_HABIT_TITLE);
+        verify(habitDao, times(1)).delete(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE);
     }
 
     @Test
     @DisplayName("Обновление данных о привычке")
     void testUpdateHabit() {
-        User user = createUser();
-        Habit habit = createHabit(SECOND_HABIT_TITLE);
-        UpsertHabitRequest request = createHabitDto(FIRST_HABIT_TITLE);
-        HabitResponse expected = new HabitResponse(request.getTitle(), request.getText(), new ArrayList<>());
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.of(habit));
-        when(habitDao.update(any(Habit.class))).thenReturn(habit);
+        Habit habitFromDb = HABIT_FROM_DATABASE;
+        habitFromDb.setTitle(SECOND_HABIT_TITLE);
 
-        HabitResponse response = habitService.updateHabit(user.getEmail(), habit.getTitle(), request);
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.of(habitFromDb));
+        when(habitDao.update(any(Habit.class))).thenReturn(HABIT_FROM_DATABASE);
 
-        verify(habitDao, times(1)).update(habit);
-        assertThat(response).isEqualTo(expected);
+        HabitResponse response = habitService.updateHabit(USER_FROM_DATABASE.getEmail(), HABIT_FROM_DATABASE.getTitle(), HABIT_REQUEST);
+        verify(habitDao, times(1)).update(HABIT_FROM_DATABASE);
+        assertThat(response).isEqualTo(HABIT_RESPONSE);
     }
 
     @Test
     @DisplayName("Попытка обновления привычки по некорректному названию")
     void testUpdateHabitByIncorrectTitle() {
-        User user = createUser();
-        Habit habit = createHabit(FIRST_HABIT_TITLE);
-        UpsertHabitRequest upsertHabitRequest = UpsertHabitRequest.builder().title(SECOND_HABIT_TITLE).build();
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), habit.getTitle())).thenReturn(Optional.empty());
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), SECOND_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.updateHabit(user.getEmail(), habit.getTitle(), upsertHabitRequest));
+        assertThrows(EntityNotFoundException.class, () -> habitService.updateHabit(USER_FROM_DATABASE.getEmail(), SECOND_HABIT_TITLE, HABIT_REQUEST));
 
     }
 
     @Test
     @DisplayName("Попытка обновления привычки с использованием названия уже имеющейся привычки")
     void testUpdateHabitWithExistsTitle() {
-        User user = createUser();
-        Habit habit = createHabit(FIRST_HABIT_TITLE);
-        UpsertHabitRequest request = UpsertHabitRequest.builder().title(FIRST_HABIT_TITLE).build();
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.of(habit));
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
 
-        assertThrows(AlreadyExistException.class, () -> habitService.updateHabit(user.getEmail(), FIRST_HABIT_TITLE, request));
+        assertThrows(AlreadyExistException.class, () -> habitService.updateHabit(USER_FROM_DATABASE.getEmail(), FIRST_HABIT_TITLE, HABIT_REQUEST));
     }
 
     @Test
     @DisplayName("Отметка выполнения привычки")
     void testConfirmHabit() {
-        User user = createUser();
-        Habit habit = createHabit(FIRST_HABIT_TITLE);
         LocalDate execution = LocalDate.of(2024, 10, 20);
-        HabitExecution habitExecution = new HabitExecution(1L, execution, habit);
-        HabitConfirmRequest request = HabitConfirmRequest.builder()
-                .title(habit.getTitle())
-                .date(LocalDate.now())
-                .build();
-        HabitExecutionResponse expected = new HabitExecutionResponse(request.getTitle(), execution);
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.of(habit));
+        HabitExecution habitExecution = new HabitExecution(1L, execution, HABIT_FROM_DATABASE);
+        HabitExecutionResponse expected = new HabitExecutionResponse(FIRST_HABIT_TITLE, execution);
+
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.of(HABIT_FROM_DATABASE));
         when(executionDao.save(any(HabitExecution.class))).thenReturn(habitExecution);
 
-        HabitExecutionResponse response = habitService.confirmHabit(user.getEmail(), request);
-
+        HabitExecutionResponse response = habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST);
         assertThat(response).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("Попытка отметки выполнения несуществующей привычки")
     void testConformHabitWithIncorrectTitle() {
-        User user = createUser();
-        HabitConfirmRequest request = HabitConfirmRequest.builder()
-                .title("incorrectTitle")
-                .date(LocalDate.now())
-                .build();
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.findHabitByTitleAndUserId(user.getId(), request.getTitle())).thenReturn(Optional.empty());
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.findHabitByTitleAndUserId(USER_FROM_DATABASE.getId(), FIRST_HABIT_TITLE)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(user.getEmail(), request));
+        assertThrows(EntityNotFoundException.class, () -> habitService.confirmHabit(USER_FROM_DATABASE.getEmail(), CONFIRM_REQUEST));
     }
 
     @Test
     @DisplayName("Получение всех привычек пользователя")
     void testGetAllHabits() {
-        User user = createUser();
         List<Habit> habits = List.of(
-                createHabit(FIRST_HABIT_TITLE),
-                createHabit(SECOND_HABIT_TITLE)
+                Habit.builder().title(FIRST_HABIT_TITLE).text(HABIT_TEXT).build(),
+                Habit.builder().title(SECOND_HABIT_TITLE).text(HABIT_TEXT).build()
         );
         List<HabitResponse> expected = List.of(
-                new HabitResponse(FIRST_HABIT_TITLE, HABIT_TEXT, new ArrayList<>()),
-                new HabitResponse(SECOND_HABIT_TITLE, HABIT_TEXT, new ArrayList<>())
+                HabitResponse.builder().title(FIRST_HABIT_TITLE).text(HABIT_TEXT).successfulExecution(new ArrayList<>()).build(),
+                HabitResponse.builder().title(SECOND_HABIT_TITLE).text(HABIT_TEXT).successfulExecution(new ArrayList<>()).build()
         );
-        when(userService.getUserByEmail(user.getEmail())).thenReturn(user);
-        when(habitDao.getAllUserHabits(user.getId())).thenReturn(habits);
 
-        List<HabitResponse> response = habitService.getAllHabits(user.getEmail());
+        when(userService.getUserByEmail(USER_FROM_DATABASE.getEmail())).thenReturn(USER_FROM_DATABASE);
+        when(habitDao.getAllUserHabits(USER_FROM_DATABASE.getId())).thenReturn(habits);
 
+        List<HabitResponse> response = habitService.getAllHabits(USER_FROM_DATABASE.getEmail());
         assertThat(response).isEqualTo(expected);
-    }
-
-    private User createUser() {
-        return User.builder()
-                .id(1L)
-                .name(FIRST_USER_NAME)
-                .email(FIRST_USER_EMAIL)
-                .password(FIRST_USER_PASSWORD)
-                .build();
-    }
-
-    private UpsertHabitRequest createHabitDto(String title) {
-        return UpsertHabitRequest.builder()
-                .title(title)
-                .text(HABIT_TEXT)
-                .rate(WEEKLY_HABIT)
-                .build();
-    }
-
-    private Habit createHabit(String title) {
-        return Habit.builder()
-                .title(title)
-                .text(HABIT_TEXT)
-                .build();
     }
 }

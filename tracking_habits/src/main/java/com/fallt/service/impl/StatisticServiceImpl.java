@@ -3,15 +3,16 @@ package com.fallt.service.impl;
 import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.response.ExecutionDto;
-import com.fallt.dto.response.HabitProgress;
-import com.fallt.entity.Habit;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.response.ExecutionDto;
+import com.fallt.domain.dto.response.HabitProgress;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.User;
 import com.fallt.service.HabitService;
 import com.fallt.service.StatisticService;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,10 +20,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class StatisticServiceImpl implements StatisticService {
 
     private final HabitService habitService;
-
     private final UserService userService;
 
     @Auditable(action = ActionType.GET)

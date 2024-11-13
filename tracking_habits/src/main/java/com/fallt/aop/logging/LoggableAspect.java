@@ -5,8 +5,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 
 @Aspect
+@Component
 @Slf4j
 public class LoggableAspect {
 
@@ -16,12 +18,12 @@ public class LoggableAspect {
 
     @Around("annotatedByLoggable()")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        String methodName = proceedingJoinPoint.getSignature().getDeclaringTypeName() + proceedingJoinPoint.getSignature().getName();
-        log.info("Calling method " + methodName);
+        String methodName = proceedingJoinPoint.getSignature().getName();
+        log.info("Calling method {}", methodName);
         long start = System.currentTimeMillis();
         Object result = proceedingJoinPoint.proceed();
         long time = System.currentTimeMillis() - start;
-        log.info("Execution of method " + methodName + " finished. Execution time is: " + time + " ms.");
+        log.info("Execution of method {} finished. Execution time is: {} ms.", methodName, time);
         return result;
     }
 }

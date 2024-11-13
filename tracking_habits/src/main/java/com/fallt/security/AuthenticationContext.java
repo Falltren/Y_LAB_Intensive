@@ -1,8 +1,9 @@
 package com.fallt.security;
 
-import com.fallt.entity.Role;
+import com.fallt.domain.entity.enums.Role;
 import com.fallt.exception.AuthenticationException;
 import com.fallt.exception.AuthorizationException;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Класс предназначенный для хранения данных об аутентифицированных пользователях
  */
+@Component
 public class AuthenticationContext {
 
     private final Map<String, UserDetails> context = new ConcurrentHashMap<>();
@@ -19,8 +21,8 @@ public class AuthenticationContext {
      *
      * @param userDetails Класс, содержащий данные о пользователе
      */
-    public void authenticate(UserDetails userDetails) {
-        context.put(userDetails.getEmail(), userDetails);
+    public void authenticate(String sessionId, UserDetails userDetails) {
+        context.put(sessionId, userDetails);
     }
 
     /**
@@ -35,10 +37,10 @@ public class AuthenticationContext {
     /**
      * Проверка наличия пользователя в контексте аутентификации
      *
-     * @param email Электронный адрес пользователя
+     * @param sessionId Id сессии
      */
-    public void checkAuthentication(String email) {
-        if (!context.containsKey(email)) {
+    public void checkAuthentication(String sessionId) {
+        if (!context.containsKey(sessionId)) {
             throw new AuthenticationException("Для выполнения данного действия вам необходимо аутентифицироваться");
         }
     }
@@ -46,18 +48,22 @@ public class AuthenticationContext {
     /**
      * Проверка наличия у пользователя требуемой роли
      *
-     * @param userEmail    Электронный адрес пользователя
+     * @param sessionId    Электронный адрес пользователя
      * @param requiredRole Требуемая роль
      */
-    public void checkRole(String userEmail, Role requiredRole) {
-        checkAuthentication(userEmail);
-        Role currentUserRole = context.get(userEmail).getRole();
+    public void checkRole(String sessionId, Role requiredRole) {
+        checkAuthentication(sessionId);
+        Role currentUserRole = context.get(sessionId).getRole();
         if (!currentUserRole.equals(requiredRole)) {
             throw new AuthorizationException("У вас недостаточно прав для выполнения данного действия");
         }
     }
 
-    public UserDetails getCurrentUser(){
+    public String getEmailCurrentUser(String sessionId) {
+        return context.get(sessionId).getEmail();
+    }
+
+    public UserDetails getCurrentUser() {
         return context.values().stream().findFirst().orElse(null);
     }
 }

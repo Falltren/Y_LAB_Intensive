@@ -3,13 +3,13 @@ package com.fallt.service.impl;
 import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
-import com.fallt.dto.request.HabitConfirmRequest;
-import com.fallt.dto.request.UpsertHabitRequest;
-import com.fallt.dto.response.HabitExecutionResponse;
-import com.fallt.dto.response.HabitResponse;
-import com.fallt.entity.Habit;
-import com.fallt.entity.HabitExecution;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.response.HabitExecutionResponse;
+import com.fallt.domain.dto.response.HabitResponse;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.HabitExecution;
+import com.fallt.domain.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.HabitMapper;
@@ -18,18 +18,18 @@ import com.fallt.repository.HabitExecutionDao;
 import com.fallt.service.HabitService;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class HabitServiceImpl implements HabitService {
 
     private final HabitDao habitDao;
-
     private final HabitExecutionDao executionDao;
-
     private final UserService userService;
 
     @Auditable(action = ActionType.CREATE)
@@ -95,5 +95,4 @@ public class HabitServiceImpl implements HabitService {
     private boolean isExistedHabit(Long userId, String title) {
         return habitDao.findHabitByTitleAndUserId(userId, title).isPresent();
     }
-
 }

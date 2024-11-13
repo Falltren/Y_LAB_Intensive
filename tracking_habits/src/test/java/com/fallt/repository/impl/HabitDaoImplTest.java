@@ -1,12 +1,14 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.User;
 import com.fallt.repository.AbstractTest;
-import com.fallt.repository.HabitDao;
-import com.fallt.util.DBUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,15 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HabitDaoImplTest extends AbstractTest {
 
-    private HabitDao habitDao;
-
+    private HabitDaoImpl habitDao;
     private User user;
 
     @BeforeAll
     static void beforeAll() {
         postgreSQLContainer.start();
-        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        migrateDatabase();
+        migrateDatabase(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        connectionManager.setConnectionSettings(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword(), DRIVER_NAME);
     }
 
     @AfterAll
@@ -36,7 +37,7 @@ class HabitDaoImplTest extends AbstractTest {
 
     @BeforeEach
     void setup() {
-        habitDao = new HabitDaoImpl();
+        habitDao = new HabitDaoImpl(connectionManager);
         user = addUserToDatabase();
     }
 

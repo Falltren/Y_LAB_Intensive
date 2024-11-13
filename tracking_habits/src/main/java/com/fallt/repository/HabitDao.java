@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.Habit;
+import com.fallt.domain.entity.Habit;
 
 import java.util.List;
 import java.util.Optional;

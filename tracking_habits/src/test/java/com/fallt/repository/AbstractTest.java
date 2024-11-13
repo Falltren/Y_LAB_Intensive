@@ -1,13 +1,12 @@
 package com.fallt.repository;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
-import com.fallt.exception.DBException;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.entity.User;
 import com.fallt.repository.impl.HabitDaoImpl;
 import com.fallt.repository.impl.UserDaoImpl;
-import com.fallt.util.DBUtils;
+import com.fallt.util.DbConnectionManager;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -19,7 +18,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +25,10 @@ import java.time.LocalDateTime;
 @Testcontainers
 public abstract class AbstractTest {
 
+    protected static final String DRIVER_NAME = "org.postgresql.Driver";
+
     protected static PostgreSQLContainer postgreSQLContainer;
+    protected static DbConnectionManager connectionManager = new DbConnectionManager();
 
     static {
         DockerImageName postgres = DockerImageName.parse("postgres:15.4");
@@ -38,16 +39,9 @@ public abstract class AbstractTest {
                 .withReuse(true);
     }
 
-    protected Connection getConnection() {
-        try {
-            return DriverManager.getConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        } catch (SQLException e) {
-            throw new DBException(e.getMessage());
-        }
-    }
 
     protected User addUserToDatabase() {
-        UserDao userDao = new UserDaoImpl();
+        UserDaoImpl userDao = new UserDaoImpl(connectionManager);
         User userForCreate = User.builder()
                 .name("user")
                 .email("user@u.u")
@@ -59,7 +53,7 @@ public abstract class AbstractTest {
     }
 
     protected Habit addHabitToDatabase() {
-        HabitDao habitDao = new HabitDaoImpl();
+        HabitDaoImpl habitDao = new HabitDaoImpl(connectionManager);
         User user = addUserToDatabase();
         Habit habit = Habit.builder()
                 .title("test habit")
@@ -71,13 +65,12 @@ public abstract class AbstractTest {
         return habitDao.save(habit);
     }
 
-    protected void clearDatabase() {
-        UserDao userDao = new UserDaoImpl();
+    protected void clearDatabase(UserDaoImpl userDao) {
         userDao.deleteAll();
     }
 
-    protected static void migrateDatabase(){
-        try (Connection connection = DBUtils.getConnection()) {
+    protected static void migrateDatabase(String url, String username, String password) {
+        try (Connection connection = connectionManager.getConnection(url, username, password, DRIVER_NAME)) {
             connection.createStatement().execute("CREATE SCHEMA if not exists service_schema;");
 
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));

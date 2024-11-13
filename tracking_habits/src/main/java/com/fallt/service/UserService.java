@@ -1,18 +1,31 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.User;
 
 import java.util.List;
 
+/**
+ * Интерфейс, предназначенный для работы с пользователями
+ */
 public interface UserService {
 
     /**
-     * Возвращает всех пользователей, сохраненных в системе
+     * Получение всех пользователей
+     *
      * @return Список пользователей
      */
     List<UserResponse> getAllUsers();
+
+    /**
+     * Получение пользователя по электронной почте
+     *
+     * @param email Электронная почта
+     * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой
+     * или null, если пользователь не найден
+     */
+    User getUserByEmail(String email);
 
     /**
      * Сохранение нового пользователя в базу данных
@@ -20,7 +33,6 @@ public interface UserService {
      * @param request Объект с данным пользователя
      * @return Сохраненный в базе данных пользователь с идентификатором
      */
-
     UserResponse saveUser(UpsertUserRequest request);
 
     /**
@@ -45,13 +57,4 @@ public interface UserService {
      * @param email Электронная почта пользователя
      */
     void deleteUser(String email);
-
-    /**
-     * Получение пользователя по электронной почте
-     *
-     * @param email Электронная почта
-     * @return Объект класса User, если в базе данных присутствует пользователь с указанной электронной почтой.
-     * Если пользователь не будет найден, то будет выброшено исключение EntityNotFoundException
-     */
-    User getUserByEmail(String email);
 }

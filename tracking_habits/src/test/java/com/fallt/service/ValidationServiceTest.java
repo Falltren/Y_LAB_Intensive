@@ -1,6 +1,10 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.*;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.request.UpsertUserRequest;
 import com.fallt.exception.ValidationException;
 import com.fallt.service.impl.ValidationService;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +15,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
-import static com.fallt.TestConstant.*;
+import static com.fallt.TestConstant.DAILY_HABIT;
+import static com.fallt.TestConstant.FIRST_HABIT_TITLE;
+import static com.fallt.TestConstant.FIRST_USER_EMAIL;
+import static com.fallt.TestConstant.FIRST_USER_NAME;
+import static com.fallt.TestConstant.FIRST_USER_PASSWORD;
+import static com.fallt.TestConstant.HABIT_TEXT;
+import static com.fallt.TestConstant.SECOND_HABIT_TITLE;
+import static com.fallt.TestConstant.SECOND_USER_EMAIL;
+import static com.fallt.TestConstant.SECOND_USER_PASSWORD;
+import static com.fallt.TestConstant.WEEKLY_HABIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -173,7 +186,7 @@ class ValidationServiceTest {
 
     @Test
     @DisplayName("Проверка ReportRequest с отсутствующей датой начала периода")
-    void testCheckReportRequestWithMissingStartDate(){
+    void testCheckReportRequestWithMissingStartDate() {
         ReportRequest request = new ReportRequest("",
                 null,
                 LocalDate.of(2024, 10, 10));
@@ -183,7 +196,7 @@ class ValidationServiceTest {
 
     @Test
     @DisplayName("Проверка ReportRequest с датой окончания предшествующей дате начала периода")
-    void testCheckReportRequestWhenStartDateIsAfterEndDate(){
+    void testCheckReportRequestWhenStartDateIsAfterEndDate() {
         ReportRequest request = new ReportRequest("",
                 LocalDate.of(2024, 10, 10),
                 LocalDate.of(2024, 10, 1));

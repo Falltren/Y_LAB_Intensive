@@ -1,6 +1,6 @@
 package com.fallt.repository;
 
-import com.fallt.entity.AuditLog;
+import com.fallt.domain.entity.AuditLog;
 
 public interface AuditDao {
 

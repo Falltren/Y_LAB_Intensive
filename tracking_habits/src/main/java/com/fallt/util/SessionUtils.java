@@ -1,16 +1,20 @@
 package com.fallt.util;
 
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * Утилитный класс для получения данных о текущем пользователе из сессии
+ * Класс для получения данных о текущей id сессии
  */
+@Component
 public class SessionUtils {
 
-    private SessionUtils() {
-    }
-
-    public static String getCurrentUserEmail(HttpServletRequest request) {
-        return String.valueOf(request.getSession().getAttribute("user"));
+    public String getSessionIdFromContext() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            throw new IllegalStateException("Сессия не найдена");
+        }
+        return attributes.getRequest().getSession().getId();
     }
 }

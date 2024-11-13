@@ -3,16 +3,17 @@ package com.fallt.service.impl;
 import com.fallt.aop.audit.ActionType;
 import com.fallt.aop.audit.Auditable;
 import com.fallt.aop.logging.Loggable;
-import com.fallt.dto.request.UpsertUserRequest;
-import com.fallt.dto.response.UserResponse;
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.dto.response.UserResponse;
+import com.fallt.domain.entity.User;
 import com.fallt.exception.AlreadyExistException;
 import com.fallt.exception.EntityNotFoundException;
 import com.fallt.mapper.UserMapper;
 import com.fallt.repository.UserDao;
+import com.fallt.security.PasswordEncoder;
 import com.fallt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -20,9 +21,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Loggable
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final PasswordEncoder passwordEncoder;
 
     @Auditable(action = ActionType.GET)
     public List<UserResponse> getAllUsers() {
@@ -31,15 +34,15 @@ public class UserServiceImpl implements UserService {
 
     @Auditable(action = ActionType.CREATE)
     public UserResponse saveUser(UpsertUserRequest request) {
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
         if (isExistsEmail(request.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", request.getEmail()));
         }
-        if (isExistsPassword(request.getPassword())) {
+        if (isExistsPassword(encodedPassword)) {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", request.getPassword()));
         }
         User user = UserMapper.INSTANCE.toEntity(request);
-        user.setRole(Role.ROLE_USER);
-        user.setBlocked(false);
+        user.setPassword(encodedPassword);
         User savedUser = userDao.create(user);
         return UserMapper.INSTANCE.toResponse(savedUser);
     }
@@ -58,10 +61,11 @@ public class UserServiceImpl implements UserService {
         if (updateUser.getEmail() != null && isExistsEmail(updateUser.getEmail())) {
             throw new AlreadyExistException(MessageFormat.format("Электронная почта: {0} уже используется", updateUser.getEmail()));
         }
-
-        if (updateUser.getPassword() != null && isExistsPassword(updateUser.getPassword())) {
+        String encodedPassword = passwordEncoder.encode(updateUser.getPassword());
+        if (updateUser.getPassword() != null && isExistsPassword(encodedPassword)) {
             throw new AlreadyExistException(MessageFormat.format("Пароль: {0} уже используется", updateUser.getPassword()));
         }
+        updateUser.setPassword(encodedPassword);
         UserMapper.INSTANCE.updateUserFromDto(updateUser, user);
         user.setUpdateAt(LocalDateTime.now());
         return UserMapper.INSTANCE.toResponse(userDao.update(user));

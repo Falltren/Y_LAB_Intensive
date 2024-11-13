@@ -1,38 +1,40 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.Role;
-import com.fallt.entity.User;
+import com.fallt.domain.entity.enums.Role;
+import com.fallt.domain.entity.User;
 import com.fallt.repository.AbstractTest;
-import com.fallt.repository.UserDao;
-import com.fallt.util.DBUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.fallt.TestConstant.*;
+import static com.fallt.TestConstant.FIRST_USER_EMAIL;
+import static com.fallt.TestConstant.FIRST_USER_PASSWORD;
+import static com.fallt.TestConstant.SECOND_USER_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserDaoImplTest extends AbstractTest {
 
-    private UserDao userDao;
+    @Autowired
+    private UserDaoImpl userDao;
 
     @BeforeEach
     void setup() {
-        userDao = new UserDaoImpl();
-    }
-
-    @AfterEach
-    void afterEach() {
-        clearDatabase();
+        userDao = new UserDaoImpl(connectionManager);
+        clearDatabase(userDao);
     }
 
     @BeforeAll
     static void startContainer() {
         postgreSQLContainer.start();
-        DBUtils.useTestConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        migrateDatabase();
+        migrateDatabase(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
+        connectionManager.setConnectionSettings(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword(), DRIVER_NAME);
     }
 
     @AfterAll
@@ -101,9 +103,9 @@ class UserDaoImplTest extends AbstractTest {
         userDao.create(user2);
         userDao.delete(existedUser.getEmail());
 
-        List<User> users = userDao.findAll();
+        User user = userDao.getUserByEmail(existedUser.getEmail()).orElseThrow();
 
-        assertThat(users).hasSize(1);
+        assertThat(user.isActive()).isFalse();
     }
 
     private User createUser(String email) {
@@ -114,6 +116,7 @@ class UserDaoImplTest extends AbstractTest {
                 .role(Role.ROLE_USER)
                 .createAt(LocalDateTime.now())
                 .isBlocked(false)
+                .isActive(true)
                 .build();
     }
 }

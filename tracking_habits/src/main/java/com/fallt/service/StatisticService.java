@@ -1,11 +1,14 @@
 package com.fallt.service;
 
-import com.fallt.dto.request.ReportRequest;
-import com.fallt.dto.response.ExecutionDto;
-import com.fallt.dto.response.HabitProgress;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.response.ExecutionDto;
+import com.fallt.domain.dto.response.HabitProgress;
 
 import java.util.List;
 
+/**
+ * Интерфейс, предназначенный для расчета различной статистики по выполнению привычек пользователем
+ */
 public interface StatisticService {
 
     /**
@@ -35,4 +38,5 @@ public interface StatisticService {
      * @return Список с данными по выполнению привычки за указанны период
      */
     List<ExecutionDto> getHabitStreak(String userEmail, ReportRequest request);
+
 }

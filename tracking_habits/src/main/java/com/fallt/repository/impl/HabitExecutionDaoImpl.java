@@ -1,26 +1,33 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.HabitExecution;
+import com.fallt.domain.entity.HabitExecution;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitExecutionDao;
-import com.fallt.util.DBUtils;
-import com.fallt.util.PropertiesUtil;
+import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import static com.fallt.util.Constant.INSERT_HABIT_EXECUTION_QUERY;
 
 /**
  * Класс предназначен для взаимодействия с таблицей habit_execution посредствам SQL запросов
  */
 @RequiredArgsConstructor
+@Repository
 public class HabitExecutionDaoImpl implements HabitExecutionDao {
 
-    private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
+    private final DbConnectionManager connectionManager;
 
     @Override
     public HabitExecution save(HabitExecution execution) {
-        String sql = "INSERT INTO " + SCHEMA_NAME + "habit_execution (date, habit_id) VALUES (?, ?)";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HABIT_EXECUTION_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, execution.getDate());
             preparedStatement.setLong(2, execution.getHabit().getId());
             preparedStatement.execute();
@@ -29,7 +36,7 @@ public class HabitExecutionDaoImpl implements HabitExecutionDao {
                 long habitId = generatedKeys.getLong(1);
                 execution.setId(habitId);
             }
-            DBUtils.closeResultSet(generatedKeys);
+            connectionManager.closeResultSet(generatedKeys);
             return execution;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());

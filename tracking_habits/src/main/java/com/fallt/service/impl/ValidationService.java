@@ -1,17 +1,18 @@
 package com.fallt.service.impl;
 
-import com.fallt.dto.request.*;
-import com.fallt.entity.ExecutionRate;
+import com.fallt.domain.dto.request.HabitConfirmRequest;
+import com.fallt.domain.dto.request.LoginRequest;
+import com.fallt.domain.dto.request.ReportRequest;
+import com.fallt.domain.dto.request.UpsertHabitRequest;
+import com.fallt.domain.dto.request.UpsertUserRequest;
+import com.fallt.domain.entity.enums.ExecutionRate;
 import com.fallt.exception.ValidationException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Сервис предназначенный для валидации данных в запросах
- */
-@RequiredArgsConstructor
+@Service
 public class ValidationService {
 
     public boolean checkUpsertUserRequest(UpsertUserRequest request) {

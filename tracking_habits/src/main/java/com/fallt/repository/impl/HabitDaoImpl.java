@@ -1,29 +1,44 @@
 package com.fallt.repository.impl;
 
-import com.fallt.entity.ExecutionRate;
-import com.fallt.entity.Habit;
+import com.fallt.domain.entity.enums.ExecutionRate;
+import com.fallt.domain.entity.Habit;
 import com.fallt.exception.DBException;
 import com.fallt.repository.HabitDao;
-import com.fallt.util.DBUtils;
-import com.fallt.util.PropertiesUtil;
+import com.fallt.util.DbConnectionManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.fallt.util.Constant.DELETE_HABIT;
+import static com.fallt.util.Constant.FIND_ALL_HABITS_QUERY;
+import static com.fallt.util.Constant.FIND_HABIT_BY_TITLE_AND_USER;
+import static com.fallt.util.Constant.INSERT_HABIT_QUERY;
+import static com.fallt.util.Constant.UPDATE_HABIT_QUERY;
 
 /**
  * Класс предназначен для взаимодействия с таблицей habits посредствам SQL запросов
  */
 @RequiredArgsConstructor
+@Repository
 public class HabitDaoImpl implements HabitDao {
 
-    private static final String SCHEMA_NAME = PropertiesUtil.getProperty("defaultSchema") + ".";
+    private final DbConnectionManager connectionManager;
 
     @Override
     public Habit save(Habit habit) {
-        String sql = "INSERT INTO " + SCHEMA_NAME + "habits (title, text, execution_rate, create_at, user_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HABIT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
@@ -35,7 +50,7 @@ public class HabitDaoImpl implements HabitDao {
                 long habitId = generatedKeys.getLong(1);
                 habit.setId(habitId);
             }
-            DBUtils.closeResultSet(generatedKeys);
+            connectionManager.closeResultSet(generatedKeys);
             return habit;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -44,8 +59,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Habit update(Habit habit) {
-        String sql = "UPDATE " + SCHEMA_NAME + "habits SET title = ?, text = ?, execution_rate = ? WHERE id = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_HABIT_QUERY)) {
             preparedStatement.setString(1, habit.getTitle());
             preparedStatement.setString(2, habit.getText());
             preparedStatement.setString(3, habit.getExecutionRate().name());
@@ -58,10 +73,9 @@ public class HabitDaoImpl implements HabitDao {
     }
 
     public List<Habit> getAllUserHabits(Long userId) {
-        String sql = "SELECT h.*, e.date FROM " + SCHEMA_NAME + "habits h LEFT JOIN " +
-                SCHEMA_NAME + "habit_execution e ON e.habit_id = h.id WHERE h.user_id = ?";
         Map<Long, Habit> userHabits = new HashMap<>();
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_HABITS_QUERY)) {
             preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -75,7 +89,7 @@ public class HabitDaoImpl implements HabitDao {
                     userHabits.put(id, habit);
                 }
             }
-            DBUtils.closeResultSet(resultSet);
+            connectionManager.closeResultSet(resultSet);
             return new ArrayList<>(userHabits.values());
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -84,9 +98,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public Optional<Habit> findHabitByTitleAndUserId(Long userId, String title) {
-        String sql = "SELECT * FROM " + SCHEMA_NAME + "habits h LEFT JOIN " +
-                SCHEMA_NAME + "habit_execution e ON e.habit_id = h.id WHERE h.user_id = ? AND h.title = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_HABIT_BY_TITLE_AND_USER)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -98,7 +111,7 @@ public class HabitDaoImpl implements HabitDao {
                     setExistsExecutionDate(habit, resultSet);
                 }
             }
-            DBUtils.closeResultSet(resultSet);
+            connectionManager.closeResultSet(resultSet);
             return Optional.ofNullable(habit);
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
@@ -107,8 +120,8 @@ public class HabitDaoImpl implements HabitDao {
 
     @Override
     public void delete(Long userId, String title) {
-        String sql = "DELETE FROM " + SCHEMA_NAME + "habits WHERE user_id = ? AND title = ?";
-        try (Connection connection = DBUtils.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_HABIT)) {
             preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, title);
             preparedStatement.execute();
